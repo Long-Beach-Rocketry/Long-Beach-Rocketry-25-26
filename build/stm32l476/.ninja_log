@@ -1,0 +1,25 @@
+# ninja log v6
+2	122	1756452991072266526	mcu_support/stm32/l4xx/HAL/CMakeFiles/st_l4_hal.dir/stm32l4xx_hal_dma_ex.c.obj	32f8d81c988eee59
+3	132	1756452991073446299	mcu_support/stm32/l4xx/HAL/CMakeFiles/st_l4_hal.dir/stm32l4xx_hal_flash_ramfunc.c.obj	7ff65d87ba825480
+2	147	1756452991072142315	mcu_support/stm32/l4xx/HAL/CMakeFiles/st_l4_hal.dir/stm32l4xx_hal_dma.c.obj	e295a5308f760f1d
+2	150	1756452991071784767	mcu_support/stm32/l4xx/HAL/CMakeFiles/st_l4_hal.dir/stm32l4xx_hal.c.obj	b84f1911c367516a
+2	152	1756452991072007188	mcu_support/stm32/l4xx/HAL/CMakeFiles/st_l4_hal.dir/stm32l4xx_hal_cortex.c.obj	ae8a38e118e391d0
+3	153	1756452991073670928	mcu_support/stm32/l4xx/HAL/CMakeFiles/st_l4_hal.dir/stm32l4xx_hal_gpio.c.obj	45e20a21cc1a4cf8
+4	155	1756452991074518236	mcu_support/stm32/l4xx/HAL/CMakeFiles/st_l4_hal.dir/stm32l4xx_hal_i2c_ex.c.obj	b36fc3fd517cbc62
+3	157	1756452991073081667	mcu_support/stm32/l4xx/HAL/CMakeFiles/st_l4_hal.dir/stm32l4xx_hal_flash_ex.c.obj	e370ee3378de3151
+122	233	1756452991192336988	mcu_support/stm32/l4xx/HAL/CMakeFiles/st_l4_hal.dir/stm32l4xx_hal_pwr.c.obj	af42abe46a7174f
+2	245	1756452991072612533	mcu_support/stm32/l4xx/HAL/CMakeFiles/st_l4_hal.dir/stm32l4xx_hal_flash.c.obj	808d91dfdaa433eb
+155	249	1756452991225665709	mcu_support/stm32/l4xx/CMakeFiles/st_l4_support.dir/system_stm32l4xx.c.obj	63864f9a34e62901
+245	258	1756452991315475257	app/blink/CMakeFiles/blink.dir/__/__/mcu_support/stm32/l4xx/l476/startup_stm32l476xx.s.obj	4e2b17859dc14e40
+157	283	1756452991227676080	app/blink/bsp_L476/CMakeFiles/blink_bsp.dir/hal_timebase.c.obj	731fb61d9169633
+150	290	1756452991219864764	mcu_support/stm32/l4xx/HAL/CMakeFiles/st_l4_hal.dir/stm32l4xx_hal_rcc_ex.c.obj	6fe98d1da8f25122
+138	306	1756452991208487130	mcu_support/stm32/l4xx/HAL/CMakeFiles/st_l4_hal.dir/stm32l4xx_hal_pwr_ex.c.obj	8edf1ba7bca6ec18
+233	316	1756452991303117896	app/blink/CMakeFiles/blink.dir/main.cc.obj	7014f6996fa12485
+147	328	1756452991217598930	mcu_support/stm32/l4xx/HAL/CMakeFiles/st_l4_hal.dir/stm32l4xx_hal_rcc.c.obj	a13f9b1198d6bac
+153	354	1756452991223406582	mcu_support/stm32/l4xx/HAL/CMakeFiles/st_l4_hal.dir/stm32l4xx_hal_tim_ex.c.obj	2d5f51d409c0d0f5
+4	386	1756452991074104895	mcu_support/stm32/l4xx/HAL/CMakeFiles/st_l4_hal.dir/stm32l4xx_hal_i2c.c.obj	c89c1fcae719a548
+152	417	1756452991221757801	mcu_support/stm32/l4xx/HAL/CMakeFiles/st_l4_hal.dir/stm32l4xx_hal_tim.c.obj	8e2ae051cba2d05
+417	445	1756452991487457251	mcu_support/stm32/l4xx/HAL/libst_l4_hal.a	bd28a986ceab18eb
+445	462	1756452991515693790	mcu_support/stm32/l4xx/libst_l4_support.a	4c8ac9b8444fa9f
+462	480	1756452991532447027	app/blink/bsp_L476/libblink_bsp.a	36941b8ed7597315
+480	633	1756452991550381995	app/blink/blink	2362d0b92ece5672

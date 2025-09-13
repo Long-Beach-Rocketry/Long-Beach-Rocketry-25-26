@@ -1,0 +1,43 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 26,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "build",
+            "generator": "Ninja"
+        },
+        {
+            "name": "native",
+            "inherits": "build",
+            "binaryDir": "${sourceDir}/build/native",
+            "cacheVariables": {
+                "TARGET_DEVICE": "NATIVE"
+            }
+        },
+        {
+            "name": "stm32l4",
+            "hidden": true,
+            "inherits": "build",
+            "toolchainFile": "cmake/gcc-m4f.cmake",
+            "cacheVariables": {
+                "FREERTOS_PORT": "GCC_ARM_CM4F",
+                "MCU_FAMILY": "STM32L4"
+            }
+        },
+        {
+            "name": "stm32l476",
+            "inherits": "stm32l4",
+            "binaryDir": "${sourceDir}/build/stm32l476",
+            "cacheVariables": {
+                "LINKER_SCRIPT": "${sourceDir}/mcu_support/stm32/l4xx/l476/STM32L476RGTX_FLASH.ld",
+                "STARTUP_FILE": "${sourceDir}/mcu_support/stm32/l4xx/l476/startup_stm32l476xx.s",
+                "TARGET_DEVICE": "STM32L476",
+                "MCU_NAME": "STM32L476xx"
+            }
+        }
+    ]
+}

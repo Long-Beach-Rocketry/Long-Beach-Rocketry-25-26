@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "flight_computer_subscale_bsp.h": "c",
+        "gpio_cs.h": "c",
+        "exit.h": "c",
+        "read_bno055.h": "c",
+        "send.h": "c",
+        "bno055.h": "c",
+        "usart_cli.h": "c",
+        "task.h": "c",
+        "uart_network_bsp.h": "c",
+        "prealloc.h": "c",
+        "freertos_timer.h": "c",
+        "stm32l476xx.h": "c",
+        "stm32l4xx_hal_conf.h": "c"
+    },
+    "cortex-debug.variableUseNaturalFormat": true
+}
