@@ -34,7 +34,7 @@ public:
      *
      * Detailed explanation if necessary.
      */
-    virtual bool toggle() = 0;
+    //virtual bool toggle() = 0;
 
     /**
      * @brief

@@ -37,8 +37,9 @@ static inline void enable_gpio_clock(GPIO_TypeDef* gpio)
         RCC->AHB2ENR |= RCC_AHB2ENR_GPIOHEN;
 }
 
-HwGpio(StGpioSettings& settings, std::uint8_t pin_num, GPIO_TypeDef* base_addr)
-    : settings_(settings), pin_num_(pin_num), base_addr_(base_addr){};
+HwGpio::HwGpio(StGpioSettings& settings, std::uint8_t pin_num,
+               GPIO_TypeDef* base_addr)
+    : settings_(settings), pin_num_(pin_num), base_addr_(base_addr) {};
 
 // enable clock in bsp
 bool HwGpio::init(void)
@@ -78,6 +79,7 @@ bool HwGpio::set(const bool active)
     {
         base_addr_->BSRR |= 1u << (pin_num_);
     }
+    return true;
 }
 
 bool HwGpio::read(void)

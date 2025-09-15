@@ -70,17 +70,18 @@ struct StGpioSettings  // controll registers
 class HwGpio : public Gpio
 {
 public:
-    explicit HwGpio(StGpioSettings& settings, std::uint8_t pin_num,
+    explicit HwGpio(StGpioSettings& settings,
+                    std::uint8_t pin_num,  //check if this need to be explicit
                     GPIO_TypeDef* base_addr);
     bool init(void) override;
-    bool toggle(void) override;
+    //bool toggle(void) override;
     bool set(const bool active) override;
     bool read(void) override;
 
 private:
-    const std::uint8_t pin_num_;  // should this be const?
-    GPIO_TypeDef* const base_addr_;
     StGpioSettings settings_;
+    const std::uint8_t pin_num_;
+    GPIO_TypeDef* const base_addr_;
 };
 }  // namespace Stml4
 }  // namespace LBR
