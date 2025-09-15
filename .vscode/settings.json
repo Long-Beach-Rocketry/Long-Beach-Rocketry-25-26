@@ -12,7 +12,8 @@
         "prealloc.h": "c",
         "freertos_timer.h": "c",
         "stm32l476xx.h": "c",
-        "stm32l4xx_hal_conf.h": "c"
+        "stm32l4xx_hal_conf.h": "c",
+        "cstdint": "cpp"
     },
     "cortex-debug.variableUseNaturalFormat": true
 }
