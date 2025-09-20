@@ -17,6 +17,9 @@ int main(int argc, char* argv[])
     while (1)
     {
         Board::get_led().set(true);
+        for (volatile int i = 0; i < 100000; i++);  // Delay
+        Board::get_led().set(false);
+        for (volatile int i = 0; i < 100000; i++);  // Delay
     }
 
     return 0;
