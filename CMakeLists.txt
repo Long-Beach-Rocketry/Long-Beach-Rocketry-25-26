@@ -27,7 +27,7 @@ else()
     add_subdirectory(app/${TARGET_APP})
 endif()
 
-#add_subdirectory(common)
+add_subdirectory(common)
 add_subdirectory(mcu_support)
 
 

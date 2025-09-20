@@ -1,0 +1,14 @@
+**/Build
+**/build
+*.ninja
+cmake_install.cmake
+CMakeCache.txt
+**/CMakeFiles
+*.cortex-debug*
+*settings.json
+.vscode
+**/venv
+.venv*
+.clangd
+.cache
+compile_commands.json
