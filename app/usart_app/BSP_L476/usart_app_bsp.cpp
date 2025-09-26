@@ -4,13 +4,14 @@
 // static st_gpio tx_pin(GPIOA, 6, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL,
 //                       GPIO_SPEED_FREQ_LOW, 0);
 
-StUsart stusart(USART2, 80000000, 115200);
+StUsart stusart(80000000, 115200);
 
 Usart& BSP_Init(USART_TypeDef* base_addr)
 {
-    // RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
-    // RCC->APB1ENR1 |= RCC_APB1ENR1_USART2EN;
+    RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
+    RCC->APB1ENR1 |= RCC_APB1ENR1_USART2EN;
 
+    stusart.init(base_addr);
     return stusart;
 }
 
