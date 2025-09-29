@@ -63,7 +63,7 @@ class HwGpio : public Gpio
 {
 public:
     explicit HwGpio(StGpioSettings& settings,
-                    std::uint8_t pin_num,  //check if this need to be explicit
+                    uint8_t pin_num,  //check if this need to be explicit
                     GPIO_TypeDef* base_addr);
     bool init(void) override;
     bool toggle(void) override;
@@ -72,7 +72,7 @@ public:
 
 private:
     StGpioSettings settings_;
-    const std::uint8_t pin_num_;
+    const uint8_t pin_num_;
     GPIO_TypeDef* const base_addr_;
 };
 }  // namespace Stml4

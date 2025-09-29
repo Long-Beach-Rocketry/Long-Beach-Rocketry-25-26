@@ -23,6 +23,8 @@ bool board_init()
     RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
 
     return_val & led.init();
+    SET_IF(!led.init(), return_val, false);
+    return_val = return_val && led.init();
 
     return return_val;
 }
