@@ -4,9 +4,14 @@
 
 namespace LBR
 {
-namespace Board
+
+struct Board
 {
-bool init();
-Gpio& get_led();
-}  // namespace Board
+    Gpio& led;
+};
+
+bool board_init(void);
+// return board struct
+Board& get_board(void);
+
 }  // namespace LBR
