@@ -135,7 +135,7 @@
             ],
             "debuggerArgs": ["-d", "${workspaceRoot}"],
             "preRestartCommands": [
-              "add-symbol-file build/stm32l476/app/usart_app/uasrt_app",
+              "add-symbol-file build/stm32l476/app/usart_app/usart_app",
               "load",
               "enable breakpoint",
               "monitor reset"
