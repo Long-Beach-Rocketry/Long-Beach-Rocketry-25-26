@@ -3,9 +3,6 @@
  * @brief Gpio driver specfiics for the stml4.
  * @author TJ Malaska
  * @date 9/13/2025
- *
- * Detailed description of what this file provides.
- * Can span multiple lines if necessary.
  */
 
 #pragma once
@@ -21,7 +18,7 @@ namespace LBR
 namespace Stml4
 {
 
-enum class GpioMode : std::uint8_t
+enum class GpioMode : uint8_t
 {
     INPUT = 0,
     GPOUT,
@@ -29,13 +26,13 @@ enum class GpioMode : std::uint8_t
     ANALOG,
 };
 
-enum class GpioOtype : std::uint8_t
+enum class GpioOtype : uint8_t
 {
     PUSH_PULL = 0,
     OPEN_DRAIN
 };
 
-enum class GpioOspeed : std::uint8_t
+enum class GpioOspeed : uint8_t
 {
     LOW = 0,
     MEDIUM,
@@ -43,14 +40,17 @@ enum class GpioOspeed : std::uint8_t
     VERY_HIGH
 };
 
-enum class GpioPupd : std::uint8_t
+enum class GpioPupd : uint8_t
 {
     NO_PULL = 0,
     PULL_UP,
     PULL_DOWN
 };
 
-struct StGpioSettings  // controll registers
+/**
+ * @brief collection of control params to configure gpio.
+ */
+struct StGpioSettings
 {
     GpioMode mode;
     GpioOtype otype;
@@ -59,14 +59,6 @@ struct StGpioSettings  // controll registers
     uint8_t af;
 };
 
-// struct StGpioParams
-// {
-//     //StPrivGpio priv;
-//     uint32_t base_addr;
-//     uint8_t pin_num;
-//     StGpioSettings conf;
-// };
-
 class HwGpio : public Gpio
 {
 public:
@@ -74,7 +66,7 @@ public:
                     std::uint8_t pin_num,  //check if this need to be explicit
                     GPIO_TypeDef* base_addr);
     bool init(void) override;
-    //bool toggle(void) override;
+    bool toggle(void) override;
     bool set(const bool active) override;
     bool read(void) override;
 
