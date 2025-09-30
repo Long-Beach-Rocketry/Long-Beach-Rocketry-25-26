@@ -7,7 +7,14 @@
  * 
  * @note How to use:
  * 
- *          
+ *          Declare an SPI object with the current SPI peripheral you are using (ex. SPI1, SPI2, or SPI3) and SpiPinMap structs 
+ *          with the desired pin mapping in st_spi_pins.h to populate the nss, sck, miso, and mosi member variables.
+ * 
+ * @example If we want to use SPI1 with GPIOA pins:
+ *              
+ *          LBR::Stml4::SPI spi_obj{SPI1, SPI1_NSS[0], SPI1_SCK[0], SPI1_MOSI[0], SPI1_MISO[0]};
+ * 
+ *          This will set nss_pin_, sck_pin_, miso_pin_, and mosi_pin_ member variables to the desired pins we want to use on the STM32L476RG
  * 
  * @copyright Copyright (c) 2025
  * 
