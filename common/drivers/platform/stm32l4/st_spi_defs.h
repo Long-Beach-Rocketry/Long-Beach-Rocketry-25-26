@@ -45,29 +45,6 @@ enum class SpiBusMode : std::uint8_t {
 };
 
 /**
- * @brief SPI read, write, and transfer data size settings
- * 
- */
-enum class SpiDataSize : std::uint8_t {
-    ONE_BIT = 0,
-    TWO_BIT,
-    THREE_BIT,
-    FOUR_BIT,
-    FIVE_BIT,
-    SIX_BIT,
-    SEVEN_BIT,
-    EIGHT_BIT,
-    NINE_BIT,
-    TEN_BIT,
-    ELEVEN_BIT,
-    TWELVE_BIT,
-    THIRTEEN_BIT,
-    FOURTEEN_BIT,
-    FIFTEEN_BIT,
-    SIXTEEN_BIT
-};
-
-/**
  * @brief Receive Most Significant Bit or Least Significant Bit through data transfer
  * 
  */

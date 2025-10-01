@@ -1,3 +1,5 @@
+// !: This is probably not going to be used, but I'm leaving it here in case.
+
 /**
  * @file st_spi_pins.h
  * @author Kent Hong
@@ -118,3 +120,4 @@ static constexpr SpiPinMap SPI3_MOSI[] = {
     {GPIOC, 12, 6},
     {GPIOG, 11, 6}
 }
+
