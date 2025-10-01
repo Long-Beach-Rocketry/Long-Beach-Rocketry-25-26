@@ -1,6 +1,5 @@
 #pragma once
 
-// #include "gpio.h"
 #include <stdbool.h>
 #include <cstddef>
 #include "gpio.h"
@@ -10,15 +9,15 @@
 class StUsart : public Usart
 {
 private:
-    // Gpio* rx_pin;
+    LBR::Gpio* rx_pin;
     LBR::Gpio* tx_pin;
     USART_TypeDef* instance;
     uint16_t uartdiv;
 
 public:
     void send_tx(const uint8_t* data, size_t size) override;
-    void receive_rx(volatile uint8_t* data, size_t size) override;
-    void init(USART_TypeDef* instance, LBR::Gpio* tx);
+    bool receive_rx(volatile uint8_t* data, size_t size) override;
+    void init(USART_TypeDef* instance, LBR::Gpio* tx, LBR::Gpio* rx);
 
     StUsart()
     {

@@ -2,13 +2,13 @@
 
 int main(int argc, char** argv)
 {
-    RCC->APB1ENR1 |= RCC_APB1ENR1_USART2EN;
-    uint8_t data[] = {"testin8"};
-    // Usart& usart = BSP_Init(USART2);
+    uint8_t data[] = {"Received Message Successfully"};
+    uint8_t recieve_data[1] = {};
 
-    // usart.send_tx(data, sizeof(data));
-
-    BSP_Init(USART2).send_tx(data, sizeof(data));
+    if (BSP_Init(USART2).receive_rx(recieve_data, sizeof(recieve_data)))
+    {
+        BSP_Init(USART2).send_tx(data, sizeof(data));
+    }
 
     while (1);
 
