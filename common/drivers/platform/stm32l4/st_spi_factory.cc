@@ -14,7 +14,7 @@ LBR::Stml4::HwSpi CreateSpi(SPI_TypeDef *instance, SpiCrSettings &cfg) {
   LBR::Stml4::HwSpi spi{instance, cfg};
 
   // Change the control register 1 and 2 settings for the SPI object
-  spi.SpiConfigSettings(cfg);
+  SpiConfigSettings(spi, cfg);
 
   return spi;
 }

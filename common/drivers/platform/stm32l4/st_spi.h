@@ -44,6 +44,7 @@ namespace LBR {
 namespace Stml4 {
 class HwSpi : public Spi {
   friend bool ValidateSpi(HwSpi &spi);
+  friend void SpiConfigSettings(HwSpi &spi, const SpiCrSettings &cfg);
 
 public:
   explicit HwSpi();
@@ -55,14 +56,9 @@ public:
   bool Read();
   bool Write(std::uint16_t output_data);
   bool Transfer(std::uint16_t output_data);
-  void
-  SpiConfigSettings(const SpiCrSettings
-                        &cfg); // Leaving SpiConfigSettings as public to be able
-                               // to use in CreateSpi in st_spi_factory for now
 
   // Setter and Getter
-  SpiCrSettings GetSpiCrSettings() const;
-  bool GetSpiValid() const;
+  bool IsSpiValid() const;
   void SetSpiValid(bool initialized_);
 
 private:

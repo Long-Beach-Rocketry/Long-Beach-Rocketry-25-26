@@ -33,6 +33,16 @@ bool ValidateSpi(HwSpi &spi) {
 }
 
 /**
+ * @brief Configure SPI settings to implement into CR1 and CR2
+ *
+ * @param cfg SpiCrSettings struct with desired config values for the registers
+ * in CR1 and CR2
+ */
+void SpiConfigSettings(HwSpi &spi, const SpiCrSettings &cfg) {
+  spi.settings = cfg;
+}
+
+/**
  * @brief Default constructor that signals HwSpi object failed to initialize
  *
  */
@@ -49,21 +59,13 @@ HwSpi::HwSpi(SPI_TypeDef *instance_, SpiCrSettings &settings_)
     : instance(instance_), settings(settings_), initialized(true) {}
 
 /**
- * @brief Returns the current control register settings of the current SPI
- * Object
- *
- * @return SpiCrSettings
- */
-SpiCrSettings HwSpi::GetSpiCrSettings() const { return settings; }
-
-/**
  * @brief Get the value that shows whether this object was initialized
  * successfully or not
  *
  * @return true
  * @return false
  */
-bool HwSpi::GetSpiValid() const { return initialized; }
+bool HwSpi::IsSpiValid() const { return initialized; }
 
 /**
  * @brief Sets the initialized condition of the Spi Object
@@ -145,14 +147,6 @@ bool HwSpi::SetSpiBusMode(SpiBusMode mode) {
   }
   return true;
 }
-
-/**
- * @brief Configure SPI settings to implement into CR1 and CR2
- *
- * @param cfg SpiCrSettings struct with desired config values for the registers
- * in CR1 and CR2
- */
-void HwSpi::SpiConfigSettings(const SpiCrSettings &cfg) { settings = cfg; }
 
 /**
  * @brief Initializes SPI peripheral and its sck, mosi, miso, and nss pins
