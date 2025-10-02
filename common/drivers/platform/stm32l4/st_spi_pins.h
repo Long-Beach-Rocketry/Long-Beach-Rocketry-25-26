@@ -42,28 +42,28 @@ static constexpr SpiPinMap SPI1_NSS[] = {
     {GPIOA, 15, 5},
     {GPIOE, 12, 5},
     {GPIOG, 5, 5}
-}
+};
 
 static constexpr SpiPinMap SPI1_SCK[] = {
     {GPIOA, 5, 5},
     {GPIOB, 3, 5},
     {GPIOE, 13, 5},
     {GPIOG, 2, 5}
-}
+};
 
 static constexpr SpiPinMap SPI1_MISO[] = {
     {GPIOA, 6, 5},
     {GPIOB, 4, 5},
     {GPIOE, 14, 5},
     {GPIOG, 3, 5}
-}
+};
 
 static constexpr SpiPinMap SPI1_MOSI[] = {
     {GPIOA, 7, 5},
     {GPIOB, 5, 5},
     {GPIOE, 15, 5},
     {GPIOG, 4, 5}
-}
+};
 
 /**
  * @brief SPI2 Pin Tables from the Alternate function tables in the stm32l476 datasheet
@@ -73,25 +73,25 @@ static constexpr SpiPinMap SPI2_NSS[] = {
     {GPIOB, 9, 5},
     {GPIOB, 12, 5},
     {GPIOD, 0, 5}
-}
+};
 
 static constexpr SpiPinMap SPI2_SCK[] = {
     {GPIOB, 10, 5},
     {GPIOB, 13, 5},
     {GPIOD, 1, 5}
-}
+};
 
 static constexpr SpiPinMap SPI2_MISO[] = {
     {GPIOB, 14, 5},
     {GPIOC, 2, 5},
     {GPIOD, 3, 5}
-}
+};
 
 static constexpr SpiPinMap SPI2_MOSI[] = {
     {GPIOB, 15, 5},
     {GPIOC, 3, 5},
     {GPIOD, 4, 5}
-}
+};
 
 /**
  * @brief SPI3 Pin Tables from the Alternate function tables in the stm32l476 datasheet
@@ -101,23 +101,23 @@ static constexpr SpiPinMap SPI3_NSS[] = {
     {GPIOA, 4, 6},
     {GPIOA, 15, 6},
     {GPIOG, 12, 6}
-}
+};
 
 static constexpr SpiPinMap SPI3_SCK[] = {
     {GPIOB, 3, 6},
     {GPIOC, 10, 6},
     {GPIOG, 9, 6}
-}
+};
 
 static constexpr SpiPinMap SPI3_MISO[] = {
     {GPIOB, 4, 6},
     {GPIOC, 11, 6},
     {GPIOG, 10, 6}
-}
+};
 
 static constexpr SpiPinMap SPI3_MOSI[] = {
     {GPIOB, 5, 6},
     {GPIOC, 12, 6},
     {GPIOG, 11, 6}
-}
+};
 
