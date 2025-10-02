@@ -42,10 +42,7 @@ struct SpiGpioNames {
   GpioName mosi_name;
 };
 
-HwSpi CreateSpi(SPI_TypeDef *instance, SpiGpioSettings &gpio_settings,
-                SpiGpioNames &gpio_names, SpiCrSettings &cfg);
-bool ValidateSpi(HwSpi &spi);
-HwSpi GetSpi(SPI_TypeDef *instance, SpiGpioSettings &gpio_settings,
-             SpiGpioNames &gpio_names, SpiCrSettings &cfg);
+HwSpi CreateSpi(SPI_TypeDef *instance, SpiCrSettings &cfg);
+HwSpi GetSpi(SPI_TypeDef *instance, SpiCrSettings &cfg);
 } // namespace Stml4
 } // namespace LBR

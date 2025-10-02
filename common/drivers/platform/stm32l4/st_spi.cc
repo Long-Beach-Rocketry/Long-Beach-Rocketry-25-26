@@ -12,11 +12,31 @@
 #include "st_spi.h"
 namespace LBR {
 namespace Stml4 {
+
+bool ValidateSpi(HwSpi &spi) {
+  // Check cr_settings
+  if (static_cast<std::uint8_t>(spi.settings.baudrate) > 7) {
+    return false;
+  }
+  if (static_cast<std::uint8_t>(spi.settings.busmode) > 3) {
+    return false;
+  }
+  if (static_cast<std::uint8_t>(spi.settings.order) > 1) {
+    return false;
+  }
+  if (static_cast<std::uint8_t>(spi.settings.threshold) > 1) {
+    return false;
+  }
+
+  spi.initialized = true;
+  return true;
+}
+
 /**
  * @brief Default constructor that signals HwSpi object failed to initialize
  *
  */
-explicit HwSpi() : instance(nullptr), initialized(false) {}
+HwSpi::HwSpi() : instance(nullptr), initialized(false) {}
 
 /**
  * @brief Construct a new HwSpi object
@@ -29,11 +49,12 @@ HwSpi::HwSpi(SPI_TypeDef *instance_, SpiCrSettings &settings_)
     : instance(instance_), settings(settings_), initialized(true) {}
 
 /**
- * @brief Getter
+ * @brief Returns the current control register settings of the current SPI
+ * Object
  *
- * @return SpiPins const
+ * @return SpiCrSettings
  */
-SpiPins HwSpi::GetPins() const { return spi_pins; }
+SpiCrSettings HwSpi::GetSpiCrSettings() const { return settings; }
 
 /**
  * @brief Get the value that shows whether this object was initialized
@@ -45,11 +66,11 @@ SpiPins HwSpi::GetPins() const { return spi_pins; }
 bool HwSpi::GetSpiValid() const { return initialized; }
 
 /**
- * @brief Setter
+ * @brief Sets the initialized condition of the Spi Object
  *
- * @param pins
+ * @param initialized_
  */
-void HwSpi::SetPins(const SpiPins &spi_pins_) { spi_pins = spi_pins_; }
+void HwSpi::SetSpiValid(bool initialized_) { initialized = initialized_; }
 
 /**
  * @brief Sets the SPI serial clock baudrate for bits 5:3 in SPIx_CR1
