@@ -13,6 +13,13 @@
 namespace LBR {
 namespace Stml4 {
 
+/**
+ * @brief Checks the SPI object to see if it has valid control register settings
+ *
+ * @param spi The SPI object you want to check
+ * @return true
+ * @return false
+ */
 bool ValidateSpi(HwSpi &spi) {
   // Check cr_settings
   if (static_cast<std::uint8_t>(spi.settings.baudrate) > 7) {
@@ -59,7 +66,7 @@ HwSpi::HwSpi(SPI_TypeDef *instance_, SpiCrSettings &settings_)
     : instance(instance_), settings(settings_), initialized(true) {}
 
 /**
- * @brief Get the value that shows whether this object was initialized
+ * @brief Gets the value that shows whether this object was initialized
  * successfully or not
  *
  * @return true
@@ -68,7 +75,7 @@ HwSpi::HwSpi(SPI_TypeDef *instance_, SpiCrSettings &settings_)
 bool HwSpi::IsSpiValid() const { return initialized; }
 
 /**
- * @brief Sets the initialized condition of the Spi Object
+ * @brief Sets the initialized condition of the SPI object
  *
  * @param initialized_
  */
@@ -157,25 +164,25 @@ bool HwSpi::SetSpiBusMode(SpiBusMode mode) {
 SpiStatus HwSpi::Init() {
 
   // Set to Master Mode (Keep in master mode unless we want our STM32l4xx to be
-  // used as a slave device) Master Mode - Sets our STM32l4xx to act as the
-  // master device to initiate/end SPI communication and drive the clock signal
+  // used as a slave device). Master Mode sets our STM32l4xx to act as the
+  // master device to initiate/end SPI communication and drive the clock signal.
   instance->CR1 |= SPI_CR1_MSTR;
 
   // Enable Full-Duplex Mode (Can send and receive data simultaneously through
   // MOSI and MISO)
   instance->CR1 &= ~(SPI_CR1_RXONLY);
 
-  // Configure SPI Baudrate
+  // Configure SPI sck Baudrate
   if (!SetSpiBaudRate(settings.baudrate)) {
     return SpiStatus::INIT_ERR;
   }
 
-  // Configure SPI Bus Mode
+  // Configure the SPI Bus Mode
   if (!SetSpiBusMode(settings.busmode)) {
     return SpiStatus::INIT_ERR;
   }
 
-  // Configure SPI data size to 8 bits
+  // Configure the SPI data size to 8 bits
   instance->CR2 |= (SPI_CR2_DS_0 | SPI_CR2_DS_1 | SPI_CR2_DS_2);
 
   // Use software slave management and toggle SSI = 1 to pull NSS to high

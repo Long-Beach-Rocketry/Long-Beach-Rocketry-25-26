@@ -77,6 +77,3 @@ struct SpiCrSettings {
   SpiBitOrder order;
   SpiRxThreshold threshold;
 };
-
-// SpiCrSettings settings{SpiBaudrate::FPCLK_2, };
-// SpiConfigSettings(settings);

@@ -1,11 +1,10 @@
 #include "st_spi_factory.h"
 
 /**
- * @brief Attempt to initialize an SPI object
+ * @brief Attempt to initialize an SPI object with desired control register
+ * settings
  *
  * @param instance
- * @param gpio_settings
- * @param gpio_names
  * @param cfg
  * @return HwSpi The SPI object we wish to use before being validated
  */
@@ -23,11 +22,9 @@ LBR::Stml4::HwSpi CreateSpi(SPI_TypeDef *instance, SpiCrSettings &cfg) {
  * @brief Returns the SPI object if everything was initialized correctly
  *
  * @param instance
- * @param gpio_settings
- * @param gpio_names
  * @param cfg
- * @return HwSpi The SPI object after validation (empty SPI object with false
- * initialization flag if failed)
+ * @return HwSpi The SPI object with configured control register settings after
+ * validation (empty SPI object with false initialization variable if failed)
  */
 LBR::Stml4::HwSpi GetSpi(SPI_TypeDef *instance, SpiCrSettings &cfg) {
   LBR::Stml4::HwSpi spi = LBR::Stml4::CreateSpi(instance, cfg);

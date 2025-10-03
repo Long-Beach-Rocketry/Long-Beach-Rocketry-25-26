@@ -15,33 +15,6 @@
 
 namespace LBR {
 namespace Stml4 {
-
-/**
- * @brief Helper function to create HwGpio objects for an SPI pin
- *
- */
-inline StGpioSettings CreateSpiPinSettings(uint8_t af) {
-  return StGpioSettings{GpioMode::ALT_FUNC, GpioOtype::PUSH_PULL,
-                        GpioOspeed::VERY_HIGH, GpioPupd::NO_PULL, af};
-}
-
-struct GpioName {
-  GPIO_TypeDef *port;
-  std::uint8_t pin_num;
-};
-
-struct SpiGpioSettings {
-  StGpioSettings sck_settings;
-  StGpioSettings miso_settings;
-  StGpioSettings mosi_settings;
-};
-
-struct SpiGpioNames {
-  GpioName sck_name;
-  GpioName miso_name;
-  GpioName mosi_name;
-};
-
 HwSpi CreateSpi(SPI_TypeDef *instance, SpiCrSettings &cfg);
 HwSpi GetSpi(SPI_TypeDef *instance, SpiCrSettings &cfg);
 } // namespace Stml4

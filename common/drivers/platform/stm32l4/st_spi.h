@@ -5,29 +5,6 @@
  * @version 0.1
  * @date 2025-09-28
  *
- * @note How to use:
- *
- *          Declare an SPI object with the current SPI peripheral you are using
- * (ex. SPI1, SPI2, or SPI3) and SpiPinMap structs with the desired pin mapping
- * in st_spi_pins.h to populate the nss, sck, miso, and mosi member variables.
- *
- * @example If we want to use SPI1 with GPIOA pins:
- *
- *              LBR::Stml4::SPI spi_obj{SPI1, SPI1_NSS[0], SPI1_SCK[0],
- * SPI1_MOSI[0], SPI1_MISO[0]};
- *
- *          This will set nss_pin_, sck_pin_, miso_pin_, and mosi_pin_ member
- * variables to the desired pins we want to use on the STM32L476RG.
- *
- *          We can then modify the SPI peripheral control registers before using
- * Init() by populating a SpiCrSettings struct with our desired settings from
- * the enum classes in st_spi_defs.h and feeding it into the SpiConfigSettings()
- * function:
- *
- *              SpiCrSettings settings{SpiBaudRate::FPCLK_2, SpiBusMode::MODE1,
- * SpiDataSize::EIGHT_BIT, SpiBitOrder::MSB, SpiRxThreshold::FIFO_8bit};
- *              spi_obj.SpiConfigSettings(settings);
- *
  * @copyright Copyright (c) 2025
  *
  */
@@ -35,7 +12,6 @@
 #pragma once
 
 #include "spi.h"
-#include "st_gpio.h"
 #include "st_spi_settings.h"
 #include <stdbool.h>
 #include <stdint.h>
