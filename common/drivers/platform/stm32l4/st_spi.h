@@ -24,8 +24,6 @@ namespace Stml4 {
 
 class HwSpi : public Spi {
 public:
-    // Default constructor
-    HwSpi() = default;
 
     // Construct with peripheral + initial settings
     HwSpi(SPI_TypeDef* instance, const StSpiSettings& settings)
@@ -51,7 +49,7 @@ public:
     // Update settings (before Init or while disabled)
     void ApplySettings(const StSpiSettings& settings) { settings_ = settings; }
 
-    // Interface overrides (can wrap buffer ops)
+    // Interface overrides (can wrap buffer ops) to make sure it compiles   
     bool Read() override;
     bool Write() override;
     bool Transfer() override;
@@ -68,9 +66,20 @@ private:
     bool SetDataSize(SpiDataSize size);
     bool SetBitOrder(SpiBitOrder order);
     bool SetRxThreshold(SpiRxThreshold th);
-
     bool SpiConfigSettings(const StSpiSettings& cfg);
-};
+
+
+    /* restructuring the inline
+    static inline void set_field(volatile uint32_t* field,
+                             uint32_t val,
+                             uint32_t pos,
+                             uint32_t bits)  // size
+{
+    uint32_t mask{(0x1 << bits) - 1u};
+    *field &= ~(mask << (pos * bits));
+    *field |= (mask & val) << (pos * bits);
+    */
+}
 
 } 
 } 
