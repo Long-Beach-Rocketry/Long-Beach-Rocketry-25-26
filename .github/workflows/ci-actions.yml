@@ -1,0 +1,110 @@
+name: Repository CI Pipelines
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  # Make sure code abides by the clang-format.
+  lint:
+    name: Lint with clang-format
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Clang
+        uses: egor-tensin/setup-clang@v1
+
+      - name: Run clang-format
+        run: |
+          chmod +x format_check.sh ; ./format_check.sh
+
+  # This ensures builds pass for each of the primary embedded targets.
+  Build:
+    name: Build Embedded
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up CMake
+        uses: lukka/get-cmake@latest
+        with:
+          cmake-version: "3.27"
+
+      - name: Pull git submodules
+        run: |
+          git submodule update --init --recursive
+
+      - name: Install GNU Arm Embedded Toolchain
+        uses: ryanwinter/arm-none-eabi-gcc@master
+        with:
+          release: "10.3-2021.10"
+
+      - name: Configure CMake for F401
+        run: |
+          cmake --preset=stm32f401 -DTARGET_APP="" -DCMAKE_BUILD_TYPE="Debug"
+
+      - name: Build for F401
+        run: cd build/stm32f401 && cmake --build .
+
+      - name: Configure CMake for F746
+        run: |
+          cmake --preset=stm32f746 -DTARGET_APP="" -DCMAKE_BUILD_TYPE="Debug"
+
+      - name: Build for F746
+        run: cd build/stm32f746 && cmake --build .
+
+      - name: Configure CMake for H503
+        run: |
+          cmake --preset=stm32h503 -DTARGET_APP="" -DCMAKE_BUILD_TYPE="Debug"
+
+      - name: Build for H503
+        run: cd build/stm32h503 && cmake --build .
+
+      - name: Configure CMake for L412
+        run: |
+          cmake --preset=stm32l412 -DTARGET_APP="" -DCMAKE_BUILD_TYPE="Debug"
+
+      - name: Build for L412
+        run: cd build/stm32l412 && cmake --build .
+
+      - name: Configure CMake for L476
+        run: |
+          cmake --preset=stm32l476 -DTARGET_APP="" -DCMAKE_BUILD_TYPE="Debug"
+
+      - name: Build for L476
+        run: cd build/stm32l476 && cmake --build .
+
+  # This runs native unit tests that verify functionality of non-HW specific code.
+  unit_test:
+    name: Run Native Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up CMake
+        uses: lukka/get-cmake@latest
+        with:
+          cmake-version: "3.27"
+
+      - name: Pull git submodules
+        run: |
+          git submodule update --init --recursive
+
+      - name: Configure CMake for testing
+        run: |
+          cmake --preset=native -DTARGET_APP="" -DCMAKE_BUILD_TYPE="Debug"
+
+      - name: Build GTest unit tests
+        run: cd build/native && cmake --build .
+
+      - name: Run GTest unit tests
+        run: cd build/native && ctest
