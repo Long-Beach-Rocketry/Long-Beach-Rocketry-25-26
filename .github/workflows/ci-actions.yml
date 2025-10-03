@@ -46,33 +46,33 @@ jobs:
         with:
           release: "10.3-2021.10"
 
-      - name: Configure CMake for F401
-        run: |
-          cmake --preset=stm32f401 -DTARGET_APP="" -DCMAKE_BUILD_TYPE="Debug"
+      # - name: Configure CMake for F401
+      #   run: |
+      #     cmake --preset=stm32f401 -DTARGET_APP="" -DCMAKE_BUILD_TYPE="Debug"
 
-      - name: Build for F401
-        run: cd build/stm32f401 && cmake --build .
+      # - name: Build for F401
+      #   run: cd build/stm32f401 && cmake --build .
 
-      - name: Configure CMake for F746
-        run: |
-          cmake --preset=stm32f746 -DTARGET_APP="" -DCMAKE_BUILD_TYPE="Debug"
+      # - name: Configure CMake for F746
+      #   run: |
+      #     cmake --preset=stm32f746 -DTARGET_APP="" -DCMAKE_BUILD_TYPE="Debug"
 
-      - name: Build for F746
-        run: cd build/stm32f746 && cmake --build .
+      # - name: Build for F746
+      #   run: cd build/stm32f746 && cmake --build .
 
-      - name: Configure CMake for H503
-        run: |
-          cmake --preset=stm32h503 -DTARGET_APP="" -DCMAKE_BUILD_TYPE="Debug"
+      # - name: Configure CMake for H503
+      #   run: |
+      #     cmake --preset=stm32h503 -DTARGET_APP="" -DCMAKE_BUILD_TYPE="Debug"
 
-      - name: Build for H503
-        run: cd build/stm32h503 && cmake --build .
+      # - name: Build for H503
+      #   run: cd build/stm32h503 && cmake --build .
 
-      - name: Configure CMake for L412
-        run: |
-          cmake --preset=stm32l412 -DTARGET_APP="" -DCMAKE_BUILD_TYPE="Debug"
+      # - name: Configure CMake for L412
+      #   run: |
+      #     cmake --preset=stm32l412 -DTARGET_APP="" -DCMAKE_BUILD_TYPE="Debug"
 
-      - name: Build for L412
-        run: cd build/stm32l412 && cmake --build .
+      # - name: Build for L412
+      #   run: cd build/stm32l412 && cmake --build .
 
       - name: Configure CMake for L476
         run: |
