@@ -1,5 +1,5 @@
 /**
- * @file st_spi_defs.h
+ * @file st_spi_settings.h
  * @author Bex Saw
  * @brief SPI definitions that are specific to the STM32L4 series
  * @version 0.1
@@ -69,10 +69,10 @@ enum class SpiBusMode : std::uint8_t {
  */
 enum class SpiStatus : std::uint8_t {
     OK = 0,           // No error
-    OVERRUN_ERR,      // Data overrun error
-    MODE_FAULT_ERR,   // Mode fault error
-    CRC_ERR,          // CRC error
-    UNEXPECTED_ERR    // Any other unexpected error
+    READ_ERR,
+    WRITE_ERR,
+    TRANSFER_ERR,
+    INIT_ERR
 };
 
 /**
