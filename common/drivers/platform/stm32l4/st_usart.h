@@ -2,6 +2,8 @@
 
 #include <stdbool.h>
 #include <cstddef>
+#include <span>
+#include <string>
 #include "gpio.h"
 #include "stm32l476xx.h"
 #include "usart.h"
@@ -15,8 +17,8 @@ private:
     uint16_t uartdiv;
 
 public:
-    void send_tx(const uint8_t* data, size_t size) override;
-    bool receive_rx(volatile uint8_t* data, size_t size) override;
+    void send_tx(const std::span<char> data) override;
+    bool receive_rx(std::span<char>& data) override;
     void init(USART_TypeDef* instance, LBR::Gpio* tx, LBR::Gpio* rx);
 
     StUsart()
