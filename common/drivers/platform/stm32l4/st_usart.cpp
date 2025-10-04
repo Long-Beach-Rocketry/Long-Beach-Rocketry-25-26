@@ -1,7 +1,8 @@
 #include "st_usart.h"
 
-bool StUsart::receive_rx(volatile uint8_t* data, size_t size)
+bool StUsart::receive_rx(std::span<char>& data)
 {
+    size_t size = sizeof(instance->RDR);
     size_t count = 0;
     while (count < size)
     {
@@ -14,14 +15,15 @@ bool StUsart::receive_rx(volatile uint8_t* data, size_t size)
     return true;
 }
 
-void StUsart::send_tx(const uint8_t* data, size_t size)
+void StUsart::send_tx(const std::span<char> data)
 {
-    for (size_t i = 0; i < size; ++i)
+    for (auto buffer : data)
     {
+
         while (!(instance->ISR & USART_ISR_TXE))
         {
         }
-        instance->TDR = data[i];
+        instance->TDR = static_cast<uint16_t>(buffer);
     }
 
     while (!(instance->ISR & USART_ISR_TC))
