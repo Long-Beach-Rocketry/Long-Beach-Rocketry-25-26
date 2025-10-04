@@ -4,6 +4,8 @@
  */
 
 #pragma once
+#include <span>
+#include <string>
 
 /**
   * @brief class that contains the functions needed to intialize and setup rx and tx functions.
