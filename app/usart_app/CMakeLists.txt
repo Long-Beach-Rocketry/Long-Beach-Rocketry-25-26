@@ -11,7 +11,7 @@ add_subdirectory_for(STM32L476 BSP_L476)
 if (TARGET usart_app_bsp)
 
     add_executable_for(${TARGET_DEVICE} ${EXECUTABLE} ${LDF}
-        main.cpp
+        main.cc
         ${STARTUP_FILE}
     )
 
