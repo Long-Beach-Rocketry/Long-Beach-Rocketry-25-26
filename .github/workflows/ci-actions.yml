@@ -76,10 +76,10 @@ jobs:
 
       - name: Configure CMake for L476
         run: |
-          cmake --preset=stm32L476 -DTARGET_APP="" -DCMAKE_BUILD_TYPE="Debug"
+          cmake --preset=stm32l476 -DTARGET_APP="" -DCMAKE_BUILD_TYPE="Debug"
 
       - name: Build for L476
-        run: cd build/stm32L476 && cmake --build .
+        run: cd build/stm32l476 && cmake --build .
 
   # This runs native unit tests that verify functionality of non-HW specific code.
   unit_test:
