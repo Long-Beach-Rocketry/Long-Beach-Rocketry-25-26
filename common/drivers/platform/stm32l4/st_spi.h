@@ -1,14 +1,14 @@
 /**
  * @file    st_spi.h
- * @author  Bex
- * @brief   STM32L4 SPI Driver (C++ only, implements Spi interface)
- * @version 0.1
- * @date    2025-10-01
+ * @author  Bex Saw
+ * @brief   Bare-metal STM32L4 SPI driver (implements Spi interface)
+ * @version 0.2
+ * @date    2025-10-05
  *
  * @note Usage:
- *   LBR::Stml4::HwSpi spi_obj(SPI1, settings);
- *   spi_obj.Init();
- *   spi_obj.Send(tx_buf, len, 1000);
+ *   LBR::Stml4::HwSpi spi(SPI1, settings);
+ *   spi.Init();
+ *   spi.Send(tx_buf, len, 1000);
  */
 
 #pragma once
@@ -20,66 +20,48 @@
 #include <cstddef>
 
 namespace LBR {
-namespace Stml4 {
+    namespace Stml4 {
+        class HwSpi : public Spi {
+            public:
+                // Construct with SPI instance and initial settings
+                    HwSpi(SPI_TypeDef* instance, const StSpiSettings& settings)
+                        : instance_(instance), settings_(settings) {}
 
-class HwSpi : public Spi {
-public:
+                // Initialize SPI and apply settings
+                    SpiStatus Init();
 
-    // Construct with peripheral + initial settings
-    HwSpi(SPI_TypeDef* instance, const StSpiSettings& settings)
-        : instance_(instance), settings_(settings) {}
+                // Basic blocking operations
+                    bool Send(const std::uint8_t* data,
+                            std::size_t size,
+                            std::uint32_t timeout);
 
-    // Configure registers and enable SPI
-    SpiStatus Init();
+                    bool Read(std::uint8_t* data,
+                            std::size_t size,
+                            std::uint32_t timeout);
 
-    // Basic blocking operations with timeout (ms)
-    bool Send(const std::uint8_t* data,
-              std::size_t size,
-              std::uint32_t timeout);
+                    bool Transfer(const std::uint8_t* tx_data,
+                            std::uint8_t* rx_data,
+                            std::size_t size,
+                            std::uint32_t timeout);
 
-    bool Read(std::uint8_t* data,
-              std::size_t size,
-              std::uint32_t timeout);
+                // Required by Spi interface (according to spi.h)
+                    bool Read() override   { return true; }
+                    bool Write() override  { return true; }
+                    bool Transfer() override { return true; }
 
-    bool Transfer(const std::uint8_t* tx_data,
-                  std::uint8_t* rx_data,
-                  std::size_t size,
-                  std::uint32_t timeout);
+            private:
+                // Hardware instance and config
+                SPI_TypeDef*   instance_      { nullptr };
+                StSpiSettings  settings_      { };
+                bool initialized_             { false };
 
-    // Update settings (before Init or while disabled)
-    void ApplySettings(const StSpiSettings& settings) { settings_ = settings; }
+                // Internal helpers
+                bool SetSpiBaudRate(SpiBaudRate baudrate);
+                bool SetSpiBusMode(SpiBusMode mode);
+                bool SetDataSize(SpiDataSize size);
+                bool SetBitOrder(SpiBitOrder order);
+                bool SetRxThreshold(SpiRxThreshold th);
+            };
 
-    // Interface overrides (can wrap buffer ops) to make sure it compiles   
-    bool Read() override;
-    bool Write() override;
-    bool Transfer() override;
-
-private:
-    // Member variables
-    SPI_TypeDef*   instance_{nullptr};  // SPI1, SPI2, SPI3...
-    StSpiSettings  settings_{};         // Current configuration
-    bool           initialized_{false}; // State flag
-
-    // Internal helpers
-    bool SetSpiBaudRate(SpiBaudRate baudrate);
-    bool SetSpiBusMode(SpiBusMode mode);
-    bool SetDataSize(SpiDataSize size);
-    bool SetBitOrder(SpiBitOrder order);
-    bool SetRxThreshold(SpiRxThreshold th);
-    bool SpiConfigSettings(const StSpiSettings& cfg);
-
-
-    /* restructuring the inline
-    static inline void set_field(volatile uint32_t* field,
-                             uint32_t val,
-                             uint32_t pos,
-                             uint32_t bits)  // size
-{
-    uint32_t mask{(0x1 << bits) - 1u};
-    *field &= ~(mask << (pos * bits));
-    *field |= (mask & val) << (pos * bits);
-    */
-}
-
-} 
-} 
+}   
+}   

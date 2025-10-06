@@ -6,4 +6,4 @@
 
 using namespace LBR;
 
-Spi& BSP_Init(Spi_TypeDef* spi_base);
+Spi& BSP_Init(SPI_TypeDef* spi_instance);
