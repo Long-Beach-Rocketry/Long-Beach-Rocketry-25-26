@@ -82,9 +82,8 @@ public:
      * @brief Initializes gpio settings.
      * @return true if success.
      */
-    virtual bool init() = 0;
-
     bool init(void);
+
     bool toggle(void) override;
     bool set(const bool active) override;
     bool read(void) override;
