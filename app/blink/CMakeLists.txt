@@ -6,7 +6,7 @@ set(PREPROCESS_DEFS
     -DDEF_FLASH_SIZE=1024K
 )
 
-add_subdirectory_for(STM32L476 bsp_L476)
+add_subdirectory_for(STM32L476 bsp_l476)
 
 if (TARGET blink_bsp)
 

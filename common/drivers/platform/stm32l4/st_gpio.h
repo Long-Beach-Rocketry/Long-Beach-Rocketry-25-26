@@ -29,7 +29,9 @@ enum class GpioMode : std::uint8_t
     ANALOG,
 };
 
-enum class GpioOtype : std::uint8_t
+enum class GpioOtype :
+
+    std::uint8_t
 {
     PUSH_PULL = 0,
     OPEN_DRAIN
