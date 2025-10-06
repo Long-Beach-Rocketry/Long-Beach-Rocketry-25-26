@@ -46,8 +46,8 @@ bool HwGpio::init(void)
 bool HwGpio::toggle(void)
 {
     uint32_t bit = (1u << pin_num_);
-    bool on = (base_addr_->ODR & bit) != 0u;
-    return HwGpio::set(!on);
+    bool current_state = (base_addr_->ODR & bit) != 0u;
+    return HwGpio::set(!current_state);
 }
 
 bool HwGpio::set(const bool active)
