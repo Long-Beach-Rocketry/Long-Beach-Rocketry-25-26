@@ -16,7 +16,7 @@ static inline void set_field(volatile uint32_t* field, uint32_t val,
     *field |= (mask & val) << (pos * bits);
 }
 
-HwGpio::HwGpio(StGpioSettings& settings, std::uint8_t pin_num,
+HwGpio::HwGpio(StGpioSettings& settings, uint8_t pin_num,
                GPIO_TypeDef* base_addr)
     : settings_{settings}, pin_num_{pin_num}, base_addr_{base_addr} {};
 

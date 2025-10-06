@@ -2,8 +2,6 @@
 #include "board.h"
 
 #include "st_gpio.h"
-#define EXIT_IF_FAIL(cond) EXIT_IF(!(cond), false)
-#define SET_IF(cond, var, val) var = (cond) ? val : var
 
 namespace LBR
 {

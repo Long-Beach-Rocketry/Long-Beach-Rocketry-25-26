@@ -68,8 +68,7 @@ public:
      * @param pin_nim
      * @param base_addr
      */
-    explicit HwGpio(StGpioSettings& settings,
-                    uint8_t pin_num,
+    explicit HwGpio(StGpioSettings& settings, uint8_t pin_num,
                     GPIO_TypeDef* base_addr);
     bool init(void);
     bool toggle(void) override;
