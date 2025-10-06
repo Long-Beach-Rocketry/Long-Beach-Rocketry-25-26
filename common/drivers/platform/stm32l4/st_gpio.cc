@@ -39,7 +39,7 @@ static inline void enable_gpio_clock(GPIO_TypeDef* gpio)
 
 HwGpio::HwGpio(StGpioSettings& settings, std::uint8_t pin_num,
                GPIO_TypeDef* base_addr)
-    : settings_(settings), pin_num_(pin_num), base_addr_(base_addr) {};
+    : settings_{settings}, pin_num_{pin_num}, base_addr_{base_addr} {};
 
 // enable clock in bsp
 bool HwGpio::init(void)
