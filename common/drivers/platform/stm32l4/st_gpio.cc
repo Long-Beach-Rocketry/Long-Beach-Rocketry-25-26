@@ -16,9 +16,10 @@ static inline void set_field(volatile uint32_t* field, uint32_t val,
     *field |= (mask & val) << (pos * bits);
 }
 
-HwGpio::HwGpio(StGpioSettings& settings, uint8_t pin_num,
-               GPIO_TypeDef* base_addr)
-    : settings_{settings}, pin_num_{pin_num}, base_addr_{base_addr} {};
+HwGpio::HwGpio(const StGpioParams& params)
+    : settings_{params.settings},
+      pin_num_{params.pin_num},
+      base_addr_{params.base_addr} {};
 
 bool HwGpio::init(void)
 {
@@ -44,7 +45,9 @@ bool HwGpio::init(void)
 
 bool HwGpio::toggle(void)
 {
-    return HwGpio::set(!base_addr_->ODR);
+    uint32_t bit = (1u << pin_num_);
+    bool on = (base_addr_->ODR & bit) != 0u;
+    return HwGpio::set(!on);
 }
 
 bool HwGpio::set(const bool active)

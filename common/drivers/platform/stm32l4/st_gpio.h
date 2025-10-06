@@ -48,7 +48,7 @@ enum class GpioPupd : uint8_t
 };
 
 /**
- * @brief collection of control params to configure gpio.
+ * @brief Collection of control params to configure gpio.
  */
 struct StGpioSettings
 {
@@ -58,18 +58,32 @@ struct StGpioSettings
     GpioPupd pupd;
     uint8_t af;
 };
-// TODO MAKE BIG STURCT FOR CONFIG
+
+/**
+ * @brief Collection of settings pin number and base address.
+ */
+struct StGpioParams
+{
+    StGpioSettings settings;
+    uint8_t pin_num;
+    GPIO_TypeDef* base_addr;
+};
+
 class HwGpio : public Gpio
 {
 public:
     /**
      * @brief Hw Contructor
-     * @param settings
-     * @param pin_nim
-     * @param base_addr
+     * @param params struct of port, number, and settings.
      */
-    explicit HwGpio(StGpioSettings& settings, uint8_t pin_num,
-                    GPIO_TypeDef* base_addr);
+    explicit HwGpio(const StGpioParams& params);
+
+    /** 
+     * @brief Initializes gpio settings.
+     * @return true if success.
+     */
+    virtual bool init() = 0;
+
     bool init(void);
     bool toggle(void) override;
     bool set(const bool active) override;

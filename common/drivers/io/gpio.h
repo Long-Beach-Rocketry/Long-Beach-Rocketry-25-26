@@ -18,12 +18,6 @@ namespace LBR
 class Gpio
 {
 public:
-    // /**
-    //  * @brief Initializes gpio settings.
-    //  * @return Returns true if success.
-    //  */
-    // virtual bool init() = 0;
-
     /**
      * @brief toggles pin.
      * @return Returns true if success.
@@ -38,7 +32,7 @@ public:
     virtual bool set(const bool active) = 0;
 
     /**
-     * @brief Reads imput register.
+     * @brief Reads input register.
      * @return Returns bool of the input register.
      */
     virtual bool read() = 0;
