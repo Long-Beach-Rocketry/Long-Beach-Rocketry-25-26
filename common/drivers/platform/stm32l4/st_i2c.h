@@ -1,27 +1,31 @@
 #pragma once
 
-#include "stm32l4xx.h"
-#include "st_gpio.h"
-#include <stdint.h>
-#include <stdbool.h>
+#include "i2c.h"
+#include <cstdint>
+#include <span>
+#include "stm32l476xx.h"
 
 namespace LBR {
     namespace Stml4 {
-        class I2C {
+        class HwI2c : public I2c {
 
-            public:
-                I2C(I2C_TypeDef* instance);
-                void Init();
-                bool SetTarget(uint8_t DevAddr);
-                bool Read(uint8_t* data, uint8_t size);
-                bool Write(const uint8_t* data, uint8_t size);
+        public:
+            explicit HwI2c(I2C_TypeDef* instance, uint32_t timingr);
 
-            private:
-                I2C_TypeDef* _instance;              //holds which I2C peripheral we're using
-                uint32_t _timing;
-                HwGpio _gpio1;
-                HwGpio _gpio2;
-                
-        }
-    }
-}
+            /**
+             * @brief Initializes I2C peripheral;
+             * 
+             * @param None
+             * @return None
+             */
+            void init();
+
+            bool read(std::span<uint8_t> data, uint8_t dev_addr) override;
+            bool write(std::span<const uint8_t> data, uint8_t dev_addr) override;
+
+        private:
+            I2C_TypeDef* _instance;  //holds which I2C peripheral we're using
+            uint32_t _timingr;
+        };
+    }  // namespace Stml4
+}  // namespace LBR

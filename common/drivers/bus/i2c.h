@@ -1,13 +1,39 @@
+/**
+ * @file i2c.h
+ * @brief I2C driver interface
+ * @author Yshi Blanco
+ * @date 10/02/2025
+ */
+
 #pragma once
+#include <cstdint>
+#include <span>
 
 namespace LBR {
-    class I2C {
+    /**
+     * @class I2c
+     * @brief I2c driver instance
+     */
+    class I2c {
         public:
-            virtual void Init() = 0;
-            virtual bool SetTarget(uint8_t DevAddr) = 0;
-            virtual bool Read(uint8_t* data, uint8_t size) = 0;
-            virtual bool Write(const uint8_t* data, uint8_t size) = 0;
+            /**
+             * @brief Read data from external device
+             * 
+             * @param data block of memory to read data into from the bus
+             * @param dev_addr address of target device
+             * @return true if successful, false otherwise
+             */
+            virtual bool read(std::span<uint8_t> data, uint8_t dev_addr) = 0;
+            
+            /**
+             * @brief Writes data to external device
+             * 
+             * @param data block of memory storing data to write into the bus
+             * @param dev_addr address of target device
+             * @return true if successful, false otherwise
+             */
+            virtual bool write(std::span<const uint8_t> data, uint8_t dev_addr) = 0;
 
-            ~I2C() = default;
-    }
-}
+            ~I2c() = default;
+    };
+}  // namespace LBR
