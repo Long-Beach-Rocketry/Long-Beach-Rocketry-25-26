@@ -9,14 +9,13 @@
 #include "st_spi_module.h"
 
 LBR::Stml4::SpiModule::SpiModule(SPI_TypeDef* instance_, StSpiSettings& cfg_,
-                                 HwGpio& sck_pin_, HwGpio& cs_pin_,
-                                 HwGpio& miso_pin_, HwGpio& mosi_pin_)
+                                 StGpioParams& sck_p, StGpioParams& miso_p,
+                                 StGpioParams& mosi_p)
     : instance{instance_},
       cfg{cfg_},
-      sck_pin{sck_pin_},
-      cs_pin{cs_pin_},
-      miso_pin{miso_pin_},
-      mosi_pin{mosi_pin_}
+      sck_pin{sck_p},
+      miso_pin{miso_p},
+      mosi_pin{mosi_p}
 {
 }
 
@@ -49,6 +48,12 @@ LBR::Stml4::HwSpi LBR::Stml4::SpiModule::GetSpi()
     LBR::Stml4::HwSpi spi = CreateSpi();
 
     bool status = ValidateSpi(spi);
+
+    if (status)
+    {
+        spi.Init();
+    }
+    // TODO: Add else logic to false status
 
     return spi;
 }
