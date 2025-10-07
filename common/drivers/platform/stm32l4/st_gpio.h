@@ -7,15 +7,16 @@
 
 #pragma once
 
+#include <cstdint>
 #include "gpio.h"
 #include "stm32l476xx.h"
-#include <cstdint>
-
 
 #define ST_GPIO_MAX_PINS 16
 
-namespace LBR {
-namespace Stml4 {
+namespace LBR
+{
+namespace Stml4
+{
 
 enum class GpioMode : uint8_t
 {
@@ -51,11 +52,11 @@ enum class GpioPupd : uint8_t
  */
 struct StGpioSettings
 {
-  GpioMode mode;
-  GpioOtype otype;
-  GpioOspeed ospeed;
-  GpioPupd pupd;
-  uint8_t af;
+    GpioMode mode;
+    GpioOtype otype;
+    GpioOspeed ospeed;
+    GpioPupd pupd;
+    uint8_t af;
 };
 
 /**
@@ -68,7 +69,8 @@ struct StGpioParams
     GPIO_TypeDef* base_addr;
 };
 
-class HwGpio : public Gpio {
+class HwGpio : public Gpio
+{
 public:
     /**
      * @brief Hw Contructor
@@ -91,5 +93,5 @@ private:
     const uint8_t pin_num_;
     GPIO_TypeDef* const base_addr_;
 };
-} // namespace Stml4
-} // namespace LBR
+}  // namespace Stml4
+}  // namespace LBR
