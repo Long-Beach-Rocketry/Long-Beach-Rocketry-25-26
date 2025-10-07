@@ -38,7 +38,7 @@ namespace LBR {
 
             // Configure for reading
             _instance->CR2 &= ~I2C_CR2_NBYTES;
-            _instance->CR2 |= ((size << I2C_CR2_NBYTES_POS) | I2C_CR2_RD_WRN | I2C_CR2_AUTOEND);
+            _instance->CR2 |= ((data.size() << I2C_CR2_NBYTES_Pos) | I2C_CR2_RD_WRN | I2C_CR2_AUTOEND);
 
             // Initiate read
             _instance->CR2 |= I2C_CR2_START;
@@ -72,7 +72,7 @@ namespace LBR {
             
             // Configure for writing
             _instance->CR2 &= ~(I2C_CR2_NBYTES | I2C_CR2_RD_WRN);
-            _instance->CR2 |= ((size << I2C_CR2_NBYTES_POS) | I2C_CR2_AUTOEND);
+            _instance->CR2 |= ((data.size() << I2C_CR2_NBYTES_Pos) | I2C_CR2_AUTOEND);
 
             // Initiate write
             _instance->CR2 |= I2C_CR2_START;

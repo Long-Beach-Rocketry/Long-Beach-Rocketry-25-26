@@ -4,8 +4,7 @@ add_library(hal STATIC
 )
 
 target_include_directories(hal PUBLIC
-    bus
-    io
+    .
     #bus #why this? i dont think needed
 )
 
