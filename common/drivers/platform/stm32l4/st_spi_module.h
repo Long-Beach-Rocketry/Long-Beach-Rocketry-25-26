@@ -17,7 +17,22 @@ namespace LBR
 {
 namespace Stml4
 {
-HwSpi CreateSpi(SPI_TypeDef* instance, StSpiSettings& cfg);
-HwSpi GetSpi(SPI_TypeDef* instance, StSpiSettings& cfg);
+class SpiModule
+{
+public:
+    explicit SpiModule(SPI_TypeDef* instance_, StSpiSettings& cfg_,
+                       HwGpio& sck_pin_, HwGpio& cs_pin_, HwGpio& miso_pin_,
+                       HwGpio& mosi_pin_);
+    HwSpi CreateSpi();
+    HwSpi GetSpi();
+
+private:
+    SPI_TypeDef* instance;
+    StSpiSettings cfg;
+    HwGpio sck_pin;
+    HwGpio cs_pin;
+    HwGpio miso_pin;
+    HwGpio mosi_pin;
+};
 }  // namespace Stml4
 }  // namespace LBR

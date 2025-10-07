@@ -16,6 +16,10 @@
 #include "spi.h"
 #include "stm32l476xx.h"
 
+namespace LBR
+{
+namespace Stml4
+{
 
 /**
  * @brief SPI Clock Baud Rate setting where FPCLK_n is the peripheral clock
@@ -97,10 +101,6 @@ struct StSpiSettings
     SpiRxThreshold threshold;
 };
 
-namespace LBR
-{
-namespace Stml4
-{
 class HwSpi : public Spi
 {
     friend bool ValidateSpi(HwSpi& spi);
@@ -121,7 +121,8 @@ private:
     StSpiSettings settings;
 
     // Private Member Functions
-    static inline void SetReg(volatile uint32_t* reg, uint32_t enum_val, uint32_t bit_num, uint32_t bit_length);
+    static inline void SetReg(volatile uint32_t* reg, uint32_t enum_val,
+                              uint32_t bit_num, uint32_t bit_length);
 };
 }  // namespace Stml4
 }  // namespace LBR
