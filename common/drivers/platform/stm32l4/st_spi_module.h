@@ -1,7 +1,7 @@
 /**
  * @file st_spi_factory.h
  * @author Kent Hong
- * @brief SPI Module that creates valid SPI objects for use in the BSP
+ * @brief SPI Module that creates valid SPI objects for use in the BSP and configures sck, miso, and mosi pins
  * @date 2025-10-01
  *
  */

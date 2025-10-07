@@ -22,9 +22,6 @@ LBR::Stml4::SpiModule::SpiModule(SPI_TypeDef* instance_, StSpiSettings& cfg_,
 /**
  * @brief Attempt to initialize an SPI object with desired control register
  * settings
- *
- * @param instance
- * @param cfg
  * @return HwSpi The SPI object we wish to use before being validated
  */
 LBR::Stml4::HwSpi LBR::Stml4::SpiModule::CreateSpi()
@@ -37,9 +34,6 @@ LBR::Stml4::HwSpi LBR::Stml4::SpiModule::CreateSpi()
 
 /**
  * @brief Returns the SPI object if everything was initialized correctly
- *
- * @param instance
- * @param cfg
  * @return HwSpi The SPI object with configured control register settings after
  * validation (empty SPI object with false initialization variable if failed)
  */
