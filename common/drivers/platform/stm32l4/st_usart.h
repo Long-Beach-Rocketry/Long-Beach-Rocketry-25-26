@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <stdbool.h>
 #include <cstddef>
 #include <span>
 #include <string>
@@ -15,7 +14,7 @@
 class StUsart : public Usart
 {
 private:
-    USART_TypeDef* instance;
+    USART_TypeDef* base_addr;
     uint16_t uartdiv;
 
 public:
@@ -25,26 +24,29 @@ public:
      * @param sys_clck The specific system clock frequency of hardware.
      * @param baud_rate The chosen baud rate to send and recieve data on a serial monitor.
      */
-    explicit StUsart(uint32_t sys_clck, uint32_t baud_rate);
+    explicit StUsart(USART_TypeDef* base_addr,
+                     uint32_t sys_clck,
+                     uint32_t baud_rate);
 
     /**
      * @brief Sends data to serial output.
      * 
-     * @param data A variable of string type that contains message to be sent.
+     * @param data A uint8_t pointer that contains message to be sent.
+     * @param size Variable of size_t type which specifies the size of message.
      */
-    void send_tx(const std::span<char> data) override;
+    void send_tx(const uint8_t* data, size_t size) override;
 
     /**
      * @brief Recieves data from serial input.
      * 
-     * @param data A variable of string type that holds data to be recieved from serial input.
+     * @param data A uint8_t pointer that holds data to be recieved from serial input.
      */
-    bool receive_rx(std::span<char>& data) override;
+    bool receive_rx(uint8_t* data) override;
 
     /**
      * @brief Initializes the USART and associated Rx and Tx pins.
      * 
-     * @param instannce The USART instance that is to be currently used.
+     * @param instannce The USART base_addr that is to be currently used.
      */
-    void init(USART_TypeDef* instance);
+    void init();
 };
