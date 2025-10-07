@@ -1,45 +1,46 @@
 #include "st_usart.h"
 
-StUsart::StUsart(uint32_t sys_clck, uint32_t baud_rate)
-    : uartdiv(sys_clck / baud_rate) {};
+StUsart::StUsart(USART_TypeDef* base_addr,
+                 uint32_t sys_clck,
+                 uint32_t baud_rate)
+    : base_addr(base_addr), uartdiv(sys_clck / baud_rate) {};
 
-bool StUsart::receive_rx(std::span<char>& data)
+bool StUsart::receive_rx(uint8_t* data)
 {
-    size_t size = sizeof(instance->RDR);
+    size_t size = sizeof(base_addr->RDR);
     size_t count = 0;
     while (count < size)
     {
-        while (!(instance->ISR & USART_ISR_RXNE))
+        while (!(base_addr->ISR & USART_ISR_RXNE))
         {
         }
-        data[count++] = instance->RDR;
+        data[count++] = base_addr->RDR;
     }
 
     return true;
 }
 
-void StUsart::send_tx(const std::span<char> data)
+void StUsart::send_tx(const uint8_t* data, size_t size)
 {
-    for (auto byte : data)
+    for (size_t i = 0; i < size; i++)
     {
 
-        while (!(instance->ISR & USART_ISR_TXE))
+        while (!(base_addr->ISR & USART_ISR_TXE))
         {
         }
-        instance->TDR = static_cast<uint8_t>(byte);
+        base_addr->TDR = data[i];
     }
 
-    while (!(instance->ISR & USART_ISR_TC))
+    while (!(base_addr->ISR & USART_ISR_TC))
     {
     }
 }
 
-void StUsart::init(USART_TypeDef* instance)
+void StUsart::init()
 {
-    StUsart::instance = instance;
 
-    StUsart::instance->CR1 &= ~USART_CR1_UE;
-    StUsart::instance->BRR = uartdiv;
-    StUsart::instance->CR1 |= USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;
-    StUsart::instance->CR1 |= USART_CR1_RXNEIE;
+    StUsart::base_addr->CR1 &= ~USART_CR1_UE;
+    StUsart::base_addr->BRR = uartdiv;
+    StUsart::base_addr->CR1 |= USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;
+    StUsart::base_addr->CR1 |= USART_CR1_RXNEIE;
 }
