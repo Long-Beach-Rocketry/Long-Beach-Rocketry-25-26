@@ -2,10 +2,7 @@
  * @file st_spi.cc
  * @author Kent Hong
  * @brief SPI Driver class implementation
- * @version 0.1
  * @date 2025-09-30
- *
- * @copyright Copyright (c) 2025
  *
  */
 

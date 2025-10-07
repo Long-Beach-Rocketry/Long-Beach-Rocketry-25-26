@@ -1,11 +1,8 @@
 /**
  * @file st_spi_factory.h
  * @author Kent Hong
- * @brief SPI Factory that creates valid SPI objects for use in the BSP
- * @version 0.1
+ * @brief SPI Module that creates valid SPI objects for use in the BSP
  * @date 2025-10-01
- *
- * @copyright Copyright (c) 2025
  *
  */
 #pragma once

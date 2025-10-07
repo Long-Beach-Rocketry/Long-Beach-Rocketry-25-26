@@ -2,10 +2,7 @@
  * @file st_spi.h
  * @author Kent Hong
  * @brief SPI Driver library for STM32l4xx
- * @version 0.1
  * @date 2025-09-28
- *
- * @copyright Copyright (c) 2025
  *
  */
 

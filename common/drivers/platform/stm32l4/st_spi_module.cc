@@ -1,3 +1,11 @@
+/**
+ * @file st_spi_module.cc
+ * @author Kent Hong
+ * @brief SPI Module Class implementation
+ * @date 2025-10-07
+ * 
+ */
+
 #include "st_spi_module.h"
 
 LBR::Stml4::SpiModule::SpiModule(SPI_TypeDef* instance_, StSpiSettings& cfg_,
