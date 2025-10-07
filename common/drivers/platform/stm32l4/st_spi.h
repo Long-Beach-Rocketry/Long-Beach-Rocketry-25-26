@@ -4,76 +4,127 @@
  * @brief SPI Driver library for STM32l4xx
  * @version 0.1
  * @date 2025-09-28
- * 
- * @note How to use:
- * 
- *          Declare an SPI object with the current SPI peripheral you are using (ex. SPI1, SPI2, or SPI3) and SpiPinMap structs 
- *          with the desired pin mapping in st_spi_pins.h to populate the nss, sck, miso, and mosi member variables.
- * 
- * @example If we want to use SPI1 with GPIOA pins:
- *              
- *              LBR::Stml4::SPI spi_obj{SPI1, SPI1_NSS[0], SPI1_SCK[0], SPI1_MOSI[0], SPI1_MISO[0]};
- * 
- *          This will set nss_pin_, sck_pin_, miso_pin_, and mosi_pin_ member variables to the desired pins we want to use on the STM32L476RG.
- * 
- *          We can then modify the SPI peripheral control registers before using Init() by populating a SpiCrSettings struct with our desired 
- *          settings from the enum classes in st_spi_defs.h and feeding it into the SpiConfigSettings() function:
- * 
- *              SpiCrSettings settings{SpiBaudRate::FPCLK_2, SpiBusMode::MODE1, SpiDataSize::EIGHT_BIT, SpiBitOrder::MSB, SpiRxThreshold::FIFO_8bit};
- *              spi_obj.SpiConfigSettings(settings);
- * 
+ *
  * @copyright Copyright (c) 2025
- * 
+ *
  */
 
 #pragma once
 
-#include "spi.h"
-#include "st_gpio.h"
-#include "st_spi_defs.h"
-#include "st_spi_pins.h"
-#include <stdint.h>
 #include <stdbool.h>
+#include <cstdint>
+#include "spi.h"
+#include "stm32l476xx.h"
 
-/** 
- * @brief Store SPI sck, miso, and mosi pins in one location
+
+/**
+ * @brief SPI Clock Baud Rate setting where FPCLK_n is the peripheral clock
+ * frequency / n
+ *
  */
-struct SpiPins {
-    HwGpio sck;
-    HwGpio miso;
-    HwGpio mosi;
+enum class SpiBaudRate : uint8_t
+{
+    FPCLK_2 = 0,
+    FPCLK_4,
+    FPCLK_8,
+    FPCLK_16,
+    FPCLK_32,
+    FPCLK_64,
+    FPCLK_128,
+    FPCLK_256
 };
 
-namespace LBR {
-    namespace Stml4 {
-        class HwSpi : public Spi {
-            public:
-                explicit HwSpi();
-                explicit HwSpi(SPI_Typedef* instance_, SpiCrSettings& settings_);
-            
-                // Member Functions
-                SpiStatus Init();
-                // TODO: implement read, write, and transfer for SPI
-                SpiStatus Read();
-                SpiStatus Write(std::uint16_t output_data);
-                SpiStatus Transfer(std::uint16_t output_data);
-               
-                // Setter and Getter
-                SpiPins GetPins const();
-                void SetPins(const SpiPins& spi_pins_);
-                
-            private:
-                // Member variables
-                SPI_Typedef* instance;
-                SpiCrSettings settings;
-                SpiPins spi_pins;
-                bool initialized;
+/**
+ * @brief SPI bus mode setting
+ *        MODE1 = CPOL - 0 and CPHA - 0
+ *        MODE2 = CPOL - 0 and CPHA - 1
+ *        MODE3 = CPOL - 1 and CPHA - 0
+ *        MODE4 = CPOL - 1 and CPHA - 1
+ *
+ */
+enum class SpiBusMode : uint8_t
+{
+    MODE1 = 0,
+    MODE2,
+    MODE3,
+    MODE4
+};
 
-                // Private Member Functions
-                bool SetSpiBaudRate(SpiBaudRate baudrate);
-                bool SetSpiBusMode(SpiBusMode mode);
-                bool SetSpiDataSize(SpiDataSize datasize);
-                void SpiConfigSettings(const SpiCrSettings& cfg);
-        };
-    }
-}
+/**
+ * @brief Receive Most Significant Bit or Least Significant Bit through data
+ * transfer
+ *
+ */
+enum class SpiBitOrder : uint8_t
+{
+    MSB = 0,
+    LSB
+};
+
+/**
+ * @brief FIFO Rx Threshold determines how many bits in the RX buffer triggers
+ * an RXNE event (new data is ready to be read)
+ *
+ */
+enum class SpiRxThreshold : uint8_t
+{
+    FIFO_16bit = 0,
+    FIFO_8bit
+};
+
+/**
+ * @brief SPI status codes for error checking
+ *
+ */
+enum class SpiStatus : uint8_t
+{
+    OK = 0,
+    READ_ERR,
+    WRITE_ERR,
+    TRANSFER_ERR,
+    INIT_ERR
+};
+
+/**
+ * @brief Desired SPI control register settings
+ *
+ */
+struct SpiCrSettings
+{
+    SpiBaudRate baudrate;
+    SpiBusMode busmode;
+    SpiBitOrder order;
+    SpiRxThreshold threshold;
+};
+
+namespace LBR
+{
+namespace Stml4
+{
+class HwSpi : public Spi
+{
+    friend bool ValidateSpi(HwSpi& spi);
+
+public:
+    explicit HwSpi(SPI_TypeDef* instance_, SpiCrSettings& settings_);
+
+    // Member Functions
+    SpiStatus Init();
+    // TODO: implement read, write, and transfer for SPI
+    bool Read();
+    bool Write(uint16_t output_data);
+    bool Transfer(uint16_t output_data);
+
+private:
+    // Member variables
+    SPI_TypeDef* instance;
+    SpiCrSettings settings;
+
+    // Private Member Functions
+    // TODO: Implement a General Function that takes in a SpiCrSettings struct and
+    // sets any bit in any register with the given control register settings
+    bool SetSpiBaudRate(SpiBaudRate baudrate);
+    bool SetSpiBusMode(SpiBusMode mode);
+};
+}  // namespace Stml4
+}  // namespace LBR
