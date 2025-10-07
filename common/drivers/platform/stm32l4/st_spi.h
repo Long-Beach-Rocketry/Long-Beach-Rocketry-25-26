@@ -89,7 +89,7 @@ enum class SpiStatus : uint8_t
  * @brief Desired SPI control register settings
  *
  */
-struct SpiCrSettings
+struct StSpiSettings
 {
     SpiBaudRate baudrate;
     SpiBusMode busmode;
@@ -106,10 +106,10 @@ class HwSpi : public Spi
     friend bool ValidateSpi(HwSpi& spi);
 
 public:
-    explicit HwSpi(SPI_TypeDef* instance_, SpiCrSettings& settings_);
+    explicit HwSpi(SPI_TypeDef* instance_, StSpiSettings& settings_);
 
     // Member Functions
-    SpiStatus Init();
+    bool Init();
     // TODO: implement read, write, and transfer for SPI
     bool Read();
     bool Write(uint16_t output_data);
@@ -118,13 +118,10 @@ public:
 private:
     // Member variables
     SPI_TypeDef* instance;
-    SpiCrSettings settings;
+    StSpiSettings settings;
 
     // Private Member Functions
-    // TODO: Implement a General Function that takes in a SpiCrSettings struct and
-    // sets any bit in any register with the given control register settings
-    bool SetSpiBaudRate(SpiBaudRate baudrate);
-    bool SetSpiBusMode(SpiBusMode mode);
+    static inline void SetReg(volatile uint32_t* reg, uint32_t enum_val, uint32_t bit_num, uint32_t bit_length);
 };
 }  // namespace Stml4
 }  // namespace LBR

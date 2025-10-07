@@ -8,7 +8,7 @@
  * @param cfg
  * @return HwSpi The SPI object we wish to use before being validated
  */
-LBR::Stml4::HwSpi CreateSpi(SPI_TypeDef* instance, SpiCrSettings& cfg)
+LBR::Stml4::HwSpi CreateSpi(SPI_TypeDef* instance, StSpiSettings& cfg)
 {
     // Instantiate new SPI object
     LBR::Stml4::HwSpi spi{instance, cfg};
@@ -24,7 +24,7 @@ LBR::Stml4::HwSpi CreateSpi(SPI_TypeDef* instance, SpiCrSettings& cfg)
  * @return HwSpi The SPI object with configured control register settings after
  * validation (empty SPI object with false initialization variable if failed)
  */
-LBR::Stml4::HwSpi GetSpi(SPI_TypeDef* instance, SpiCrSettings& cfg)
+LBR::Stml4::HwSpi GetSpi(SPI_TypeDef* instance, StSpiSettings& cfg)
 {
     LBR::Stml4::HwSpi spi = LBR::Stml4::CreateSpi(instance, cfg);
 

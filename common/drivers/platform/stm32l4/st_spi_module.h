@@ -17,7 +17,7 @@ namespace LBR
 {
 namespace Stml4
 {
-HwSpi CreateSpi(SPI_TypeDef* instance, SpiCrSettings& cfg);
-HwSpi GetSpi(SPI_TypeDef* instance, SpiCrSettings& cfg);
+HwSpi CreateSpi(SPI_TypeDef* instance, StSpiSettings& cfg);
+HwSpi GetSpi(SPI_TypeDef* instance, StSpiSettings& cfg);
 }  // namespace Stml4
 }  // namespace LBR

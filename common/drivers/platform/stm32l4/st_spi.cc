@@ -16,6 +16,22 @@ namespace Stml4
 {
 
 /**
+ * @brief Sets any SPI register with the desired bits
+ * 
+ * @param reg 
+ * @param enum_val 
+ * @param bit_num 
+ * @param bit_length 
+ */
+void HwSpi::SetReg(volatile uint32_t* reg, uint32_t enum_val, uint32_t bit_num,
+                   uint32_t bit_length)
+{
+    uint32_t mask{(0x01 << bit_length) - 1U};
+    *reg &= ~(mask << bit_num);
+    *reg |= (mask & enum_val) << bit_num;
+}
+
+/**
  * @brief Checks the SPI object to see if it has valid control register settings
  *
  * @param spi The SPI object you want to check
@@ -52,87 +68,9 @@ bool ValidateSpi(HwSpi& spi)
  * @param settings_ The SPI control register settings
  *
  */
-HwSpi::HwSpi(SPI_TypeDef* instance_, SpiCrSettings& settings_)
+HwSpi::HwSpi(SPI_TypeDef* instance_, StSpiSettings& settings_)
     : instance(instance_), settings(settings_)
 {
-}
-
-/**
- * @brief Sets the SPI serial clock baudrate for bits 5:3 in SPIx_CR1
- *
- * @param baudrate
- */
-bool HwSpi::SetSpiBaudRate(SpiBaudRate baudrate)
-{
-
-    // Clear bits 5:3 to 0b000
-    instance->CR1 &= ~(SPI_CR1_BR);
-
-    switch (baudrate)
-    {
-        case SpiBaudRate::FPCLK_2:
-            break;  // 0b000 << 3
-        case SpiBaudRate::FPCLK_4:
-            instance->CR1 |= SPI_CR1_BR_0;  // 0b001 << 3
-            break;
-        case SpiBaudRate::FPCLK_8:
-            instance->CR1 |= SPI_CR1_BR_1;  // 0b010 << 3
-            break;
-        case SpiBaudRate::FPCLK_16:
-            instance->CR1 |= (SPI_CR1_BR_1 | SPI_CR1_BR_0);  // 0b011 << 3
-            break;
-        case SpiBaudRate::FPCLK_32:
-            instance->CR1 |= SPI_CR1_BR_2;  // 0b100 << 3
-            break;
-        case SpiBaudRate::FPCLK_64:
-            instance->CR1 |= (SPI_CR1_BR_2 | SPI_CR1_BR_0);  // 0b101 << 3
-            break;
-        case SpiBaudRate::FPCLK_128:
-            instance->CR1 |= (SPI_CR1_BR_2 | SPI_CR1_BR_1);  // 0b110 << 3
-            break;
-        case SpiBaudRate::FPCLK_256:
-            instance->CR1 |= SPI_CR1_BR;  // 0b111 << 3
-            break;
-        default:
-            return false;
-    }
-    return true;
-}
-
-/**
- * @brief Sets the SPI Bus Mode for Bit 1 - CPOL and Bit 0 - CPHA
- *
- * @param mode The bus mode from the SpiBusMode enum class
- * @return true Bus Mode Configuration success
- * @return false Bus Mode Configuration failed
- *
- * @note The bus mode is dependent on the slave device you are interfacing with
- * (in other words, check its datasheet)
- */
-bool HwSpi::SetSpiBusMode(SpiBusMode mode)
-{
-
-    switch (mode)
-    {
-        case SpiBusMode::MODE1:
-            instance->CR1 &= ~(SPI_CR1_CPHA);  // CPHA = 0
-            instance->CR1 &= ~(SPI_CR1_CPOL);  // CPOL = 0
-            break;
-        case SpiBusMode::MODE2:
-            instance->CR1 |= SPI_CR1_CPHA;     // CPHA = 1
-            instance->CR1 &= ~(SPI_CR1_CPOL);  // CPOL = 0
-            break;
-        case SpiBusMode::MODE3:
-            instance->CR1 &= ~(SPI_CR1_CPHA);  // CPHA = 0
-            instance->CR1 |= SPI_CR1_CPOL;     // CPOL = 1
-            break;
-        case SpiBusMode::MODE4:
-            instance->CR1 |= SPI_CR1_CPHA;  // CPHA = 1
-            instance->CR1 |= SPI_CR1_CPOL;  // CPOL = 1
-        default:
-            return false;
-    }
-    return true;
 }
 
 /**
@@ -141,7 +79,7 @@ bool HwSpi::SetSpiBusMode(SpiBusMode mode)
  * @return SpiStatus::Ok initialization success
  * @return SpiStatus::InitErr initialization failed
  */
-SpiStatus HwSpi::Init()
+bool HwSpi::Init()
 {
 
     // Set to Master Mode (Keep in master mode unless we want our STM32l4xx to be
@@ -154,16 +92,17 @@ SpiStatus HwSpi::Init()
     instance->CR1 &= ~(SPI_CR1_RXONLY);
 
     // Configure SPI sck Baudrate
-    if (!SetSpiBaudRate(settings.baudrate))
-    {
-        return SpiStatus::INIT_ERR;
-    }
+    SetReg(&instance->CR1, uint32_t(settings.baudrate), 3, 3);
 
     // Configure the SPI Bus Mode
-    if (!SetSpiBusMode(settings.busmode))
-    {
-        return SpiStatus::INIT_ERR;
-    }
+    SetReg(&instance->CR1, uint32_t(settings.busmode), 0, 2);
+
+    // Configure Bit order
+    SetReg(&instance->CR1, uint32_t(settings.order), 7, 1);
+
+    // Determine FIFO reception threshold to see how many bits in RX Buffer
+    // triggers an RXNE event
+    SetReg(&instance->CR2, uint32_t(settings.threshold), 12, 1);
 
     // Configure the SPI data size to 8 bits
     instance->CR2 |= (SPI_CR2_DS_0 | SPI_CR2_DS_1 | SPI_CR2_DS_2);
@@ -173,31 +112,10 @@ SpiStatus HwSpi::Init()
     instance->CR1 |= SPI_CR1_SSM;
     instance->CR1 |= SPI_CR1_SSI;
 
-    // Configure Bit order
-    if (settings.order == SpiBitOrder::MSB)
-    {
-        instance->CR1 &= ~(SPI_CR1_LSBFIRST);
-    }
-    else if (settings.order == SpiBitOrder::LSB)
-    {
-        instance->CR1 |= SPI_CR1_LSBFIRST;
-    }
-
-    // Determine FIFO reception threshold to see how many bits in RX Buffer
-    // triggers an RXNE event
-    if (settings.threshold == SpiRxThreshold::FIFO_16bit)
-    {
-        instance->CR2 &= ~(SPI_CR2_FRXTH);
-    }
-    else if (settings.threshold == SpiRxThreshold::FIFO_8bit)
-    {
-        instance->CR2 |= SPI_CR2_FRXTH;
-    }
-
     // Enable SPI peripheral
     instance->CR1 |= SPI_CR1_SPE;
 
-    return SpiStatus::OK;
+    return true;
 }
 }  // namespace Stml4
 }  // namespace LBR
