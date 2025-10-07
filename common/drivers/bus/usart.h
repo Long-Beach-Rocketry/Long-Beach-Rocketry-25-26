@@ -4,8 +4,6 @@
  */
 
 #pragma once
-#include <span>
-#include <string>
 
 /**
   * @brief class that contains the functions needed to intialize and setup rx and tx functions.
@@ -17,16 +15,17 @@ public:
       * @brief Sends data through serial tx data line.
       * 
       * @param data Data to be sent passed as a string variable.
+      * @param size Size of data variable containing message;
       * 
       */
-    virtual void send_tx(const std::span<char> data) = 0;
+    virtual void send_tx(const uint8_t* data, size_t size) = 0;
 
     /**
       * @brief Recieves data from serial rx data line input.
       * 
-      * @param data A variable of type string to store recieved serial input.
+      * @param data A uint8_t pointer used to store recieved serial input.
       * 
       * @return True on success.
       */
-    virtual bool receive_rx(std::span<char>& data) = 0;
+    virtual bool receive_rx(uint8_t* data) = 0;
 };
