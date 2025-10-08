@@ -14,7 +14,6 @@
 #include "spi.h"
 #include "stm32l476xx.h"
 
-
 namespace LBR
 {
 namespace Stml4
@@ -109,7 +108,6 @@ public:
 
     // Member Functions
     bool Init();
-    // TODO: implement read, write, and transfer for SPI
     bool Read(uint8_t* rx_data, size_t buffer_len);
     bool Write(uint8_t* tx_data, size_t buffer_len);
     bool Transfer(uint8_t* tx_data, uint8_t* rx_data, size_t buffer_len);
