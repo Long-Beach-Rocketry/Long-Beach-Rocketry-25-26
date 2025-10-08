@@ -71,6 +71,14 @@ HwSpi::HwSpi(SPI_TypeDef* instance_, StSpiSettings& settings_)
 {
 }
 
+/**
+ * @brief Read data from a slave device.
+ * 
+ * @param rx_data 8 byte array to store read data.
+ * @param buffer_len Size of array.
+ * @return true 
+ * @return false 
+ */
 bool HwSpi::Read(uint8_t* rx_data, size_t buffer_len)
 {
     // Check if SPI is enabled
@@ -112,6 +120,14 @@ bool HwSpi::Read(uint8_t* rx_data, size_t buffer_len)
     return true;
 }
 
+/**
+ * @brief Write data to a slave device.
+ * 
+ * @param tx_data 8 byte array of the data to be sent.
+ * @param buffer_len Size of array
+ * @return true 
+ * @return false 
+ */
 bool HwSpi::Write(uint8_t* tx_data, size_t buffer_len)
 {
     // Check if SPI is enabled
@@ -162,6 +178,15 @@ bool HwSpi::Write(uint8_t* tx_data, size_t buffer_len)
     return true;
 }
 
+/**
+ * @brief Read and Write data to a slave device.
+ * 
+ * @param tx_data 8 byte array of the data to be sent.
+ * @param rx_data 8 byte array to store read data.
+ * @param buffer_len Size of arrays
+ * @return true 
+ * @return false 
+ */
 bool HwSpi::Transfer(uint8_t* tx_data, uint8_t* rx_data, size_t buffer_len)
 {
     // Check if SPI is enabled
