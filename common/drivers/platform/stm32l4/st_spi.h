@@ -9,9 +9,11 @@
 #pragma once
 
 #include <stdbool.h>
+#include <cstddef>
 #include <cstdint>
 #include "spi.h"
 #include "stm32l476xx.h"
+
 
 namespace LBR
 {
@@ -108,9 +110,9 @@ public:
     // Member Functions
     bool Init();
     // TODO: implement read, write, and transfer for SPI
-    bool Read(uint8_t* rx_data);
-    bool Write(uint8_t* tx_data);
-    bool Transfer(uint8_t* tx_data, uint8_t* rx_data);
+    bool Read(uint8_t* rx_data, size_t buffer_len);
+    bool Write(uint8_t* tx_data, size_t buffer_len);
+    bool Transfer(uint8_t* tx_data, uint8_t* rx_data, size_t buffer_len);
 
 private:
     // Member variables
