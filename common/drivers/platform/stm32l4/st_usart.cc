@@ -1,7 +1,6 @@
 #include "st_usart.h"
 
-StUsart::StUsart(USART_TypeDef* base_addr,
-                 uint32_t sys_clck,
+StUsart::StUsart(USART_TypeDef* base_addr, uint32_t sys_clck,
                  uint32_t baud_rate)
     : base_addr(base_addr), uartdiv(sys_clck / baud_rate) {};
 
