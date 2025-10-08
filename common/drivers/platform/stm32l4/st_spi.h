@@ -108,9 +108,9 @@ public:
     // Member Functions
     bool Init();
     // TODO: implement read, write, and transfer for SPI
-    bool Read();
-    bool Write(uint16_t output_data);
-    bool Transfer(uint16_t output_data);
+    bool Read(uint8_t* rx_data);
+    bool Write(uint8_t* tx_data);
+    bool Transfer(uint8_t* tx_data, uint8_t* rx_data);
 
 private:
     // Member variables

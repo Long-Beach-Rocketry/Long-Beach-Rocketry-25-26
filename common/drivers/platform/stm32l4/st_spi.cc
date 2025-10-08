@@ -70,16 +70,16 @@ HwSpi::HwSpi(SPI_TypeDef* instance_, StSpiSettings& settings_)
 {
 }
 
-bool HwSpi::Read() {
-    if (instance->CR2)
+bool HwSpi::Read(uint8_t* rx_data)
+{
 }
 
-bool HwSpi::Write() {
-
+bool HwSpi::Write(uint8_t* tx_data)
+{
 }
 
-bool HwSpi::Transfer() {
-    
+bool HwSpi::Transfer(uint8_t* tx_data, uint8_t* rx_data)
+{
 }
 
 /**
