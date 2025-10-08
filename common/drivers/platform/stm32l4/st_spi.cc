@@ -70,6 +70,18 @@ HwSpi::HwSpi(SPI_TypeDef* instance_, StSpiSettings& settings_)
 {
 }
 
+bool HwSpi::Read() {
+    if (instance->CR2)
+}
+
+bool HwSpi::Write() {
+
+}
+
+bool HwSpi::Transfer() {
+    
+}
+
 /**
  * @brief Initializes SPI peripheral and its sck, mosi, miso, and nss pins
  *
