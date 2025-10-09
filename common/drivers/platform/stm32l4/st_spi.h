@@ -1,7 +1,11 @@
 /**
+ * @file st_spi.h
+ * @brief spi header file for STM32
  * @author Phoebe Ho
- * @date 10/2/25    
+ * @date 10/2/2025
+ *
  */
+
 //spi interface
 //INIT Function
 /*
@@ -29,9 +33,9 @@ enum class SpiBitOrder : std::uint8_t{
     MSB_First=0,
     LSB_First
 };
-enum class SpiError: std::uint8_t{
+/*enum class SpiError: std::uint8_t{
     //need to add
-};
+};*/
 enum class SpiBaudRate: std::uint8_t{ // std::uint8_t is to ensure it's an unassigned integer of 8 bits
     Baud2 =0,
     Baud4,
@@ -43,16 +47,17 @@ enum class SpiBaudRate: std::uint8_t{ // std::uint8_t is to ensure it's an unass
     Baud256
 };
 
+// !: We only need enable
 enum class SpiEnable : std::uint8_t{
-    Enable = 0,
-    Disable
+    Enable = 0
 };
 class HwSpi
 { //pins should already be configured
 public: 
-    explicit HwSpi(SPI_TypeDef* spi, Pin mosi, Pin miso, Pin clk); //passing SPI1, SPI2, etc
+    // !: We dont need to set up the pins in the SPI class
+    explicit HwSpi(SPI_TypeDef* spi_, Pin mosi, Pin miso, Pin clk); //passing SPI1, SPI2, etc
     //constructor declaration for a class: HwSpi ^
-    bool spi_init();  
+    bool spi_init(SpiBaudRate baud, SpiBitOrder bit, SpiEnable enable, SpiPinMode mode);  
    //init function takes in no arguments --telling compiler it's meant to override a virtual function from a base 
     //class and if it's not found, it will generate an error (virtual so it can be overriden by derived classes)
     /*
@@ -66,7 +71,7 @@ public:
 
 private: //only accessible to the member functions of HwSpi (spi's own methods) (if i want initClocks(), need to call spi_init()
     //defining everything in the constructor
-    SPI_TypeDef* const spi_; //spi_ underscore is naming convention for private members
+    SPI_TypeDef* const spi; //spi_ underscore is naming convention for private members
     //^ private pointer to hardware Spi peripheral 
     /*SPI_TypeDef
     - C struct defined in stm32l476xx.h
@@ -74,12 +79,13 @@ private: //only accessible to the member functions of HwSpi (spi's own methods) 
     */
     Pin mosi;
     Pin miso;
-    Pin clk;
+    Pin clk; // Dont need these
 
-    void enableSPI(SpiEnable enable); //using enableSPI class with SpiEnable parameters
+    void enableSPI(SpiEnable enable); //using enableSPI class with SpiEnable parameters // Can do this in the init
     void setMode(SpiPinMode mode); 
+    void setBit(SpiBitOrder bit);
+    void setBaud(SpiBaudRate baud);
         
     };
 }; //semicolon after classes
-}
 }
