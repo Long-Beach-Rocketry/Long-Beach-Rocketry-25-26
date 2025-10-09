@@ -63,7 +63,21 @@ void HwSpi::spi_init(SpiBaudRate baud, SpiEnable enable, SpiPinMode mode, SpiBit
 
 }
 void HwSpi::spi_read(){
-    /*
+    //checking if there's still data to receive RXNE not empty
+    //checking if there's still data to receive: FIFO is not empty
+    //while((spi_->SR & (3<<9)) ||(spi_->SR & (1<<10))||(spi_->SR & (1<<9)) ){ //when the first in first out reception is greater than 0
+    while(!(spi_->SR & (1<<0))){
+    } //waiting for data to receive and be read
+
+    
+    
+    volatile uint8_t read_data = spi_->DR; //uint8_t is the data type; volatile: value can always change, read from hardware register
+    //& signifies a reference to variable (allows function to directly modify original variable in calling code)
+    //send in data read to spi_->DR
+    if(spi_->SR & (1<<6)){ //checking for overrun (when master or slave receives too much data and doesn't have space to store it)
+         volatile uint8_t discard = spi_->DR; //clearing overrun flag //stores it in a temporary variable discard
+         //documentation: clear by rading spi->DR register ; SPI peripheral clears oldest value in RXFIFO , and if not read, it will be lost
+    }}/*
     READ:
     - returns oldest value in RXFIFO that has not been read yet
     - managed by RXNE event (triggered when data stored in RXFIFO and threshold is reached)
@@ -71,16 +85,21 @@ void HwSpi::spi_read(){
     - Aligned with RXFIFO configured by FRXTH 
     - 1. 
     */
-}
+   
+
 
 void HwSpi::spi_write(uint8_t data){ 
-    
         while(!(spi_->SR & (1<<1))) {//if TXE is empty, continues in the loop and doesn't move on
 
         }
-        spi_->DR = data //writing to SPI DR (data register)
+        spi_->DR = data; //writing to SPI DR (data register) placed into FIFO
 
-        while()  /*
+        
+            
+        
+    while((spi_->SR & 1<<7)){ //BSY, TXE, etc are read, so do not set them 
+    }//waiting till the BSY is false to move on
+    /*
     WRITE:
     - stores written data in TXFIFO at end of a send queue
     - Managed by the TXE event (triggered when TXFIFO level is less than or equal to half of its capacity)
