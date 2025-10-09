@@ -80,8 +80,7 @@ void HwSpi::spi_write(uint8_t data){
         }
         spi_->DR = data //writing to SPI DR (data register)
 
-        while() // https://www.google.com/search?q=using+DR+stm32+SPI&oq=using+DR+stm32+SPI+&gs_lcrp=EgZjaHJvbWUyBggAEEUYOTIHCAEQIRiPAjIHCAIQIRiPAjIHCAMQIRiPAtIBCDUyMDRqMGoxqAIAsAIA&sourceid=chrome&ie=UTF-8
-    /*
+        while()  /*
     WRITE:
     - stores written data in TXFIFO at end of a send queue
     - Managed by the TXE event (triggered when TXFIFO level is less than or equal to half of its capacity)
