@@ -1,3 +1,16 @@
+/**
+ * @file    st_spi.h
+ * @author  Bex Saw
+ * @brief   Bare-metal STM32L4 SPI driver (implements Spi interface)
+ * @version 0.2
+ * @date    2025-10-05
+ *
+ * @note Usage:
+ *   LBR::Stml4::HwSpi spi(SPI1, settings);
+ *   spi.Init();
+ *   spi.Send(tx_buf, len, 1000);
+ */
+
 #pragma once
 
 #include <cstdint>
