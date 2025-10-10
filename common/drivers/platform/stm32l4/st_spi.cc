@@ -9,7 +9,7 @@
 #include "stm32l476xx.h"
 
 namespace LBR {
-namespace Stml4 {
+    namespace Stml4 {
 
 /**
  * @brief Set bits in a SPI register
