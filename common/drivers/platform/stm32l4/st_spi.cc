@@ -1,131 +1,155 @@
 /**
- * @file    st_spi.cc
- * @author  Bex Saw
- * @brief   Bare-metal SPI driver for STM32L4
- * @version 0.2
- * @date    2025-10-05
+ * @file st_spi.cc
+ * @brief SPI Driver class implementation for STM32L4xx
+ * @author Bex Saw
+ * @date 2025-09-30
  */
 
 #include "st_spi.h"
+#include "stm32l476xx.h"
 
 namespace LBR {
-    namespace Stml4 {
-        SpiStatus HwSpi::Init()
-        {
-            if (!instance_)
-            return SpiStatus::INIT_ERR;
-            
-            // Disable SPI before config
-            instance_->CR1 &= ~SPI_CR1_SPE;
+namespace Stml4 {
 
-            // Full duplex
-            instance_->CR1 |= SPI_CR1_MSTR;
-            instance_->CR1 &= ~SPI_CR1_RXONLY;
-
-            // (NSS) 
-            instance_->CR1 |= SPI_CR1_SSM | SPI_CR1_SSI;
-            
-            // Apply all settings
-            if (!SetSpiBaudRate(settings_.baudRate))     
-                return SpiStatus::INIT_ERR;
-            if (!SetSpiBusMode(settings_.busMode))       
-                return SpiStatus::INIT_ERR;
-            if (!SetDataSize(settings_.dataSize))        
-                return SpiStatus::INIT_ERR;
-            if (!SetBitOrder(settings_.bitOrder))        
-                return SpiStatus::INIT_ERR;
-            if (!SetRxThreshold(settings_.rxThreshold))  
-                return SpiStatus::INIT_ERR;
-
-            // Enable SPI
-            instance_->CR1 |= SPI_CR1_SPE;
-
-            initialized_ = true;
-            return SpiStatus::OK;
+/**
+ * @brief Set bits in a SPI register
+ * 
+ * @param reg Target register
+ * @param enum_val Enum value or bit pattern to set
+ * @param bit_num Starting bit position
+ * @param bit_length Number of bits to modify
+ */
+void HwSpi::SetReg(volatile uint32_t* reg, uint32_t enum_val, uint32_t bit_num, uint32_t bit_length)
+{
+    uint32_t mask = ((1U << bit_length) - 1U);
+    *reg = (*reg & ~(mask << bit_num)) | ((enum_val & mask) << bit_num);
 }
 
 /**
- * @brief Blocking send operation
- * @note SetSpiBaudRate, SetSpiBusMode, SetDataSize, SetBitOrder, SetRxThreshold
- * must be called before this function 
+ * @brief Validate SPI configuration
+ * 
+ * @param spi SPI object to validate
+ * @return true if configuration is valid
+ * @return false otherwise
  */
-
-bool HwSpi::SetSpiBaudRate(SpiBaudRate baudRate)
+bool ValidateSpi(HwSpi& spi)
 {
-    if (!instance_)
-        return false;
+    if (static_cast<uint8_t>(spi.settings.baudrate) > 7) return false;
+    if (static_cast<uint8_t>(spi.settings.busmode) > 3) return false;
+    if (static_cast<uint8_t>(spi.settings.order) > 1) return false;
+    if (static_cast<uint8_t>(spi.settings.threshold) > 1) return false;
+    return true;
+}
 
-    // Clear divider bits, then set new value
-    instance_->CR1 &= ~SPI_CR1_BR_Msk;
-    instance_->CR1 |= (static_cast<uint32_t>(baudRate) << SPI_CR1_BR_Pos);
+/**
+ * @brief Constructor for HwSpi object
+ * 
+ * @param instance_ SPI peripheral base address
+ * @param settings_ SPI configuration settings
+ */
+HwSpi::HwSpi(SPI_TypeDef* instance_, const StSpiSettings& settings_)
+    : instance(instance_), settings(settings_)
+{
+}
+
+/**
+ * @brief Initialize the SPI peripheral
+ * 
+ * @return true if initialized successfully
+ * @return false otherwise
+ */
+bool HwSpi::Init()
+{
+    instance->CR1 |= SPI_CR1_MSTR;         // Master mode
+    instance->CR1 &= ~SPI_CR1_RXONLY;      // Full-duplex
+
+    SetReg(&instance->CR1, uint32_t(settings.baudrate), 3, 3);
+    SetReg(&instance->CR1, uint32_t(settings.busmode), 0, 2);
+    SetReg(&instance->CR1, uint32_t(settings.order), 7, 1);
+    SetReg(&instance->CR2, uint32_t(settings.threshold), 12, 1);
+
+    instance->CR2 |= (SPI_CR2_DS_0 | SPI_CR2_DS_1 | SPI_CR2_DS_2); // 8-bit data
+    instance->CR1 |= (SPI_CR1_SSM | SPI_CR1_SSI);                  // Software NSS
+    instance->CR1 |= SPI_CR1_SPE;                                  // Enable SPI
 
     return true;
 }
 
-
-bool HwSpi::SetSpiBusMode(SpiBusMode mode)
+/**
+ * @brief Read data from SPI slave
+ * 
+ * @param rx_data Pointer to receive buffer
+ * @param buffer_len Number of bytes to read
+ * @return true if successful
+ * @return false otherwise
+ */
+bool HwSpi::Read(uint8_t* rx_data, size_t buffer_len)
 {
-    if (!instance_)
+    if (!(instance->CR1 & SPI_CR1_SPE) || (instance->SR & SPI_SR_BSY))
         return false;
 
-    // Clear CPOL and CPHA
-    instance_->CR1 &= ~(SPI_CR1_CPOL | SPI_CR1_CPHA);
+    for (size_t i = 0; i < buffer_len; i++)
+    {
+        while (!(instance->SR & SPI_SR_TXE)) {}
+        *(volatile uint8_t*)&instance->DR = 0x00; // Dummy write
+        while (!(instance->SR & SPI_SR_RXNE)) {}
+        rx_data[i] = *(volatile uint8_t*)&instance->DR;
+    }
 
-    // Extract bit patterns directly from enum value
-    uint8_t mode_val = static_cast<uint8_t>(mode);
-
-    uint32_t cpol_bit = (mode_val >> 1) & 0x01;  // high bit
-    uint32_t cpha_bit = mode_val & 0x01;         // low bit
-
-    instance_->CR1 |= (cpol_bit * SPI_CR1_CPOL);
-    instance_->CR1 |= (cpha_bit * SPI_CR1_CPHA);
-
+    while (instance->SR & SPI_SR_BSY) {}
     return true;
 }
 
-
-bool HwSpi::SetDataSize(SpiDataSize size)
+/**
+ * @brief Write data to SPI slave
+ * 
+ * @param tx_data Pointer to data buffer
+ * @param buffer_len Number of bytes to send
+ * @return true if successful
+ * @return false otherwise
+ */
+bool HwSpi::Write(const uint8_t* tx_data, size_t buffer_len)
 {
-    if (!instance_)
+    if (!(instance->CR1 & SPI_CR1_SPE) || (instance->SR & SPI_SR_BSY))
         return false;
 
-    instance_->CR2 &= ~SPI_CR2_DS_Msk;
+    for (size_t i = 0; i < buffer_len; i++)
+    {
+        while (!(instance->SR & SPI_SR_TXE)) {}
+        *(volatile uint8_t*)&instance->DR = tx_data[i];
+        while (!(instance->SR & SPI_SR_RXNE)) {}
+        (void)(*(volatile uint8_t*)&instance->DR); // Clear RXNE
+    }
 
-    if (size == SpiDataSize::DATA_8BIT)
-        instance_->CR2 |= (0x7U << SPI_CR2_DS_Pos);
-    else
-        instance_->CR2 |= (0xFU << SPI_CR2_DS_Pos);
-
+    while (instance->SR & SPI_SR_BSY) {}
     return true;
 }
 
-
-bool HwSpi::SetBitOrder(SpiBitOrder order)
+/**
+ * @brief Perform full-duplex SPI transfer
+ * 
+ * @param tx_data Pointer to transmit buffer
+ * @param rx_data Pointer to receive buffer
+ * @param buffer_len Number of bytes to transfer
+ * @return true if successful
+ * @return false otherwise
+ */
+bool HwSpi::Transfer(const uint8_t* tx_data, uint8_t* rx_data, size_t buffer_len)
 {
-    if (!instance_)
+    if (!(instance->CR1 & SPI_CR1_SPE) || (instance->SR & SPI_SR_BSY))
         return false;
 
-    if (order == SpiBitOrder::MSB_FIRST)
-        instance_->CR1 &= ~SPI_CR1_LSBFIRST;
-    else
-        instance_->CR1 |= SPI_CR1_LSBFIRST;
+    for (size_t i = 0; i < buffer_len; i++)
+    {
+        while (!(instance->SR & SPI_SR_TXE)) {}
+        *(volatile uint8_t*)&instance->DR = tx_data[i];
+        while (!(instance->SR & SPI_SR_RXNE)) {}
+        rx_data[i] = *(volatile uint8_t*)&instance->DR;
+    }
 
+    while (instance->SR & SPI_SR_BSY) {}
     return true;
 }
 
-
-bool HwSpi::SetRxThreshold(SpiRxThreshold th)
-{
-    if (!instance_)
-        return false;
-
-    if (th == SpiRxThreshold::RX_8BIT)
-        instance_->CR2 |= SPI_CR2_FRXTH;
-    else
-        instance_->CR2 &= ~SPI_CR2_FRXTH;
-
-    return true;
-}
-
-} 
-} 
+}  // namespace Stml4
+}  // namespace LBR

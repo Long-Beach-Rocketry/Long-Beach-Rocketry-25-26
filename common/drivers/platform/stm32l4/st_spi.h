@@ -1,67 +1,83 @@
-/**
- * @file    st_spi.h
- * @author  Bex Saw
- * @brief   Bare-metal STM32L4 SPI driver (implements Spi interface)
- * @version 0.2
- * @date    2025-10-05
- *
- * @note Usage:
- *   LBR::Stml4::HwSpi spi(SPI1, settings);
- *   spi.Init();
- *   spi.Send(tx_buf, len, 1000);
- */
-
 #pragma once
 
-#include "stm32l4xx.h"
-#include "spi.h"
-#include "st_spi_settings.h"
 #include <cstdint>
 #include <cstddef>
+#include "spi.h"
+#include "stm32l476xx.h"
 
 namespace LBR {
     namespace Stml4 {
-        class HwSpi : public Spi {
-            public:
-                // Construct with SPI instance and initial settings
-                    HwSpi(SPI_TypeDef* instance, const StSpiSettings& settings)
-                        : instance_(instance), settings_(settings) {}
 
-                // Initialize SPI and apply settings
-                    SpiStatus Init();
 
-                // Basic blocking operations
-                    bool Send(const std::uint8_t* data,
-                            std::size_t size,
-                            std::uint32_t timeout);
+enum class SpiBaudRate : uint8_t
+{
+    FPCLK_2 = 0,
+    FPCLK_4,
+    FPCLK_8,
+    FPCLK_16,
+    FPCLK_32,
+    FPCLK_64,
+    FPCLK_128,
+    FPCLK_256
+};
 
-                    bool Read(std::uint8_t* data,
-                            std::size_t size,
-                            std::uint32_t timeout);
+enum class SpiBusMode : uint8_t
+{
+    MODE1 = 0,  // CPOL=0, CPHA=0
+    MODE2,      // CPOL=0, CPHA=1
+    MODE3,      // CPOL=1, CPHA=0
+    MODE4       // CPOL=1, CPHA=1
+};
 
-                    bool Transfer(const std::uint8_t* tx_data,
-                            std::uint8_t* rx_data,
-                            std::size_t size,
-                            std::uint32_t timeout);
+enum class SpiBitOrder : uint8_t
+{
+    MSB = 0,
+    LSB
+};
 
-                // Required by Spi interface (according to spi.h)
-                    bool Read() override   { return true; }
-                    bool Write() override  { return true; }
-                    bool Transfer() override { return true; }
+enum class SpiRxThreshold : uint8_t
+{
+    FIFO_16bit = 0,
+    FIFO_8bit
+};
 
-            private:
-                // Hardware instance and config
-                SPI_TypeDef*   instance_      { nullptr };
-                StSpiSettings  settings_      { };
-                bool initialized_             { false };
+enum class SpiStatus : uint8_t
+{
+    OK = 0,
+    READ_ERR,
+    WRITE_ERR,
+    TRANSFER_ERR,
+    INIT_ERR
+};
 
-                // Internal helpers
-                bool SetSpiBaudRate(SpiBaudRate baudrate);
-                bool SetSpiBusMode(SpiBusMode mode);
-                bool SetDataSize(SpiDataSize size);
-                bool SetBitOrder(SpiBitOrder order);
-                bool SetRxThreshold(SpiRxThreshold th);
-            };
+struct StSpiSettings
+{
+    SpiBaudRate baudrate;
+    SpiBusMode busmode;
+    SpiBitOrder order;
+    SpiRxThreshold threshold;
+};
 
-}   
-}   
+class HwSpi : public Spi
+{
+    friend bool ValidateSpi(HwSpi& spi);
+
+public:
+    explicit HwSpi(SPI_TypeDef* instance, const StSpiSettings& cfg);
+
+    bool Init();
+    bool Read(uint8_t* rx_buf, size_t len);
+    bool Write(const uint8_t* tx_buf, size_t len);
+    bool Transfer(const uint8_t* tx_buf, uint8_t* rx_buf, size_t len);
+
+private:
+    SPI_TypeDef* instance;
+    StSpiSettings settings;
+
+    static inline void SetReg(volatile uint32_t* reg,
+                              uint32_t val,
+                              uint32_t pos,
+                              uint32_t width);
+};
+}
+}
