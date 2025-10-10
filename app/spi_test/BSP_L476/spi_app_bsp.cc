@@ -1,17 +1,24 @@
 #include "spi_app_bsp.h"
+#include "stm32l476xx.h"
 
 using namespace LBR::Stml4;
 
-static HwSpi spi1(SPI1, {
-    .baudRate    = SpiBaudRate::FPCLK_16,
-    .busMode     = SpiBusMode::MODE1,
-    .dataSize    = SpiDataSize::DATA_8BIT,
-    .bitOrder    = SpiBitOrder::MSB_FIRST,
-    .rxThreshold = SpiRxThreshold::RX_8BIT
-});
+// Define SPI configuration
+static StSpiSettings spi_cfg = {
+    .baudrate   = SpiBaudRate::FPCLK_16,
+    .busmode    = SpiBusMode::MODE1,
+    .order      = SpiBitOrder::MSB,
+    .threshold  = SpiRxThreshold::FIFO_8bit
+};
 
+// Create SPI1 instance
+static HwSpi spi1(SPI1, spi_cfg);
+
+// Initialize SPI BSP
 Spi& BSP_Init(SPI_TypeDef* base_addr)
 {
+    (void)base_addr; // avoid unused parameter warning
+
     // Enable GPIOA clock
     RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
 

@@ -16,33 +16,11 @@ static inline void set_field(volatile uint32_t* field, uint32_t val,
     *field |= (mask & val) << (pos * bits);
 }
 
-//not using currently
-static inline void enable_gpio_clock(GPIO_TypeDef* gpio)
-{
-    if (gpio == GPIOA)
-        RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
-    else if (gpio == GPIOB)
-        RCC->AHB2ENR |= RCC_AHB2ENR_GPIOBEN;
-    else if (gpio == GPIOC)
-        RCC->AHB2ENR |= RCC_AHB2ENR_GPIOCEN;
-    else if (gpio == GPIOD)
-        RCC->AHB2ENR |= RCC_AHB2ENR_GPIODEN;
-    else if (gpio == GPIOE)
-        RCC->AHB2ENR |= RCC_AHB2ENR_GPIOEEN;
-    else if (gpio == GPIOF)
-        RCC->AHB2ENR |= RCC_AHB2ENR_GPIOFEN;
-    else if (gpio == GPIOG)
-        RCC->AHB2ENR |= RCC_AHB2ENR_GPIOGEN;
-    else if (gpio == GPIOH)
-        RCC->AHB2ENR |= RCC_AHB2ENR_GPIOHEN;
-}
+HwGpio::HwGpio(const StGpioParams& params)
+    : settings_{params.settings},
+      pin_num_{params.pin_num},
+      base_addr_{params.base_addr} {};
 
-HwGpio::HwGpio(StGpioSettings& settings,
-               std::uint8_t pin_num,
-               GPIO_TypeDef* base_addr)
-    : settings_(settings), pin_num_(pin_num), base_addr_(base_addr) {};
-
-// enable clock in bsp
 bool HwGpio::init(void)
 {
     if (pin_num_ >= ST_GPIO_MAX_PINS || base_addr_ == nullptr)
