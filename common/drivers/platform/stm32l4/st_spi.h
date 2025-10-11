@@ -13,14 +13,15 @@
 
 #pragma once
 
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
 #include "spi.h"
 #include "stm32l476xx.h"
 
-namespace LBR {
-    namespace Stml4 {
-
+namespace LBR
+{
+namespace Stml4
+{
 
 enum class SpiBaudRate : uint8_t
 {
@@ -87,10 +88,8 @@ private:
     SPI_TypeDef* instance;
     StSpiSettings settings;
 
-    static inline void SetReg(volatile uint32_t* reg,
-                              uint32_t val,
-                              uint32_t pos,
-                              uint32_t width);
+    static inline void SetReg(volatile uint32_t* reg, uint32_t val,
+                              uint32_t pos, uint32_t width);
 };
-}
-}
+}  // namespace Stml4
+}  // namespace LBR
