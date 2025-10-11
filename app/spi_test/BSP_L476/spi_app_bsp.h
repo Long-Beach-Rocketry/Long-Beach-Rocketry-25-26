@@ -1,8 +1,8 @@
-#pragma once 
+#pragma once
 
+#include "spi.h"
 #include "st_gpio.h"
 #include "st_spi.h"
-#include "spi.h"
 
 using namespace LBR;
 
