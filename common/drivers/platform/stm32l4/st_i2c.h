@@ -16,9 +16,9 @@ namespace LBR {
              * @brief Initializes I2C peripheral;
              * 
              * @param None
-             * @return None
+             * @return true if successful, false otherwise
              */
-            void init();
+            bool init();
 
             bool read(std::span<uint8_t> data, uint8_t dev_addr) override;
             bool write(std::span<const uint8_t> data, uint8_t dev_addr) override;

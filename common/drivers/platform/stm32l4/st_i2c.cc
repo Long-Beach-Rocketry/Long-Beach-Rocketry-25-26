@@ -5,7 +5,11 @@ namespace LBR {
         HwI2c::HwI2c(I2C_TypeDef* instance, uint32_t timingr)
             : _instance{instance}, _timingr{timingr} {}
 
-        void HwI2c::init() {
+        bool HwI2c::init() {
+            if (_instance == nullptr) {
+                return false;
+            }
+
             // Reset peripheral
             _instance->CR1 &= ~I2C_CR1_PE;
 
@@ -17,6 +21,8 @@ namespace LBR {
 
             // Enable peripheral
             _instance->CR1 |= I2C_CR1_PE;
+
+            return true;
         }
 
         bool HwI2c::read(std::span<uint8_t> data, uint8_t dev_addr) {
