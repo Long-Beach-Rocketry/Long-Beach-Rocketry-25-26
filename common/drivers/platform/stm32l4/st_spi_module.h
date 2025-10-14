@@ -28,10 +28,8 @@ public:
      * @param miso_p GPIO parameters for the MISO pin.
      * @param mosi_p GPIO parameters for the MOSI pin.
      */
-    explicit SpiModule(SPI_TypeDef* instance_,
-                       const StSpiSettings& cfg_,
-                       const StGpioParams& sck_p,
-                       const StGpioParams& miso_p,
+    explicit SpiModule(SPI_TypeDef* instance_, const StSpiSettings& cfg_,
+                       const StGpioParams& sck_p, const StGpioParams& miso_p,
                        const StGpioParams& mosi_p);
 
     /**
@@ -54,4 +52,4 @@ private:
     HwGpio mosi_pin_;
 };
 
-} 
+}  // namespace LBR::Stml4

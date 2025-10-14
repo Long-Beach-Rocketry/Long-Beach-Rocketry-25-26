@@ -42,7 +42,7 @@ LBR::Stml4::HwSpi LBR::Stml4::SpiModule::GetSpi()
     }
     else
     {
-        // TODO: Handle invalid SPI 
+        // TODO: Handle invalid SPI
     }
 
     return spi;
