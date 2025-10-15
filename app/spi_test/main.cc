@@ -1,87 +1,66 @@
 /**
- * @file    main.cc
- * @author  Bex Saw
- * @brief   Bare-metal SPI test for STM32L4 using HwSpi driver
- * @version 0.3
- * @date    2025-10-05
+ * @file main.cc
+ * @brief Bare-metal SPI1 communication test on STM32L476.
+ * @author Bex Saw
  */
 
-#include "st_spi.h"
-#include "st_spi_settings.h"
-#include "stm32l4xx.h"
+#include "st_gpio.h"
+#include "st_spi_module.h"
+#include "stm32l476xx.h"
 
 using namespace LBR::Stml4;
 
 int main(void)
 {
+    // Enable peripheral clks
 
-    RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;  // Enable GPIOA clock
-    RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;   // Enable SPI1 clock
+    RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;  // Enable GPIOA clk
+    RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;   // Enable SPI1 clk
 
-    // SPI1 pins (PA5=SCK, PA6=MISO, PA7=MOSI)
-    GPIOA->MODER &=
-        ~(GPIO_MODER_MODE5_Msk | GPIO_MODER_MODE6_Msk | GPIO_MODER_MODE7_Msk);
-    GPIOA->MODER |= (0b10 << GPIO_MODER_MODE5_Pos) |
-                    (0b10 << GPIO_MODER_MODE6_Pos) |
-                    (0b10 << GPIO_MODER_MODE7_Pos);
+    // SPI configuration
+    StSpiSettings cfg{SpiBaudRate::FPCLK_8,
+                      SpiBusMode::MODE1,  // MODE1
+                      SpiBitOrder::MSB, SpiRxThreshold::FIFO_8bit};
 
-    // For Alternate Function mode, set AF5 for SPI1
-    GPIOA->AFR[0] &=
-        ~((0xF << GPIO_AFRL_AFSEL5_Pos) | (0xF << GPIO_AFRL_AFSEL6_Pos) |
-          (0xF << GPIO_AFRL_AFSEL7_Pos));
-    GPIOA->AFR[0] |= (5 << GPIO_AFRL_AFSEL5_Pos) | (5 << GPIO_AFRL_AFSEL6_Pos) |
-                     (5 << GPIO_AFRL_AFSEL7_Pos);
+    // GPIO configuration for SPI1 pins (Subject to Change)
+    StGpioParams sck_pin{
+        {GpioMode::ALT_FUNC, GpioOtype::PUSH_PULL, GpioOspeed::HIGH,
+         GpioPupd::NO_PULL, 5},  // AF5
+        5,
+        GPIOA  // PA5 - SCK
+    };
 
-    // Highspeed
-    GPIOA->OSPEEDR |= (0b11 << GPIO_OSPEEDR_OSPEED5_Pos) |
-                      (0b11 << GPIO_OSPEEDR_OSPEED6_Pos) |
-                      (0b11 << GPIO_OSPEEDR_OSPEED7_Pos);
+    StGpioParams miso_pin{
+        {GpioMode::ALT_FUNC, GpioOtype::PUSH_PULL, GpioOspeed::HIGH,
+         GpioPupd::NO_PULL, 5},  // AF5
+        6,
+        GPIOA  // PA6 - MISO
+    };
 
-    // 3. Configure SPI settings
-    StSpiSettings spiSettings{SpiBaudRate::FPCLK_8,
-                              SpiBusMode::MODE2,  // Assume CPOL=0, CPHA=1
-                              SpiDataSize::DATA_8BIT, SpiBitOrder::MSB_FIRST,
-                              SpiRxThreshold::RX_8BIT};
+    StGpioParams mosi_pin{
+        {GpioMode::ALT_FUNC, GpioOtype::PUSH_PULL, GpioOspeed::HIGH,
+         GpioPupd::NO_PULL, 5},  // AF5
+        7,
+        GPIOA  // PA7 - MOSI
+    };
 
-    HwSpi spi(SPI1, spiSettings);
+    // Init SPI Module
+    SpiModule spi_module(SPI1, cfg, sck_pin, miso_pin, mosi_pin);
 
-    if (spi.Init() != SpiStatus::OK)
-    {
-        // Initialization failed, loop in here
-        while (1)
-        {
-            __BKPT(0);
-        }
-    }
+    // Create SPI driver
+    HwSpi spi = spi_module.CreateSpi();
 
-    // 4. TXFIFO RXFIFO loopback: PA7 -> PA6
-    uint8_t txData[] = {0xAA, 0x55};
-    uint8_t rxData[2] = {0};
+    // Initialize SPI Peripheral
+    if (!spi.Init())
+        while (1);  // Trap CPU if SPI init failed
 
-    spi.Send(txData, 2, 1000);
-    spi.Read(rxData, 2, 1000);
+    // Data buffers
+    uint8_t txData[2] = {0xAB, 0xCD};
+    uint8_t rxData[2] = {0x00, 0x00};
 
-    // Validation: verify data
-    bool match = true;
-    for (size_t i = 0; i < sizeof(txData); ++i)
-    {
-        if (rxData[i] != txData[i])
-        {
-            match = false;
-            break;
-        }
-    }
+    // Perform full-duplex SPI transfer
+    spi.Transfer(txData, rxData, 2);
 
-    // Superloop for Validation
-    while (1)
-    {
-        if (match)
-        {
-            __NOP();  // success → idle or probe with logic analyzer
-        }
-        else
-        {
-            __BKPT(0);  // data mismatch → debugger breakpoint
-        }
-    }
+    // Idle loop
+    while (1);
 }

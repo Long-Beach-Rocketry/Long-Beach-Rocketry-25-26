@@ -8,7 +8,7 @@ set(PREPROCESS_DEFS
 
 add_subdirectory_for(STM32L476 BSP_L476)
 
-if (TARGET spi_bsp)
+if (TARGET spi_app_bsp)
 
     add_executable_for(${TARGET_DEVICE} ${EXECUTABLE} ${LDF}
         main.cc
@@ -20,7 +20,7 @@ if (TARGET spi_bsp)
     )
 
     target_link_libraries_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
-        spi_bsp
+        spi_app_bsp
     )
 
     target_preprocess_for(${TARGET_DEVICE} ${EXECUTABLE} ${LINKER_SCRIPT} ${LDF} ${PREPROCESS_DEFS})

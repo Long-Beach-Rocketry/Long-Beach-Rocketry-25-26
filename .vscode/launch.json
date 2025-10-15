@@ -3,6 +3,22 @@
     "projectName": "proj2",
     "configurations": [
         {
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceRoot}/build/stm32l476/app/spi_test/spi_test",
+            "name": "DEBUG SPI L4",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32L476",
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
+            ],
+            "runToMain": true,
+            "svdFile": "${workspaceRoot}/mcu_support/l4xx/STM32L4x2.svd",
+            "showDevDebugOutput": false
+        },
+        {
             "cwd": "${workspaceFolder}",
             "executable": "${workspaceRoot}/build/stm32f746/app/cli_app/cli_app",
             "name": "DEBUG CLI F7",
