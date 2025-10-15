@@ -43,7 +43,6 @@ public:
      * @return HwSpi The existing SPI instance.
      */
     HwSpi GetSpi() const;
-    
 
 private:
     bool ValidateSpi(const HwSpi& spi);

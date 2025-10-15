@@ -58,8 +58,7 @@ bool LBR::Stml4::SpiModule::ValidateSpi(const HwSpi& spi)
     if (&sck_pin_ == nullptr || &miso_pin_ == nullptr || &mosi_pin_ == nullptr)
         return false;
 
-
     (void)cfg_;
     return true;
 }
-}
+}  // namespace LBR::Stml4
