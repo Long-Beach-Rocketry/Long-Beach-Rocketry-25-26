@@ -43,8 +43,10 @@ public:
      * @return HwSpi The existing SPI instance.
      */
     HwSpi GetSpi() const;
+    
 
 private:
+    bool ValidateSpi(const HwSpi& spi);
     SPI_TypeDef* instance_;
     StSpiSettings cfg_;
     HwGpio sck_pin_;
