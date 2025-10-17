@@ -64,33 +64,41 @@ void HwSpi::spi_init(SpiBaudRate baud, SpiEnable enable, SpiPinMode mode, SpiBit
     
 
 }
-void HwSpi::spi_read(){
-    //enable spi first
-    spi_->CR1 |= 
+void HwSpi::spi_read(uint8_t* buffer_read, size_t length){ //pointer to buffer_read so any data will be stored there, length represents # of bytes (allows for more bytes to be read at a time instead of one at a time)
+    //dummy byte to return byte from slave 0xFF --> all bits are high and just wants to clock out data from slave
+    //need dummy byte: to receive any data from slave to keep clk - provides clock pulses
+    size_t i; //initializing i to use in the for loop (size_t represents unsigned (0 to 255) size/counts/lengths of an object)
+    spi_->CR1 |= (1<<6); //enable spi
 
-    }
-    //RXONLY = 1 or BIDIMODE = 1 & BIDIOE = 0
-    while(spi_->SR && 1<<7){
-
-    } //wait until bsy flag is off 
-    while(spi_->SR && (1<<7)){
-    }//BSY FLAG -- add, dereference for volatile read data (convert to 8 bit register and access that register using *) &--> the address 
+//BSY FLAG -- add, dereference for volatile read data (convert to 8 bit register and access that register using *) &--> the address 
     //checking if there's still data to receive RXNE not empty
     //checking if there's still data to receive: FIFO is not empty
     //while((spi_->SR & (3<<9)) ||(spi_->SR & (1<<10))||(spi_->SR & (1<<9)) ){ //when the first in first out reception is greater than 0
-    while(!(spi_->SR && (1<<0))){
-    } //waiting for data to receive and be read
+    
 
     
-    
-    volatile uint8_t read_data = spi_->DR; //uint8_t is the data type; volatile: value can always change, read from hardware register
+    for(i = 0; i < length; i++){
+          while(spi_->SR & 1<<7){
+
+    } //wait until bsy flag is off 
+           while(!(spi_->SR & (1<<1))){ // waiting for TXE = making sure it's empty so it can read
+    }
+        //setting up dummy variable
+
+    uint8_t dummy = 0xFF; //dummy variable to have clock pulses
+    spi_->DR = dummy;
+    while(!(spi_->SR & (1<<0))){
+    } //waiting for data to receive and be read
+
+    buffer_read[i] = spi_->DR; //uint8_t is the data type; volatile: value can always change, read from hardware register
     //& signifies a reference to variable (allows function to directly modify original variable in calling code)
     //send in data read to spi_->DR
-    if(spi_->SR && (1<<6)){ //checking for overrun (when master or slave receives too much data and doesn't have space to store it)
-         volatile uint8_t discard = spi_->DR; //clearing overrun flag //stores it in a temporary variable discard
-         //documentation: clear by rading spi->DR register ; SPI peripheral clears oldest value in RXFIFO , and if not read, it will be lost
-    }}
-    
+    //spi_->DR should be volatile in hal
+    if(spi_->SR & (1<<6)){ //checking for overrun (when master or slave receives too much data and doesn't have space to store it)
+        uint8_t discard = spi_->DR; //clearing overrun flag //stores it in a temporary variable discard
+         //documentation: clear by reading spi->DR register ; SPI peripheral clears oldest value in RXFIFO , and if not read, it will be lost
+    }
+    }
     /*
     READ:
     - returns oldest value in RXFIFO that has not been read yet
@@ -99,19 +107,27 @@ void HwSpi::spi_read(){
     - Aligned with RXFIFO configured by FRXTH 
     - 1. 
     */
-   
+       while(spi_->SR & 1<<7){
 
+    } //wait until bsy flag is off 
 
-void HwSpi::spi_write(uint8_t data){ 
-    while(spi_->SR & (1<<1)){
-    while(spi_->SR & (1<<7)){
-    }//ADD CHECK FOR BSY, implement for loop to keep feeding bytes you want to send from an array
+}
+
+void HwSpi::spi_write(uint8_t* data, size_t len){ 
+    spi_->CR1 |= (1<<6); //enable spi
+    size_t j;
+       while((spi_->SR & 1<<7)){ //BSY, TXE, etc are read, so do not set them 
+    }//waiting till the BSY is false to move on
+    
+    
+  //ADD CHECK FOR BSY, implement for loop to keep feeding bytes you want to send from an array
     //every time it writes it needs to read (make sure things show up in read) -- checking if things can be written when 
 
-        while(!(spi_->SR & (1<<1))) {//if TXE is empty, continues in the loop and doesn't move on
-
-        }
-        spi_->DR = data; //writing to SPI DR (data register) placed into FIFO
+        for(j = 0; j<len;j++){
+            while(!(spi_->SR & (1<<1))){ //waiting for TXE to be empty
+            }
+            spi_->DR = data[j]; //writing to SPI DR (data register) placed into FIFO
+            }
 
         
             
@@ -120,7 +136,7 @@ void HwSpi::spi_write(uint8_t data){
     }//waiting till the BSY is false to move on
     /*
 
-        while()  /*
+        while()  
 
     WRITE:
     - stores written data in TXFIFO at end of a send queue
@@ -129,18 +145,18 @@ void HwSpi::spi_write(uint8_t data){
     
     */
 }
-}
+
 
 void Hw::spi_transfer(){
 
 }
 
 }
-}
+
 
 //clangd --> to settings.json
 
 
-
+}   
     
 

@@ -8,9 +8,9 @@
 namespace LBR{
     class spi{
         //virtual bool init()=0; don't need?
-        virtual bool read(); //virtual bool: can be overridden in derived classes (child class)
-        virtual bool write();
-        virtual bool transfer(); // !: Suggestion - use Google C++ naming conventions
+        virtual bool read(); = 0 //virtual bool: can be overridden in derived classes (child class)
+        virtual bool write(); = 0
+        virtual bool transfer(); = 0 // !: Suggestion - use Google C++ naming conventions
         ~spi() = default; //deconstructor; in case it goes out of bounds and set to default
     };
 }
