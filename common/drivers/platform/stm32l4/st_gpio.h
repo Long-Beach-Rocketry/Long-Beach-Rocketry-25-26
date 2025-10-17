@@ -11,7 +11,7 @@
 #include "gpio.h" //abstract class: in io
 #include "stm32l476xx.h" //register definitions for GPIO register access
 
-#define ST_GPIO_MAX_PINS 16 //# of pins per port on STM32
+#define ST_GPIO_MAX_PINS 16 //# of pins per port on STM32 //
 
 namespace LBR //project name / org
 {

@@ -10,7 +10,7 @@
 //spi implementation
 #include "st_spi.h"
 #include "stm32l476xx.h"
-#include "st_gpio.h"
+#include "st_gpio.h" //take out some
 namespace LBR
 {
 namespace STM32
@@ -67,8 +67,9 @@ void HwSpi::spi_init(SpiBaudRate baud, SpiEnable enable, SpiPinMode mode, SpiBit
 void HwSpi::spi_read(uint8_t* buffer_read, size_t length){ //pointer to buffer_read so any data will be stored there, length represents # of bytes (allows for more bytes to be read at a time instead of one at a time)
     //dummy byte to return byte from slave 0xFF --> all bits are high and just wants to clock out data from slave
     //need dummy byte: to receive any data from slave to keep clk - provides clock pulses
+    //pointers allow modification of original 
     size_t i; //initializing i to use in the for loop (size_t represents unsigned (0 to 255) size/counts/lengths of an object)
-    spi_->CR1 |= (1<<6); //enable spi
+    spi_->CR1 |= (1<<6); //enable spi - do we need?
 
 //BSY FLAG -- add, dereference for volatile read data (convert to 8 bit register and access that register using *) &--> the address 
     //checking if there's still data to receive RXNE not empty
@@ -78,7 +79,7 @@ void HwSpi::spi_read(uint8_t* buffer_read, size_t length){ //pointer to buffer_r
 
     
     for(i = 0; i < length; i++){
-          while(spi_->SR & 1<<7){
+          while(spi_->SR & SPI_SR_BSY){ //while(spi_->SR & 1<<7) <-- original one
 
     } //wait until bsy flag is off 
            while(!(spi_->SR & (1<<1))){ // waiting for TXE = making sure it's empty so it can read
@@ -107,7 +108,7 @@ void HwSpi::spi_read(uint8_t* buffer_read, size_t length){ //pointer to buffer_r
     - Aligned with RXFIFO configured by FRXTH 
     - 1. 
     */
-       while(spi_->SR & 1<<7){
+        while(spi_->SR & SPI_SR_BSY){ //while(spi_->SR & 1<<7) <-- original one
 
     } //wait until bsy flag is off 
 
@@ -116,14 +117,17 @@ void HwSpi::spi_read(uint8_t* buffer_read, size_t length){ //pointer to buffer_r
 void HwSpi::spi_write(uint8_t* data, size_t len){ 
     spi_->CR1 |= (1<<6); //enable spi
     size_t j;
-       while((spi_->SR & 1<<7)){ //BSY, TXE, etc are read, so do not set them 
-    }//waiting till the BSY is false to move on
-    
+      
     
   //ADD CHECK FOR BSY, implement for loop to keep feeding bytes you want to send from an array
     //every time it writes it needs to read (make sure things show up in read) -- checking if things can be written when 
 
         for(j = 0; j<len;j++){
+              while(spi_->SR & SPI_SR_BSY){ //while(spi_->SR & 1<<7) <-- original one
+
+    } //wait until bsy flag is off  //BSY, TXE, etc are read, so do not set them 
+   
+    
             while(!(spi_->SR & (1<<1))){ //waiting for TXE to be empty
             }
             spi_->DR = data[j]; //writing to SPI DR (data register) placed into FIFO
@@ -132,8 +136,9 @@ void HwSpi::spi_write(uint8_t* data, size_t len){
         
             
         
-    while((spi_->SR & 1<<7)){ //BSY, TXE, etc are read, so do not set them 
-    }//waiting till the BSY is false to move on
+    while(spi_->SR & SPI_SR_BSY){ //while(spi_->SR & 1<<7) <-- original one
+
+    } //wait until bsy flag is off 
     /*
 
         while()  
