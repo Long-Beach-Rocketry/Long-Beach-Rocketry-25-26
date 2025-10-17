@@ -12,9 +12,9 @@ namespace LBR
 class Spi
 {
 public:
-    virtual bool Read();
-    virtual bool Write();
-    virtual bool Transfer();
-    ~Spi() = default;
+    virtual bool Read() = 0;
+    virtual bool Write() = 0;
+    virtual bool Transfer() = 0;
+    virtual ~Spi() = default;
 };
 }  // namespace LBR

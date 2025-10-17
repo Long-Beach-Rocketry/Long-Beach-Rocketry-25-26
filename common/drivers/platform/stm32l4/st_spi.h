@@ -9,6 +9,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <cstddef>
 #include <cstdint>
 #include "spi.h"
 #include "stm32l476xx.h"
@@ -105,12 +106,16 @@ class HwSpi : public Spi
 public:
     explicit HwSpi(SPI_TypeDef* instance_, StSpiSettings& settings_);
 
+    // Override base class virtual functions
+    bool Read() override;
+    bool Write() override;
+    bool Transfer() override;
+
     // Member Functions
     bool Init();
-    // TODO: implement read, write, and transfer for SPI
-    bool Read();
-    bool Write(uint16_t output_data);
-    bool Transfer(uint16_t output_data);
+    bool Read(uint8_t* rx_data, size_t buffer_len);
+    bool Write(uint8_t* tx_data, size_t buffer_len);
+    bool Transfer(uint8_t* tx_data, uint8_t* rx_data, size_t buffer_len);
 
 private:
     // Member variables

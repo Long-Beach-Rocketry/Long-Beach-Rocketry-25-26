@@ -7,6 +7,7 @@
  */
 
 #include "st_spi.h"
+#include "stm32l476xx.h"
 namespace LBR
 {
 namespace Stml4
@@ -70,17 +71,167 @@ HwSpi::HwSpi(SPI_TypeDef* instance_, StSpiSettings& settings_)
 {
 }
 
-bool HwSpi::Read()
+/**
+ * @brief Read data from a slave device.
+ * 
+ * @param rx_data 8 byte array to store read data.
+ * @param buffer_len Size of array.
+ * @return true 
+ * @return false 
+ */
+bool HwSpi::Read(uint8_t* rx_data, size_t buffer_len)
 {
-    if (instance->CR2)
+    // Check if SPI is enabled
+    if (!(instance->CR1 & SPI_CR1_SPE))
+    {
+        return false;
+    }
+
+    // Check if SPI is already in communication
+    if (instance->SR & SPI_SR_BSY)
+    {
+        return false;
+    }
+
+    for (size_t i = 0; i < buffer_len; i++)
+    {
+        // Wait until TX Buffer is empty before sending dummy byte to generate clock pulse
+        while (!(instance->SR & SPI_SR_TXE))
+        {
+        }
+
+        // Send dummy byte to DR to generate clock pulse
+        *(volatile uint8_t*)&instance->DR = 0x00;
+
+        // Wait until RX buffer has enough data to be read
+        while (!(instance->SR & SPI_SR_RXNE))
+        {
+        }
+
+        // Read data from RX buffer
+        rx_data[i] = *(volatile uint8_t*)&instance->DR;
+    }
+
+    // Wait until transmission is complete
+    while (instance->SR & SPI_SR_BSY)
+    {
+    }
+
+    return true;
 }
 
-bool HwSpi::Write()
+/**
+ * @brief Write data to a slave device.
+ * 
+ * @param tx_data 8 byte array of the data to be sent.
+ * @param buffer_len Size of array
+ * @return true 
+ * @return false 
+ */
+bool HwSpi::Write(uint8_t* tx_data, size_t buffer_len)
 {
+    // Check if SPI is enabled
+    if (!(instance->CR1 & SPI_CR1_SPE))
+    {
+        return false;
+    }
+
+    // Check if SPI is already in communication
+    if (instance->SR & SPI_SR_BSY)
+    {
+        return false;
+    }
+
+    for (size_t i = 0; i < buffer_len; i++)
+    {
+        // Wait until TX Buffer is empty
+        while (!(instance->SR & SPI_SR_TXE))
+        {
+        }
+
+        /*
+         * Write to SPI Data Register (DR).
+         * Automatically starts clock once data is written to the DR.
+         */
+        *(volatile uint8_t*)&instance->DR = tx_data[i];
+
+        /*
+         * Wait for RX buffer to be filled.
+         * Even if only writing, RXNE flag has to be cleared before proceeding to the next byte write.
+         */
+        while (!(instance->SR & SPI_SR_RXNE))
+        {
+        }
+
+        /*
+         * Clear RXNE flag by performing a dummy read in the RX Buffer.
+         * Dereferencing the data reg performs a read. Type casting to void explicitly discards the unused value.
+         */
+        (void)(*(volatile uint8_t*)&instance->DR);
+    }
+
+    // Wait until transmission is complete
+    while (instance->SR & SPI_SR_BSY)
+    {
+    }
+
+    return true;
 }
 
-bool HwSpi::Transfer()
+/**
+ * @brief Read and Write data to a slave device.
+ * 
+ * @param tx_data 8 byte array of the data to be sent.
+ * @param rx_data 8 byte array to store read data.
+ * @param buffer_len Size of arrays
+ * @return true 
+ * @return false 
+ */
+bool HwSpi::Transfer(uint8_t* tx_data, uint8_t* rx_data, size_t buffer_len)
 {
+    // Check if SPI is enabled
+    if (!(instance->CR1 & SPI_CR1_SPE))
+    {
+        return false;
+    }
+
+    // Check if SPI is already in communication
+    if (instance->SR & SPI_SR_BSY)
+    {
+        return false;
+    }
+
+    for (size_t i = 0; i < buffer_len; i++)
+    {
+        // Wait until TX Buffer is empty
+        while (!(instance->SR & SPI_SR_TXE))
+        {
+        }
+
+        /*
+         * Write to SPI Data Register (DR).
+         * Automatically starts clock once data is written to the DR.
+         */
+        *(volatile uint8_t*)&instance->DR = tx_data[i];
+
+        /*
+         * Wait for RX buffer to be filled.
+         * Even if only writing, RXNE flag has to be cleared before proceeding to the next byte write.
+         */
+        while (!(instance->SR & SPI_SR_RXNE))
+        {
+        }
+
+        // Read data from RX buffer
+        rx_data[i] = *(volatile uint8_t*)&instance->DR;
+    }
+
+    // Wait until transmission is complete
+    while (instance->SR & SPI_SR_BSY)
+    {
+    }
+
+    return true;
 }
 
 /**
@@ -126,6 +277,39 @@ bool HwSpi::Init()
     instance->CR1 |= SPI_CR1_SPE;
 
     return true;
+}
+
+/**
+ * @brief Virtual function override - Read with default parameters
+ * @return true if successful, false otherwise
+ */
+bool HwSpi::Read()
+{
+    // Default implementation could read a single byte or return an error
+    // Since we don't have default parameters, we'll return false for now
+    return false;
+}
+
+/**
+ * @brief Virtual function override - Write with default parameters
+ * @return true if successful, false otherwise
+ */
+bool HwSpi::Write()
+{
+    // Default implementation could write a single byte or return an error
+    // Since we don't have default parameters, we'll return false for now
+    return false;
+}
+
+/**
+ * @brief Virtual function override - Transfer with default parameters
+ * @return true if successful, false otherwise
+ */
+bool HwSpi::Transfer()
+{
+    // Default implementation could transfer a single byte or return an error
+    // Since we don't have default parameters, we'll return false for now
+    return false;
 }
 }  // namespace Stml4
 }  // namespace LBR
