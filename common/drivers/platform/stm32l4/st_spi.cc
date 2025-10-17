@@ -178,5 +178,38 @@ bool HwSpi::Transfer(const uint8_t* tx_data, uint8_t* rx_data,
     return true;
 }
 
+/**
+ * @brief Virtual function override - Read with default parameters
+ * @return true if successful, false otherwise
+ */
+bool HwSpi::Read()
+{
+    // Default implementation could read a single byte or return an error
+    // Since we don't have default parameters, we'll return false for now
+    return false;
+}
+
+/**
+ * @brief Virtual function override - Write with default parameters
+ * @return true if successful, false otherwise
+ */
+bool HwSpi::Write()
+{
+    // Default implementation could write a single byte or return an error
+    // Since we don't have default parameters, we'll return false for now
+    return false;
+}
+
+/**
+ * @brief Virtual function override - Transfer with default parameters
+ * @return true if successful, false otherwise
+ */
+bool HwSpi::Transfer()
+{
+    // Default implementation could transfer a single byte or return an error
+    // Since we don't have default parameters, we'll return false for now
+    return false;
+}
+
 }  // namespace Stml4
 }  // namespace LBR

@@ -23,18 +23,9 @@ namespace LBR
 class Spi
 {
 public:
-    virtual bool Read()
-    {
-        return false;
-    }
-    virtual bool Write()
-    {
-        return false;
-    }
-    virtual bool Transfer()
-    {
-        return false;
-    }
+    virtual bool Read() = 0;
+    virtual bool Write() = 0;
+    virtual bool Transfer() = 0;
     virtual ~Spi() = default;
 };
 }  // namespace LBR

@@ -84,6 +84,15 @@ public:
     bool Write(const uint8_t* tx_buf, size_t len);
     bool Transfer(const uint8_t* tx_buf, uint8_t* rx_buf, size_t len);
 
+    /* Parameterless overrides to satisfy LBR::Spi interface (legacy API).
+     * These are thin wrappers that perform a zero-length operation by
+     * delegating to the parameterized methods. They avoid changing the
+     * shared `spi.h` interface while allowing HwSpi to be instantiated.
+     */
+    bool Read() override;
+    bool Write() override;
+    bool Transfer() override;
+
 private:
     SPI_TypeDef* instance;
     StSpiSettings settings;
