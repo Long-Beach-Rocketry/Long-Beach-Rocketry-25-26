@@ -3,8 +3,8 @@
  * @brief Bare-metal SPI1 communication test on STM32L476.
  * @author Bex Saw
  */
-#include "st_spi.h"
 #include "st_gpio.h"
+#include "st_spi.h"
 #include "st_spi_module.h"
 #include "stm32l476xx.h"
 
@@ -19,8 +19,8 @@ int main(void)
 
     // SPI configuration
     LBR::Stml4::StSpiSettings cfg{SpiBaudRate::FPCLK_8,
-                      SpiBusMode::MODE1,  // MODE1
-                      SpiBitOrder::MSB, SpiRxThreshold::FIFO_8bit};
+                                  SpiBusMode::MODE1,  // MODE1
+                                  SpiBitOrder::MSB, SpiRxThreshold::FIFO_8bit};
 
     // GPIO configuration for SPI1 pins (Subject to Change)
     LBR::Stml4::StGpioParams sck_pin{
