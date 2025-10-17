@@ -18,7 +18,9 @@ spi peripheral : SPI1, SPI2, etc.
 #pragma once
 
 #include "stm32l476xx.h"
-#define ST_GPIO_MAX_PINS 16 //defining amt of pins for stm32
+constexpr int ST_GPIO_MAX_PINS = 16; //defining amt of pins for stm32
+//using constexpr so the compiler can check (evaluated at compiler check)
+//need to define function type when using constexpr
 
 namespace LBR{
 namespace STM32{
@@ -47,15 +49,12 @@ enum class SpiBaudRate: std::uint8_t{ // std::uint8_t is to ensure it's an unass
     Baud256
 };
 
-// !: We only need enable
-enum class SpiEnable : std::uint8_t{
-    Enable = 0
-};
+
 class HwSpi
 { //pins should already be configured
 public: 
     // !: We dont need to set up the pins in the SPI class
-    explicit HwSpi(SPI_TypeDef* spi_, Pin mosi, Pin miso, Pin clk); //passing SPI1, SPI2, etc
+    explicit HwSpi(SPI_TypeDef* spi_, uint16_t mosi, uint16_t miso, uint16_t clk); //passing SPI1, SPI2, etc
     //constructor declaration for a class: HwSpi ^ 
    //init function takes in no arguments --telling compiler it's meant to override a virtual function from a base 
     //class and if it's not found, it will generate an error (virtual so it can be overriden by derived classes)
@@ -81,8 +80,8 @@ private: //only accessible to the member functions of HwSpi (spi's own methods) 
     
     bool spi_init(SpiBaudRate baud, SpiBitOrder bit, SpiEnable enable, SpiPinMode mode); 
     //NOTE: place in public or private?
-    bool spi_read(); //want to return byte 
-    bool spi_write(uint_8 data);
+    bool spi_read(uint8_t* buffer_read, size_t length); //want to return byte 
+    bool spi_write(uint8_t* data, size_t len);
     bool spi_transfer(); // add parameters
         
     };
