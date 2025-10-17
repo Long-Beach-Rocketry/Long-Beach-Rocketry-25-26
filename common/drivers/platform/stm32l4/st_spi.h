@@ -76,15 +76,14 @@ private: //only accessible to the member functions of HwSpi (spi's own methods) 
     - C struct defined in stm32l476xx.h
     - so we can use SPI1->CR1 |= SPI_CR1_SPE instead of mapping each one individually
     */
-    Pin mosi;
-    Pin miso;
-    Pin clk; // Dont need these
+
 
     
     bool spi_init(SpiBaudRate baud, SpiBitOrder bit, SpiEnable enable, SpiPinMode mode); 
     //NOTE: place in public or private?
     bool spi_read(); //want to return byte 
     bool spi_write(uint_8 data);
+    bool spi_transfer(); // add parameters
         
     };
 }; //semicolon after classes

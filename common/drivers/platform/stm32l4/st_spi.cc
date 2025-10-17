@@ -11,8 +11,10 @@
 #include "st_spi.h"
 #include "stm32l476xx.h"
 #include "st_gpio.h"
-
-using namespace LBR::STM32 //telling compiler to use << namespace by default
+namespace LBR
+{
+namespace STM32
+{
 /*
 NAMESPACE:
 - groups related code (classes, functions,variables) avoiding conflicts
@@ -63,10 +65,20 @@ void HwSpi::spi_init(SpiBaudRate baud, SpiEnable enable, SpiPinMode mode, SpiBit
 
 }
 void HwSpi::spi_read(){
+    //enable spi first
+    spi_->CR1 |= 
+
+    }
+    //RXONLY = 1 or BIDIMODE = 1 & BIDIOE = 0
+    while(spi_->SR && 1<<7){
+
+    } //wait until bsy flag is off 
+    while(spi_->SR && (1<<7)){
+    }//BSY FLAG -- add, dereference for volatile read data (convert to 8 bit register and access that register using *) &--> the address 
     //checking if there's still data to receive RXNE not empty
     //checking if there's still data to receive: FIFO is not empty
     //while((spi_->SR & (3<<9)) ||(spi_->SR & (1<<10))||(spi_->SR & (1<<9)) ){ //when the first in first out reception is greater than 0
-    while(!(spi_->SR & (1<<0))){
+    while(!(spi_->SR && (1<<0))){
     } //waiting for data to receive and be read
 
     
@@ -74,10 +86,12 @@ void HwSpi::spi_read(){
     volatile uint8_t read_data = spi_->DR; //uint8_t is the data type; volatile: value can always change, read from hardware register
     //& signifies a reference to variable (allows function to directly modify original variable in calling code)
     //send in data read to spi_->DR
-    if(spi_->SR & (1<<6)){ //checking for overrun (when master or slave receives too much data and doesn't have space to store it)
+    if(spi_->SR && (1<<6)){ //checking for overrun (when master or slave receives too much data and doesn't have space to store it)
          volatile uint8_t discard = spi_->DR; //clearing overrun flag //stores it in a temporary variable discard
          //documentation: clear by rading spi->DR register ; SPI peripheral clears oldest value in RXFIFO , and if not read, it will be lost
-    }}/*
+    }}
+    
+    /*
     READ:
     - returns oldest value in RXFIFO that has not been read yet
     - managed by RXNE event (triggered when data stored in RXFIFO and threshold is reached)
@@ -89,6 +103,11 @@ void HwSpi::spi_read(){
 
 
 void HwSpi::spi_write(uint8_t data){ 
+    while(spi_->SR & (1<<1)){
+    while(spi_->SR & (1<<7)){
+    }//ADD CHECK FOR BSY, implement for loop to keep feeding bytes you want to send from an array
+    //every time it writes it needs to read (make sure things show up in read) -- checking if things can be written when 
+
         while(!(spi_->SR & (1<<1))) {//if TXE is empty, continues in the loop and doesn't move on
 
         }
@@ -110,10 +129,16 @@ void HwSpi::spi_write(uint8_t data){
     
     */
 }
+}
 
+void Hw::spi_transfer(){
 
+}
 
+}
+}
 
+//clangd --> to settings.json
 
 
 
