@@ -29,25 +29,13 @@ LBR::Stml4::HwSpi LBR::Stml4::SpiModule::CreateSpi()
     // Instantiate new SPI object
     LBR::Stml4::HwSpi spi{instance, cfg};
 
-    return spi;
-}
+    // Init SPI gpio pins
+    sck_pin.init();
+    miso_pin.init();
+    mosi_pin.init();
 
-/**
- * @brief Returns the SPI object if everything was initialized correctly
- * @return HwSpi The SPI object with configured control register settings after
- * validation (empty SPI object with false initialization variable if failed)
- */
-LBR::Stml4::HwSpi LBR::Stml4::SpiModule::GetSpi()
-{
-    LBR::Stml4::HwSpi spi = CreateSpi();
-
-    bool status = ValidateSpi(spi);
-
-    if (status)
-    {
-        spi.Init();
-    }
-    // TODO: Add else logic to false status
+    // Init SPI instance
+    spi.Init();
 
     return spi;
 }

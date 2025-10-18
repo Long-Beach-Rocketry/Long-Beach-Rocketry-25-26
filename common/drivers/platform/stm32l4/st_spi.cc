@@ -30,36 +30,6 @@ void HwSpi::SetReg(volatile uint32_t* reg, uint32_t enum_val, uint32_t bit_num,
 }
 
 /**
- * @brief Checks the SPI object to see if it has valid control register settings
- *
- * @param spi The SPI object you want to check
- * @return true
- * @return false
- */
-bool ValidateSpi(HwSpi& spi)
-{
-    // Check cr_settings
-    if (static_cast<uint8_t>(spi.settings.baudrate) > 7)
-    {
-        return false;
-    }
-    if (static_cast<uint8_t>(spi.settings.busmode) > 3)
-    {
-        return false;
-    }
-    if (static_cast<uint8_t>(spi.settings.order) > 1)
-    {
-        return false;
-    }
-    if (static_cast<uint8_t>(spi.settings.threshold) > 1)
-    {
-        return false;
-    }
-
-    return true;
-}
-
-/**
  * @brief Construct a new HwSpi object
  *
  * @param instance_ The SPI peripheral being used
@@ -242,6 +212,7 @@ bool HwSpi::Transfer(uint8_t* tx_data, uint8_t* rx_data, size_t buffer_len)
  */
 bool HwSpi::Init()
 {
+    // TODO: Add static error checks to this (check for nullptrs, etc...)
 
     // Set to Master Mode (Keep in master mode unless we want our STM32l4xx to be
     // used as a slave device). Master Mode sets our STM32l4xx to act as the

@@ -1,4 +1,7 @@
 #include "spi_app_bsp.h"
+#include "st_gpio.h"
+#include "st_spi.h"
+#include "st_spi_module.h"
 #include "stm32l476xx.h"
 
 using namespace LBR::Stml4;
@@ -13,29 +16,26 @@ static StSpiSettings spi_cfg = {.baudrate = SpiBaudRate::FPCLK_16,
 static HwSpi spi1(SPI1, spi_cfg);
 
 // Initialize SPI BSP
-Spi& BSP_Init(SPI_TypeDef* base_addr)
+Spi& BSP_Init(SPI_TypeDef* spi_instance, GPIO_TypeDef* gpio_instance)
 {
-    (void)base_addr;  // avoid unused parameter warning
+    (void)spi_instance;  // avoid unused parameter warning
 
     // Enable GPIOA clock
     RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
 
-    // Configure pins PA5(SCK), PA6(MISO), PA7(MOSI)
-    GPIOA->MODER &=
-        ~(GPIO_MODER_MODE5_Msk | GPIO_MODER_MODE6_Msk | GPIO_MODER_MODE7_Msk);
-    GPIOA->MODER |= (0b10 << GPIO_MODER_MODE5_Pos) |
-                    (0b10 << GPIO_MODER_MODE6_Pos) |
-                    (0b10 << GPIO_MODER_MODE7_Pos);
-
-    GPIOA->AFR[0] &=
-        ~((0xF << GPIO_AFRL_AFSEL5_Pos) | (0xF << GPIO_AFRL_AFSEL6_Pos) |
-          (0xF << GPIO_AFRL_AFSEL7_Pos));
-    GPIOA->AFR[0] |= (5 << GPIO_AFRL_AFSEL5_Pos) | (5 << GPIO_AFRL_AFSEL6_Pos) |
-                     (5 << GPIO_AFRL_AFSEL7_Pos);
-
-    // Enable SPI1 clock
+    // Enable SPI clock
     RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
 
-    spi1.Init();
-    return spi1;
+    StSpiSettings spi_settings{SpiBaudRate::FPCLK_2, SpiBusMode::MODE1,
+                               SpiBitOrder::MSB, SpiRxThreshold::FIFO_8bit};
+    StGpioSettings gpio_settings{GpioMode::ALT_FUNC, GpioOtype::PUSH_PULL,
+                                 GpioOspeed::VERY_HIGH, GpioPupd::NO_PULL, 5};
+    StGpioParams clk_params{gpio_settings, 5, gpio_instance};
+    StGpioParams miso_params{gpio_settings, 6, gpio_instance};
+    StGpioParams mosi_params{gpio_settings, 7, gpio_instance};
+    SpiModule spi_mod(spi_instance, spi_settings, clk_params, miso_params,
+                      mosi_params);
+    static HwSpi spi = spi_mod.CreateSpi();
+
+    return spi;
 }

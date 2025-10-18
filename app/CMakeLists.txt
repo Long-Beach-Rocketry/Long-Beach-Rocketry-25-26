@@ -1,1 +1,2 @@
 add_subdirectory(spi_test)
+add_subdirectory(blink)

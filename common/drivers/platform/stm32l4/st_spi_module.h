@@ -21,7 +21,6 @@ public:
                        StGpioParams& sck_p, StGpioParams& miso_p,
                        StGpioParams& mosi_p);
     HwSpi CreateSpi();
-    HwSpi GetSpi();
 
 private:
     SPI_TypeDef* instance;

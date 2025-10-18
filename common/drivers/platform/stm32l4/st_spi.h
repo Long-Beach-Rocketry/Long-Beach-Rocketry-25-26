@@ -101,8 +101,6 @@ struct StSpiSettings
 
 class HwSpi : public Spi
 {
-    friend bool ValidateSpi(HwSpi& spi);
-
 public:
     explicit HwSpi(SPI_TypeDef* instance_, StSpiSettings& settings_);
 
