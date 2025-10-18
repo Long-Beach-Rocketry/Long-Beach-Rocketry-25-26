@@ -56,8 +56,7 @@ class HwSpi
 public: 
     // !: We dont need to set up the pins in the SPI class
     explicit HwSpi(SPI_TypeDef* spi_, Pin mosi, Pin miso, Pin clk); //passing SPI1, SPI2, etc
-    //constructor declaration for a class: HwSpi ^
-    bool spi_init(SpiBaudRate baud, SpiBitOrder bit, SpiEnable enable, SpiPinMode mode);  
+    //constructor declaration for a class: HwSpi ^ 
    //init function takes in no arguments --telling compiler it's meant to override a virtual function from a base 
     //class and if it's not found, it will generate an error (virtual so it can be overriden by derived classes)
     /*
@@ -81,10 +80,11 @@ private: //only accessible to the member functions of HwSpi (spi's own methods) 
     Pin miso;
     Pin clk; // Dont need these
 
-    void enableSPI(SpiEnable enable); //using enableSPI class with SpiEnable parameters // Can do this in the init
-    void setMode(SpiPinMode mode); 
-    void setBit(SpiBitOrder bit);
-    void setBaud(SpiBaudRate baud);
+    
+    bool spi_init(SpiBaudRate baud, SpiBitOrder bit, SpiEnable enable, SpiPinMode mode); 
+    //NOTE: place in public or private?
+    bool spi_read(); //want to return byte 
+    bool spi_write(uint_8 data);
         
     };
 }; //semicolon after classes

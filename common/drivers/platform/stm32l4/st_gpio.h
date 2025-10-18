@@ -5,31 +5,31 @@
  * @date 9/13/2025
  */
 
-#pragma once
+#pragma once //ensures file is only used once
 
-#include <cstdint>
-#include "gpio.h"
-#include "stm32l476xx.h"
+#include <cstdint> //for fixed widths like std::uint8_t
+#include "gpio.h" //abstract class: in io
+#include "stm32l476xx.h" //register definitions for GPIO register access
 
-#define ST_GPIO_MAX_PINS 16
+#define ST_GPIO_MAX_PINS 16 //# of pins per port on STM32
 
-namespace LBR
+namespace LBR //project name / org
 {
-namespace Stml4
+namespace Stml4 //scope for STM32l4 specific code
 {
 
 enum class GpioMode : uint8_t
 {
-    INPUT = 0,
-    GPOUT,
-    ALT_FUNC,
-    ANALOG,
+    INPUT = 0, //input mode: buttons;sensor input
+    GPOUT, //general purpose output; LED enable signal (=1)
+    ALT_FUNC, //alternate function mode; SPI etc (=2)
+    ANALOG, //Analog input,output  (=3)
 };
 
 enum class GpioOtype : uint8_t
 {
-    PUSH_PULL = 0,
-    OPEN_DRAIN
+    PUSH_PULL = 0, 
+    OPEN_DRAIN 
 };
 
 enum class GpioOspeed : uint8_t
@@ -69,7 +69,7 @@ struct StGpioParams
     GPIO_TypeDef* base_addr;
 };
 
-class HwGpio : public Gpio
+class HwGpio : public Gpio 
 {
 public:
     /**

@@ -100,6 +100,9 @@ void HwSpi::spi_write(uint8_t data){
     while((spi_->SR & 1<<7)){ //BSY, TXE, etc are read, so do not set them 
     }//waiting till the BSY is false to move on
     /*
+
+        while()  /*
+
     WRITE:
     - stores written data in TXFIFO at end of a send queue
     - Managed by the TXE event (triggered when TXFIFO level is less than or equal to half of its capacity)
