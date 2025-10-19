@@ -3,7 +3,7 @@ add_library(hal STATIC
     st_spi.cc
     st_i2c.cc
     st_usart.cc
-    st_usart_factory.cc
+    st_usart_module.cc
 )
 
 target_include_directories(hal PUBLIC

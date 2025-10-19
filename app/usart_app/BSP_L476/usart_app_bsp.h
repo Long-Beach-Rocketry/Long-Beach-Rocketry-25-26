@@ -2,7 +2,7 @@
 
 #include "st_gpio.h"
 #include "st_usart.h"
-#include "st_usart_factory.h"
+#include "st_usart_module.h"
 #include "usart.h"
 
 using namespace LBR;
