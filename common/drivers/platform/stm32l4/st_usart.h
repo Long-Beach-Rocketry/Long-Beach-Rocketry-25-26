@@ -11,6 +11,13 @@
 #include "stm32l476xx.h"
 #include "usart.h"
 
+struct StUsartParams
+{
+    USART_TypeDef* base_addr;
+    uint32_t sys_clck;
+    uint32_t baud_rate;
+};
+
 class StUsart : public Usart
 {
 private:
@@ -40,12 +47,10 @@ public:
      * 
      * @param data A uint8_t pointer that holds data to be recieved from serial input.
      */
-    bool receive_rx(uint8_t* data) override;
-
+    uint8_t receive_rx(uint8_t* data) override;
     /**
      * @brief Initializes the USART and associated Rx and Tx pins.
      * 
-     * @param instannce The USART base_addr that is to be currently used.
      */
     void init();
 };
