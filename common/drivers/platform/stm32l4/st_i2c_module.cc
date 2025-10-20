@@ -4,46 +4,26 @@ namespace LBR
 {
 namespace Stml4
 {
-I2cModule::I2cModule() : _i2c{nullptr}
+I2cModule::I2cModule(I2C_TypeDef* base_addr, uint32_t timingr,
+                     const StGpioParams& sda_pin, const StGpioParams& scl_pin)
+    : _base_addr{base_addr},
+      _timingr{timingr},
+      _sda_pin{sda_pin},
+      _scl_pin{scl_pin}
 {
 }
 
-bool I2cModule::GiveI2c(I2C_TypeDef* base_addr, uint32_t timingr,
-                        const StGpioParams& sda_pin,
-                        const StGpioParams& scl_pin)
+HwI2c& I2cModule::CreateI2c()
 {
-    bool ret;
+    HwGpio sda_gpio(_sda_pin);
+    HwGpio scl_gpio(_scl_pin);
+    static HwI2c i2c(_base_addr, _timingr);
 
-    HwGpio sda_gpio = HwGpio(sda_pin);
-    HwGpio scl_gpio = HwGpio(scl_pin);
-    HwI2c i2c = HwI2c(base_addr, timingr);
+    sda_gpio.init();
+    scl_gpio.init();
+    i2c.init();
 
-    _i2c = &i2c;
-
-    ret = sda_gpio.init();
-    if (ret == false)
-    {
-        return false;
-    }
-
-    ret = scl_gpio.init();
-    if (ret == false)
-    {
-        return false;
-    }
-
-    ret = i2c.init();
-    if (ret == false)
-    {
-        return false;
-    }
-
-    return true;
-}
-
-HwI2c* I2cModule::CreateI2c()
-{
-    return _i2c;
+    return i2c;
 }
 }  // namespace Stml4
 }  // namespace LBR
