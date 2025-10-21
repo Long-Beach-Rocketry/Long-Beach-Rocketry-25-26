@@ -1,5 +1,5 @@
 /**
- * @file st_spi_factory.h
+ * @file st_spi_module.h
  * @author Bex Saw
  * @brief Factory module for creating and configuring SPI interfaces and their GPIO pins.
  * @date  2025-10-01
