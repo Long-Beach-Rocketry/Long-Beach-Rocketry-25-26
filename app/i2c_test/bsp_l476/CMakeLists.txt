@@ -1,5 +1,5 @@
 add_library(i2c_bsp STATIC
-    i2c_test_bsp.cc
+    l476_board.cc
 )
 
 target_include_directories(i2c_bsp PUBLIC 

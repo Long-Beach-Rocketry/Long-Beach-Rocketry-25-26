@@ -9,11 +9,21 @@ namespace LBR
 {
 namespace Stml4
 {
+
+/**
+ * @brief Collection of base address and timing register info
+ */
+struct StI2cParams
+{
+    I2C_TypeDef* base_addr;
+    uint32_t timingr;
+};
+
 class HwI2c : public I2c
 {
 
 public:
-    explicit HwI2c(I2C_TypeDef* instance, uint32_t timingr);
+    explicit HwI2c(const StI2cParams& params);
 
     /**
      * @brief Initializes I2C peripheral;
@@ -27,7 +37,7 @@ public:
     bool write(std::span<const uint8_t> data, uint8_t dev_addr) override;
 
 private:
-    I2C_TypeDef* _instance;
+    I2C_TypeDef* _base_addr;
     uint32_t _timingr;
 };
 }  // namespace Stml4

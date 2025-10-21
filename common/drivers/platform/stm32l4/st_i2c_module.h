@@ -22,13 +22,11 @@ public:
     /**
      * @brief I2cModule constructor
      * 
-     * @param base_addr base address of I2C peripheral
-     * @param timingr timing settings
+     * @param params struct containing base address and timing register value for the I2C instance
      * @param sda_pin struct containing settings, pin number, and port address for SDA pin
      * @param scl_pin struct containing settings, pin number, and port address for SCL pin
      */
-    explicit I2cModule(I2C_TypeDef* base_addr, uint32_t timingr,
-                       const StGpioParams& sda_pin,
+    explicit I2cModule(const StI2cParams& params, const StGpioParams& sda_pin,
                        const StGpioParams& scl_pin);
     ;
 
@@ -40,8 +38,7 @@ public:
     HwI2c& CreateI2c();
 
 private:
-    I2C_TypeDef* _base_addr;
-    uint32_t _timingr;
+    const StI2cParams _i2c_params;
     const StGpioParams& _sda_pin;
     const StGpioParams& _scl_pin;
 };
