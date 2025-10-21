@@ -1,7 +1,6 @@
 #include "cs_gpio.h"
 
-LBR::GpioCS::GpioCS(LBR::Gpio& cs_pin_)
-    : cs_pin(cs_pin_)
+LBR::GpioCS::GpioCS(LBR::Gpio& cs_pin_) : cs_pin(cs_pin_)
 {
 }
 
