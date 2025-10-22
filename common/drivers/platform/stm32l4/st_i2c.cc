@@ -93,7 +93,8 @@ bool HwI2c::write(std::span<const uint8_t> data, uint8_t dev_addr)
 
     // Configure for writing
     _base_addr->CR2 &= ~(I2C_CR2_NBYTES | I2C_CR2_RD_WRN);
-    _base_addr->CR2 |= ((data.size() << (I2C_CR2_NBYTES_Pos + 1)) | I2C_CR2_AUTOEND);
+    _base_addr->CR2 |=
+        ((data.size() << (I2C_CR2_NBYTES_Pos + 1)) | I2C_CR2_AUTOEND);
 
     // Initiate write
     _base_addr->CR2 |= I2C_CR2_START;
@@ -109,7 +110,6 @@ bool HwI2c::write(std::span<const uint8_t> data, uint8_t dev_addr)
                 _base_addr->ICR |= I2C_ICR_NACKCF;
                 return false;
             }
-
         }
         _base_addr->TXDR = byte;
     }
