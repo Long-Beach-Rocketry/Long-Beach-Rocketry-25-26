@@ -28,8 +28,6 @@ public:
      */
     explicit I2cModule(const StI2cParams& params, const StGpioParams& sda_pin,
                        const StGpioParams& scl_pin);
-    ;
-
 
     bool InitI2c();
     /**

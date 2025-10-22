@@ -36,10 +36,10 @@ bool I2cModule::InitI2c()
     }
 
     return true;
-
 }
 
-HwI2c& I2cModule::GetI2c() {
+HwI2c& I2cModule::GetI2c()
+{
     return _i2c;
 }
 }  // namespace Stml4
