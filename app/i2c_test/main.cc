@@ -7,10 +7,9 @@ using namespace LBR;
 
 int main(int argc, char* argv[])
 {
-    board_init();
-    Board hw = get_board();
+    Board hw = board_init();
 
-    uint8_t dummy_addr = 0x0F;
+    uint8_t dummy_addr = 0xAA;
     uint8_t val[1] = {0xAA};
     std::span<const uint8_t> write_val{val, 1};
 

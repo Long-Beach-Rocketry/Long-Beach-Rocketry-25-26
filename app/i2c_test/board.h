@@ -9,7 +9,6 @@ struct Board
     I2c& i2c;
 };
 
-bool board_init(void);
-Board& get_board(void);
+Board& board_init(void);
 
 }  // namespace LBR
