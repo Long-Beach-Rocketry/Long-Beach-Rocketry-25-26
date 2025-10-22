@@ -30,17 +30,20 @@ public:
                        const StGpioParams& scl_pin);
     ;
 
+
+    bool InitI2c();
     /**
      * @brief Creates HwI2c instance
      * 
      * @return reference to HwI2c instance
      */
-    HwI2c& CreateI2c();
+    HwI2c& GetI2c();
 
 private:
     const StI2cParams _i2c_params;
     const StGpioParams& _sda_pin;
     const StGpioParams& _scl_pin;
+    HwI2c _i2c;
 };
 }  // namespace Stml4
 }  // namespace LBR

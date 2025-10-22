@@ -45,8 +45,6 @@ bool bsp_init()
     return ret;
 }
 
-Board& get_board()
-{
     return board;
 }
 
