@@ -26,18 +26,17 @@ LBR::Stml4::HwSpi LBR::Stml4::SpiModule::CreateSpi()
 {
     // Instantiate new SPI object
 
-  // Use the class members (they have trailing underscores)
-  LBR::Stml4::HwSpi spi{instance_, cfg_};
+    // Use the class members (they have trailing underscores)
+    LBR::Stml4::HwSpi spi{instance_, cfg_};
 
-  // Init SPI gpio pins
-  sck_pin_.init();
-  miso_pin_.init();
-  mosi_pin_.init();
+    // Init SPI gpio pins
+    sck_pin_.init();
+    miso_pin_.init();
+    mosi_pin_.init();
 
-  // Init SPI peripheral before returning the object
-  spi.Init();
+    // Init SPI peripheral before returning the object
+    spi.Init();
 
-  return spi;
-
+    return spi;
 }
 }  // namespace LBR::Stml4

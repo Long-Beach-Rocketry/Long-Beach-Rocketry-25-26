@@ -26,6 +26,5 @@ int main(void)
         hw_spi.Write(tx_buffer, tx_len);
 
         hw_spi.Read(tx_buffer, tx_len);
-        
     }
 }

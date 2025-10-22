@@ -25,7 +25,8 @@ LBR::Spi& BSP_Init(SPI_TypeDef* spi_instance, GPIO_TypeDef* gpio_instance)
     StGpioParams miso_pin{gpio_settings, 6, GPIOA};
     StGpioParams mosi_pin{gpio_settings, 7, GPIOA};  // PA7 - MOSI
 
-    SpiModule spi_module(spi_instance, spi_settings, sck_pin, miso_pin, mosi_pin);
+    SpiModule spi_module(spi_instance, spi_settings, sck_pin, miso_pin,
+                         mosi_pin);
 
     // Create a static HwSpi so that we can return a reference to it. The
     // SpiModule::CreateSpi() returns a concrete HwSpi by value; keep a

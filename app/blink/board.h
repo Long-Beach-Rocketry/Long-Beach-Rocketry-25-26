@@ -13,4 +13,4 @@ struct Board
 bool board_init(void);
 Board& get_board(void);
 
-}  // namespace LBR 
+}  // namespace LBR
