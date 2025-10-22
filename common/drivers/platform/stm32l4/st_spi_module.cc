@@ -22,43 +22,22 @@ SpiModule::SpiModule(SPI_TypeDef* instance_, const StSpiSettings& cfg_,
 {
 }
 
-HwSpi SpiModule::CreateSpi()
+LBR::Stml4::HwSpi LBR::Stml4::SpiModule::CreateSpi()
 {
-    return HwSpi{instance_, cfg_};
-}
+    // Instantiate new SPI object
 
-HwSpi SpiModule::GetSpi() const
-{
-    HwSpi spi = HwSpi{instance_, cfg_};
+  // Use the class members (they have trailing underscores)
+  LBR::Stml4::HwSpi spi{instance_, cfg_};
 
-    if (instance_ && (instance_->CR1 & SPI_CR1_SPE))
-    {
-        // Already enabled or valid SPI
-        return spi;
-    }
+  // Init SPI gpio pins
+  sck_pin_.init();
+  miso_pin_.init();
+  mosi_pin_.init();
 
-    // You can call Init() here if you want to auto-initialize
-    return spi;
-}
+  // Init SPI peripheral before returning the object
+  spi.Init();
 
-bool LBR::Stml4::SpiModule::ValidateSpi(const HwSpi& spi)
-{
-    if (!instance_)
-        return false;
+  return spi;
 
-    // Ensure peripheral clock is enabled (STM32L4 register map)
-    const bool clk_enabled =
-        (instance_ == SPI1 && (RCC->APB2ENR & RCC_APB2ENR_SPI1EN)) ||
-        (instance_ == SPI2 && (RCC->APB1ENR1 & RCC_APB1ENR1_SPI2EN)) ||
-        (instance_ == SPI3 && (RCC->APB1ENR1 & RCC_APB1ENR1_SPI3EN));
-
-    if (!clk_enabled)
-        return false;
-
-    if (&sck_pin_ == nullptr || &miso_pin_ == nullptr || &mosi_pin_ == nullptr)
-        return false;
-
-    (void)cfg_;
-    return true;
 }
 }  // namespace LBR::Stml4

@@ -4,10 +4,10 @@
 
 using namespace LBR::Stml4;
 
-// Initialize SPI BSP
-Spi& BSP_Init(SPI_TypeDef* spi_instance, GPIO_TypeDef* gpio_instance)
+// Initialize SPI BSP and return a reference to the generic LBR::Spi
+LBR::Spi& BSP_Init(SPI_TypeDef* spi_instance, GPIO_TypeDef* gpio_instance)
 {
-    (void)spi_instance;
+    (void)gpio_instance;
 
     // Enable GPIOA clock
     RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
@@ -24,8 +24,13 @@ Spi& BSP_Init(SPI_TypeDef* spi_instance, GPIO_TypeDef* gpio_instance)
     StGpioParams sck_pin{gpio_settings, 5, GPIOA};  // PA5 - SCK
     StGpioParams miso_pin{gpio_settings, 6, GPIOA};
     StGpioParams mosi_pin{gpio_settings, 7, GPIOA};  // PA7 - MOSI
-    SpiModule spi_module(SPI1, spi_settings, sck_pin, miso_pin, mosi_pin);
 
+    SpiModule spi_module(spi_instance, spi_settings, sck_pin, miso_pin, mosi_pin);
+
+    // Create a static HwSpi so that we can return a reference to it. The
+    // SpiModule::CreateSpi() returns a concrete HwSpi by value; keep a
+    // static storage duration instance to avoid returning reference to a
+    // temporary.
     static HwSpi spi = spi_module.CreateSpi();
 
     return spi;

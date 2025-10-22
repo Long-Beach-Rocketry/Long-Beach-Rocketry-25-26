@@ -13,18 +13,19 @@ using namespace LBR::Stml4;
 
 int main(void)
 {
-    SPI_TypeDef* spi_instance = SPI1;
-    GPIO_TypeDef* gpio_instance = GPIOA;
-    Spi& spi1 = BSP_Init(spi_instance, gpio_instance);
+    // BSP handles the hardware setup and returns an initialized SPI handle
+    LBR::Spi& spi1 = BSP_Init(SPI1, GPIOA);
 
     uint8_t tx_buffer[5] = {10, 20, 30, 40, 50};
     size_t tx_len = sizeof(tx_buffer);
 
-    // Cast to derived type to access parameterized Write function
-    LBR::Stml4::HwSpi& hw_spi = static_cast<LBR::Stml4::HwSpi&>(spi1);
+    auto& hw_spi = static_cast<LBR::Stml4::HwSpi&>(spi1);
 
     while (1)
     {
         hw_spi.Write(tx_buffer, tx_len);
+
+        hw_spi.Read(tx_buffer, tx_len);
+        
     }
 }
