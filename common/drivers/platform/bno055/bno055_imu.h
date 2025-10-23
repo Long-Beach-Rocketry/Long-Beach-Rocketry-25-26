@@ -1,5 +1,5 @@
 /**
-* @file bno055.h
+* @file bno055_imu.h
 * @brief BNO055 IMU sensor interface
 * @author Bex Saw
 * @date 2025-10-22
@@ -9,12 +9,13 @@
 #pragma once
 #include <cstdint>
 #include "imu.h"
+#include "stm32l4xx.h"
 #include "st_i2c.h"
 
 namespace LBR {
     class Bno055 : public Imu {
     public:
-        explicit Bn055(LBR::Stml4::StI2c& i2c, uint8_t addr = 0x28);
+        explicit Bno055(LBR::Stml4::HwI2c& i2c_, uint8_t addr = 0x28);
         void Init() override;
         void Update() override;
         void GetAcceleration(float& x, float& y, float& z) override;
@@ -26,8 +27,9 @@ namespace LBR {
     private:
         void WriteRegister(uint8_t reg, uint8_t value);
         uint8_t ReadRegister(uint8_t reg);
-        void ReadMultipleRegisters(uint8_t startReg, uint8_t* buffer, size_t length); // Maybe useful
-
+        void ReadMultipleRegisters(uint8_t startReg, uint8_t* buffer, size_t length); 
+        void SetMode(uint8_t mode);
+        
         LBR::Stml4::StI2c& i2c_;
         uint8_t address_;
 
@@ -48,5 +50,24 @@ namespace LBR {
 
         // Power modes
         static constexpr uint8_t PWR_MODE_NORMAL = 0x00;
-    };
+
+        // Register addresses for raw data
+        // Accelerometer data registers
+        static constexpr uint8_t REG_ACCEL_X_LSB = 0x08;
+        static constexpr uint8_t REG_ACCEL_X_MSB = 0x09;
+        static constexpr uint8_t REG_ACCEL_Y_LSB = 0x0A;
+        static constexpr uint8_t REG_ACCEL_Y_MSB = 0x0B;
+        static constexpr uint8_t REG_ACCEL_Z_LSB = 0x0C;
+        static constexpr uint8_t REG_ACCEL_Z_MSB = 0x0D;
+        // Gyroscope data registers
+        static constexpr uint8_t REG_GYRO_X_LSB = 0x14;
+        static constexpr uint8_t REG_GYRO_X_MSB = 0x15;
+        static constexpr uint8_t REG_GYRO_Y_LSB = 0x16;
+        static constexpr uint8_t REG_GYRO_Y_MSB = 0x17;
+        static constexpr uint8_t REG_GYRO_Z_LSB = 0x18;
+        static constexpr uint8_t REG_GYRO_Z_MSB = 0x19;
+
+        // Operating mode register and value
+        static constexpr uint8_t VAL_OPR_MODE_NDOF = 0x0C;
+    };  
 }
