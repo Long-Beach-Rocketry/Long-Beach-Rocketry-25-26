@@ -19,7 +19,6 @@ public:
     *        - Research IMU data (poll or DMA)
     *        - Get Acceleration in m/s^2
     *        - Get Angular velocity in degrees/s
-    *        - Get Euler angles in degrees
     *        - Calibrate the IMU
     *        - Virtual destructor
     *
@@ -29,7 +28,7 @@ public:
     virtual void GetAcceleration(float& x, float& y, float& z) = 0;
     virtual void GetGyroscope(float& x, float& y, float& z) = 0;
     virtual void SensorFusionUpdate() = 0; //Check on this soon
-    virtual void Calibrate() = 0; // Maybe
+    virtual void Calibrate() = 0; 
     virtual ~Imu() = default;
 }
 } // namespace LBR
