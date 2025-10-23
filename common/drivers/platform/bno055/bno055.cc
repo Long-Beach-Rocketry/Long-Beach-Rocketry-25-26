@@ -52,12 +52,11 @@ void Bno055::Update() {
     // This is a placeholder for actual update code
     ReadMultipleRegisters(REG_ACC_START, accelData_, 6);
     ReadMultipleRegisters(REG_GYR_START, gyroData_, 6);
-    ReadMultipleRegisters(REG_EUL_START, eulData_, 6);
 }
 
 void Bno055::GetAcceleration(float& x, float& y, float& z) {
 
-    unit8_t buf[6];
+    uint8_t buf[6];
     ReadRegisters(REG_ACC_START, buf, 6);
 
     // Convert raw accelerometer data to m/s^2
@@ -70,5 +69,5 @@ void Bno055::GetAcceleration(float& x, float& y, float& z) {
     z = z / 100.0f;
 }
 
-// TODO: GetGyroscope(), GetEulerAngles(), Calibrate(), SetMode(), WriteRegister(), ReadRegister(), ReadMultipleRegisters()
+// TODO: GetGyroscope(), Calibrate(), SetMode(), WriteRegister(), ReadRegister(), ReadMultipleRegisters()
 } // namespace LBR

@@ -18,5 +18,6 @@ namespace LBR::Utils {
             __NOP();
         }
     }
+};
 } // namespace LBR::Utils
        
