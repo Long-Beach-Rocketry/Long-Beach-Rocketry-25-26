@@ -28,8 +28,8 @@ public:
     virtual void Update() = 0;
     virtual void GetAcceleration(float& x, float& y, float& z) = 0;
     virtual void GetGyroscope(float& x, float& y, float& z) = 0;
-    virtual void GetEulerAngles(float& roll, float& pitch, float& yaw) = 0;
-    virtual void Calibrate() = 0;
+    virtual void SensorFusionUpdate() = 0; //Check on this soon
+    virtual void Calibrate() = 0; // Maybe
     virtual ~Imu() = default;
 }
 } // namespace LBR
