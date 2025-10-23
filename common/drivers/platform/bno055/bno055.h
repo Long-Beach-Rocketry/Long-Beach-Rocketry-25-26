@@ -19,14 +19,14 @@ namespace LBR {
         void Update() override;
         void GetAcceleration(float& x, float& y, float& z) override;
         void GetGyroscope(float& x, float& y, float& z) override;
-        void GetEulerAngles(float& roll, float& pitch, float& yaw) override;
+        void SensorFusionUpdate() override;
         void Calibrate() override;
         ~Bno055() override = default;
 
     private:
         void WriteRegister(uint8_t reg, uint8_t value);
         uint8_t ReadRegister(uint8_t reg);
-        void ReadMultipleRegisters(uint8_t startReg, uint8_t* buffer, size_t length);
+        void ReadMultipleRegisters(uint8_t startReg, uint8_t* buffer, size_t length); // Maybe useful
 
         LBR::Stml4::StI2c& i2c_;
         uint8_t address_;
