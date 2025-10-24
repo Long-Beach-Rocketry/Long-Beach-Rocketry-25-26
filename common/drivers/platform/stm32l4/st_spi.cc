@@ -51,11 +51,6 @@ HwSpi::HwSpi(SPI_TypeDef* instance_, StSpiSettings& settings_)
  */
 bool HwSpi::Read(uint8_t* rx_data, size_t buffer_len)
 {
-    // Check if SPI is enabled
-    if (!(instance->CR1 & SPI_CR1_SPE))
-    {
-        return false;
-    }
 
     // Check if SPI is already in communication
     if (instance->SR & SPI_SR_BSY)
@@ -65,6 +60,8 @@ bool HwSpi::Read(uint8_t* rx_data, size_t buffer_len)
 
     for (size_t i = 0; i < buffer_len; i++)
     {
+        // TODO: ADD a timeout
+
         // Wait until TX Buffer is empty before sending dummy byte to generate clock pulse
         while (!(instance->SR & SPI_SR_TXE))
         {
@@ -74,6 +71,8 @@ bool HwSpi::Read(uint8_t* rx_data, size_t buffer_len)
         *(volatile uint8_t*)&instance->DR = 0x00;
 
         // Wait until RX buffer has enough data to be read
+        // TODO: ADD a timeout
+
         while (!(instance->SR & SPI_SR_RXNE))
         {
         }
@@ -100,11 +99,6 @@ bool HwSpi::Read(uint8_t* rx_data, size_t buffer_len)
  */
 bool HwSpi::Write(uint8_t* tx_data, size_t buffer_len)
 {
-    // Check if SPI is enabled
-    if (!(instance->CR1 & SPI_CR1_SPE))
-    {
-        return false;
-    }
 
     // Check if SPI is already in communication
     if (instance->SR & SPI_SR_BSY)
@@ -214,13 +208,13 @@ bool HwSpi::Init()
 {
     // TODO: Add static error checks to this (check for nullptrs, etc...)
 
-    // Set to Master Mode (Keep in master mode unless we want our STM32l4xx to be
-    // used as a slave device). Master Mode sets our STM32l4xx to act as the
-    // master device to initiate/end SPI communication and drive the clock signal.
+    /* Set to Master Mode (Keep in master mode unless we want our STM32l4xx to be
+     used as a slave device). Master Mode sets our STM32l4xx to act as the
+     master device to initiate/end SPI communication and drive the clock signal. */
     instance->CR1 |= SPI_CR1_MSTR;
 
-    // Enable Full-Duplex Mode (Can send and receive data simultaneously through
-    // MOSI and MISO)
+    /* Enable Full-Duplex Mode (Can send and receive data simultaneously through
+     MOSI and MISO) */
     instance->CR1 &= ~(SPI_CR1_RXONLY);
 
     // Configure SPI sck Baudrate
@@ -248,39 +242,6 @@ bool HwSpi::Init()
     instance->CR1 |= SPI_CR1_SPE;
 
     return true;
-}
-
-/**
- * @brief Virtual function override - Read with default parameters
- * @return true if successful, false otherwise
- */
-bool HwSpi::Read()
-{
-    // Default implementation could read a single byte or return an error
-    // Since we don't have default parameters, we'll return false for now
-    return false;
-}
-
-/**
- * @brief Virtual function override - Write with default parameters
- * @return true if successful, false otherwise
- */
-bool HwSpi::Write()
-{
-    // Default implementation could write a single byte or return an error
-    // Since we don't have default parameters, we'll return false for now
-    return false;
-}
-
-/**
- * @brief Virtual function override - Transfer with default parameters
- * @return true if successful, false otherwise
- */
-bool HwSpi::Transfer()
-{
-    // Default implementation could transfer a single byte or return an error
-    // Since we don't have default parameters, we'll return false for now
-    return false;
 }
 }  // namespace Stml4
 }  // namespace LBR
