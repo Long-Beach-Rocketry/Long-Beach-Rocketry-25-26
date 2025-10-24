@@ -19,3 +19,10 @@ Usart& BSP_Init(USART_TypeDef* base_addr)
 
     return UsartModule(usart_params, rx_params, tx_params);
 }
+
+Board board{BSP_Init(USART2)};
+
+Board& get_board(void)
+{
+    return board;
+}
