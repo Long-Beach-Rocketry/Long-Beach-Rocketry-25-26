@@ -47,7 +47,7 @@ public:
      * 
      * @param data A uint8_t pointer that holds data to be recieved from serial input.
      */
-    uint8_t receive_rx(uint8_t* data) override;
+    bool receive_rx(uint8_t* data, size_t size) override;
     /**
      * @brief Initializes the USART and associated Rx and Tx pins.
      * 

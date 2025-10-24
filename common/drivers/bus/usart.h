@@ -29,5 +29,5 @@ public:
       * 
       * @return True on success.
       */
-    virtual bool receive_rx(uint8_t* data) = 0;
+    virtual bool receive_rx(uint8_t* data, size_t size) = 0;
 };
