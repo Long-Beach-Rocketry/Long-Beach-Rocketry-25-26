@@ -13,11 +13,6 @@ namespace LBR::Utils {
             __NOP();
         }
     }
-    void DelayUs(uint32_t us) {
-        for (volatile uint32_t i = 0; i < us * 4; ++i) {
-            __NOP();
-        }
-    }
-};
-} // namespace LBR::Utils
+}
+}; // namespace LBR::Utils
        
