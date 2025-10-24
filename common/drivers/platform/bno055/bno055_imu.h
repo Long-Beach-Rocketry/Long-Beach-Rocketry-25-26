@@ -18,8 +18,8 @@ namespace LBR {
         explicit Bno055(LBR::Stml4::HwI2c& i2c_, uint8_t addr = 0x28);
         void Init() override;
         void Update() override;
-        void GetAcceleration(float& x, float& y, float& z) override;
-        void GetGyroscope(float& x, float& y, float& z) override;
+        void GetAcceleration(float& ax, float& ay, float& az) override;
+        void GetGyroscope(float& gx, float& gy, float& gz) override;
         void SensorFusionUpdate() override;
         void Calibrate() override;
         ~Bno055() override = default;
@@ -33,11 +33,14 @@ namespace LBR {
         LBR::Stml4::StI2c& i2c_;
         uint8_t address_;
 
+        //Default I2C address for BNO055
+        static constexpr uint8_t BNO055_I2C_ADDR = 0x28;
         //Common BN055 registers
-        static constexpr uint8_t REG_CHIP_ID = 0x00;
-        static constexpr uint8_t REG_OPR_MODE = 0x3D;
-        static constexpr uint8_t REG_PWR_MODE = 0x3E;
-        static constexpr uint8_t REG_PAGE_ID  = 0x07;
+        static constexpr uint8_t REG_CHIP_ID      = 0x00;
+        static constexpr uint8_t REG_OPR_MODE     = 0x3D;
+        static constexpr uint8_t REG_PWR_MODE     = 0x3E;
+        static constexpr uint8_t REG_PAGE_ID      = 0x07;
+        static constexpr uint8_t REG_SYS_TRIGGER  = 0x3F;
 
         // Data Registers
         static constexpr uint8_t REG_ACC_START = 0x08;
@@ -69,5 +72,6 @@ namespace LBR {
 
         // Operating mode register and value
         static constexpr uint8_t VAL_OPR_MODE_NDOF = 0x0C;
+
     };  
 }

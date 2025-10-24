@@ -28,7 +28,7 @@ void Bno055::Init() {
 
     DelayMs(650); // Wait for sensor to power up
 
-    id = ReadingRegister(REG_CHIP_ID); // Read chip ID register
+    id = ReadRegister(REG_CHIP_ID); // Read chip ID register
     if (id != 0xA0) {
         return;
     }
@@ -42,7 +42,7 @@ void Bno055::Init() {
     DelayMs(10);
 
     // Select page 0 for main registers
-    WriteRegister(REG_PAGE_ID, 0, 0x00);
+    WriteRegister(REG_PAGE_ID, 0x00);
 
     // Enter NDOF fusion mode
     SetMode(MODE_NDOF);
@@ -65,10 +65,10 @@ void Bno055::Update() {
 * This function retrieves the acceleration data from the sensor and converts it to m/s^2.
 */
 
-void Bno055::GetAcceleration(float& x, float& y, float& z) {
+void Bno055::GetAcceleration(float& ax, float& ay, float& az) {
 
     uint8_t buf[6];
-    ReadRegisters(REG_ACC_START, buf, 6);
+    ReadMultipleRegisters(REG_ACC_START, buf, 6);
 
     // Convert raw accelerometer data to m/s^2
     int16_t x = static_cast<int16_t>((buf[1] << 8) | buf[0]);
@@ -76,9 +76,9 @@ void Bno055::GetAcceleration(float& x, float& y, float& z) {
     int16_t z = static_cast<int16_t>((buf[5] << 8) | buf[4]);
 
     // 1 LSB = 1 m/s^2 / 100 per datasheet 
-    x = x / 100.0f; // Assuming 1 LSB = 0.01 m/s^2
-    y = y / 100.0f;
-    z = z / 100.0f;
+    ax = x / 100.0f; // Assuming 1 LSB = 0.01 m/s^2
+    ay = y / 100.0f;
+    az = z / 100.0f;
 }
  
 
@@ -87,7 +87,7 @@ void Bno055::GetAcceleration(float& x, float& y, float& z) {
 * This function retrieves the gyroscope data from the sensor and converts it to degrees per second.
 */
 
-void Bno055::GetGyroscope(float& x, float& y, float& z) {
+void Bno055::GetGyroscope(float& gx, float& gy, float& gz) {
 
     uint8_t buf[6];
     ReadMultipleRegisters(REG_GYR_START, buf, 6);
@@ -98,9 +98,9 @@ void Bno055::GetGyroscope(float& x, float& y, float& z) {
     int16_t z = static_cast<int16_t>((buf[5] << 8) | buf[4]);
 
     // 1 LSB = 1 dps / 16 per deg/s
-    x = x / 16.0f; // Assuming 1 LSB = 0.0625 deg/s
-    y = y / 16.0f;
-    z = z / 16.0f;
+    gx = x / 16.0f; // Assuming 1 LSB = 0.0625 deg/s
+    gy = y / 16.0f;
+    gz = z / 16.0f;
 
 }
 
