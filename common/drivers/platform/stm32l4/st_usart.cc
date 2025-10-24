@@ -4,9 +4,8 @@ StUsart::StUsart(USART_TypeDef* base_addr, uint32_t sys_clck,
                  uint32_t baud_rate)
     : base_addr(base_addr), uartdiv(sys_clck / baud_rate) {};
 
-bool StUsart::receive_rx(uint8_t* data)
+bool StUsart::receive_rx(uint8_t* data, size_t size)
 {
-    size_t size = sizeof(base_addr->RDR);
     size_t count = 0;
     while (count < size)
     {

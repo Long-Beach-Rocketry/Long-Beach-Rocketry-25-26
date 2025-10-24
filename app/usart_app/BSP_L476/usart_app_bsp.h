@@ -4,6 +4,7 @@
 #include "st_usart.h"
 #include "st_usart_module.h"
 #include "usart.h"
+#include "usartboard.h"
 
 using namespace LBR;
 
