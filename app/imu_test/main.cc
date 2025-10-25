@@ -23,6 +23,11 @@ int main(void) {
         imu.GetAcceleration(ax, ay, az);
         imu.GetGyroscope(gx, gy, gz);
         DelayMs(100);
+
+        imu.SensorFusionUpdate();
+        imu.GetEuler(heading, roll, pitch);
+        uinit8_t calibStatus = imu.Calibrate();
+        DelayMs(100);
     }
 }
 

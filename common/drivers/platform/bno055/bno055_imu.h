@@ -20,8 +20,10 @@ namespace LBR {
         void Update() override;
         void GetAcceleration(float& ax, float& ay, float& az) override;
         void GetGyroscope(float& gx, float& gy, float& gz) override;
+        void GetEuler(float& roll, float& pitch, float& yaw) override;
         void SensorFusionUpdate() override;
-        void Calibrate() override;
+        uint8_t Calibrate() override;
+        uint8_t GetSystemStatus() override;
         ~Bno055() override = default;
 
     private:
@@ -69,6 +71,17 @@ namespace LBR {
         static constexpr uint8_t REG_GYRO_Y_MSB = 0x17;
         static constexpr uint8_t REG_GYRO_Z_LSB = 0x18;
         static constexpr uint8_t REG_GYRO_Z_MSB = 0x19;
+
+
+        // Calibration and status registers 
+        static constexpr uint8_t REG_CALIB_STAT = 0x35;
+        static constexpr uint8_t REG_SYS_STATUS = 0x39;
+        static constexpr uint8_t REG_SYS_ERR    = 0x3A;
+
+        //Euler fused data (not sure if needed)
+        static constexpr uint8_t REG_EUL_START = 0x1A;
+
+        float euler_[3] = {0.0f, 0.0f, 0.0f}; // Roll, Pitch, Yaw   
 
         // Operating mode register and value
         static constexpr uint8_t VAL_OPR_MODE_NDOF = 0x0C;

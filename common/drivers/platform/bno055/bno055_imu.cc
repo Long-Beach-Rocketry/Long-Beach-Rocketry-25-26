@@ -110,15 +110,45 @@ void Bno055::GetGyroscope(float& gx, float& gy, float& gz) {
 */
 
 void Bno055::SensorFusionUpdate() {
-    
+    uint8_t buf[6];
+    ReadMultipleRegisters(REG_EUL_START, buf, 6);
+
+    int16_t x = static_cast<int16_t>((buf[1] << 8) | buf[0]);
+    int16_t y = static_cast<int16_t>((buf[3] << 8) | buf[2]);  
+    int16_t z = static_cast<int16_t>((buf[5] << 8) | buf[4]);
+
+    // Convert to degrees - 1 LSB = 1/16 degree
+    float fusedHeading = x / 16.0f;
+    float fusedRoll    = y / 16.0f;
+    float fusedPitch   = z / 16.0f;
+
 }
 
+
+// Euler fused data (not sure if needed)
+void Bno055::GetFusedEuler(float& heading, float& roll, float& pitch) {
+    heading = euler_[0];
+    roll    = euler_[1];
+    pitch   = euler_[2];
+}
 /**
 * @brief Calibrate the sensor
 * This function performs sensor calibration if necessary.
 */
 
-void Bno055::Calibrate() {
+uint8_t Bno055::Calibrate() {
+    return ReadRegister(REG_CALIB_STAT);
+}
+
+
+/**
+* @brief Read system status for self-test or fused status
+* @return The system status byte
+*/
+
+uint8_t Bno055::GetSystemStatus() {
+    return ReadRegister(REG_SYS_STATUS);
+    return ReadRegister(REG_SYS_ERR);
 
 }
 
