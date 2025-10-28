@@ -4,7 +4,6 @@
 #include "st_spi_module.h"
 #include "stm32l476xx.h"
 
-
 using namespace LBR::Stml4;
 using namespace LBR;
 
@@ -42,9 +41,6 @@ Spi& BSP_Init(SPI_TypeDef* spi_instance, GPIO_TypeDef* gpio_instance)
     // Create ready to use SPI object based on the SPI & GPIO Register settings from earlier
     SpiModule spi_mod(spi_instance, spi_settings, clk_params, miso_params,
                       mosi_params);
-
-    
-    
 
     static HwSpi spi = spi_mod.CreateSpi();
 

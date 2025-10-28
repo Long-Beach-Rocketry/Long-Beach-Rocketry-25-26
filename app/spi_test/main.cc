@@ -31,11 +31,12 @@ int main(void)
     uint8_t rx_buffer[6];
     //size_t rx_len = sizeof(rx_buffer);
 
-    StGpioSettings gpio_settings{GpioMode::ALT_FUNC, GpioOtype::PUSH_PULL,
-                                 GpioOspeed::VERY_HIGH, GpioPupd::NO_PULL, 5};
+    StGpioSettings gpio_settings{GpioMode::GPOUT, GpioOtype::PUSH_PULL,
+                                 GpioOspeed::VERY_HIGH, GpioPupd::NO_PULL, 0};
     StGpioParams cs_params{gpio_settings, 4, gpio_instance};
     static HwGpio cs_gpio{cs_params};
     cs_gpio.init();
+    cs_gpio.set(1);  // Initialize CS high (idle)
     GpioChipSelect chip_select{cs_gpio};
 
     while (1)

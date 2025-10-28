@@ -1,6 +1,5 @@
 #pragma once
 
-#include "gpio_cs.h"
 #include "spi.h"
 #include "stm32l476xx.h"
 

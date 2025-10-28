@@ -17,6 +17,7 @@ if (TARGET spi_app_bsp)
 
     target_include_directories_for(${TARGET_DEVICE} ${EXECUTABLE}
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/BSP_L476
     )
 
     target_link_libraries_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE

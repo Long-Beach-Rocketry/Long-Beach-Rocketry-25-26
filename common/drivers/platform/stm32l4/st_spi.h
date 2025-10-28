@@ -102,7 +102,6 @@ class HwSpi : public Spi
 public:
     explicit HwSpi(SPI_TypeDef* instance_, StSpiSettings& settings_);
 
-
     // Member Functions
     bool Init();
     bool Read(uint8_t* rx_data, size_t buffer_len) override;
