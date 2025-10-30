@@ -118,38 +118,47 @@ void Bno055::SensorFusionUpdate() {
     int16_t z = static_cast<int16_t>((buf[5] << 8) | buf[4]);
 
     // Convert to degrees - 1 LSB = 1/16 degree
-    float fusedHeading = x / 16.0f;
-    float fusedRoll    = y / 16.0f;
-    float fusedPitch   = z / 16.0f;
+    euler_[0] = x / 16.0f;
+    euler_[1] = y / 16.0f;
+    euler_[2] = z / 16.0f;
 
 }
 
 
-// Euler fused data (not sure if needed)
+// Euler fused data
 void Bno055::GetFusedEuler(float& heading, float& roll, float& pitch) {
     heading = euler_[0];
     roll    = euler_[1];
     pitch   = euler_[2];
 }
+
 /**
 * @brief Calibrate the sensor
 * This function performs sensor calibration if necessary.
 */
 
 uint8_t Bno055::Calibrate() {
-    return ReadRegister(REG_CALIB_STAT);
+    uint8_t calibStat = ReadRegister(REG_CALIB_STAT);
+    sys     = (calibStat >> 6) & 0x03;       // System calibration status
+    gyro    = (calibStat >> 4) & 0x03;      // Gyroscope calibration status
+    accel   = (calibStat >> 2) & 0x03;     // Accelerometer calibration status
+    mag     = calibStat & 0x03;              // Magnetometer calibration status
+
+    return (sys << 6) | (gyro << 4) | (accel << 2) | mag;
 }
 
 
 /**
-* @brief Read system status for self-test or fused status
+* @brief Read system status for status and error 
 * @return The system status byte
 */
 
 uint8_t Bno055::GetSystemStatus() {
     return ReadRegister(REG_SYS_STATUS);
-    return ReadRegister(REG_SYS_ERR);
+}
 
+uint8_t Bno055::GetSystemError() {
+    return ReadRegister(REG_SYS_ERR);
 }
 
 /**
@@ -204,3 +213,5 @@ void Bno055::ReadMultipleRegisters(uint8_t startReg, uint8_t* buffer, size_t len
 }
 
 } // namespace LBR
+
+// Fix Calibrate, Euler fused data functions, and check scaling factors with datasheet once more.

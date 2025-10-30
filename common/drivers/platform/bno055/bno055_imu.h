@@ -16,27 +16,41 @@ namespace LBR {
     class Bno055 : public Imu {
     public:
         explicit Bno055(LBR::Stml4::HwI2c& i2c_, uint8_t addr = 0x28);
+
+        // Core IMU interface methods
         void Init() override;
         void Update() override;
+
+        // Sensor data retrieval methods
         void GetAcceleration(float& ax, float& ay, float& az) override;
         void GetGyroscope(float& gx, float& gy, float& gz) override;
         void GetEuler(float& roll, float& pitch, float& yaw) override;
         void SensorFusionUpdate() override;
+
+        // Calibration and status methods
         uint8_t Calibrate() override;
         uint8_t GetSystemStatus() override;
+        uint8_t GetSystemError() override;
+
+
         ~Bno055() override = default;
 
     private:
+        // I2C communication methods or helpers
         void WriteRegister(uint8_t reg, uint8_t value);
         uint8_t ReadRegister(uint8_t reg);
-        void ReadMultipleRegisters(uint8_t startReg, uint8_t* buffer, size_t length); 
+        void ReadMultipleRegisters(uint8_t startReg, uint8_t* buffer, size_t length);
         void SetMode(uint8_t mode);
         
+
+        // I2C interface and device address
         LBR::Stml4::StI2c& i2c_;
         uint8_t address_;
+        float euler_[3] = {0.0f, 0.0f, 0.0f}; // Roll, Pitch, Yaw
 
         //Default I2C address for BNO055
         static constexpr uint8_t BNO055_I2C_ADDR = 0x28;
+
         //Common BN055 registers
         static constexpr uint8_t REG_CHIP_ID      = 0x00;
         static constexpr uint8_t REG_OPR_MODE     = 0x3D;
