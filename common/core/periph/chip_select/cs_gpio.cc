@@ -1,14 +1,15 @@
 #include "cs_gpio.h"
 
-LBR::GpioCS::GpioCS(LBR::Gpio& cs_pin_) : cs_pin(cs_pin_)
+LBR::GpioChipSelect::GpioChipSelect(LBR::Gpio& cs_pin_) : cs_pin{cs_pin_}
 {
 }
 
-void LBR::GpioCS::ChipSelect::High()
+void LBR::GpioChipSelect::ChipSelectEnable()
 {
-    cs_pin.set(true);
+    cs_pin.set(0);
 }
-void LBR::GpioCS::ChipSelect::Low()
+
+void LBR::GpioChipSelect::ChipSelectDisable()
 {
-    cs_pin.set(false);
+    cs_pin.set(1);
 }

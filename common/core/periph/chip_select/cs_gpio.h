@@ -1,13 +1,15 @@
+#pragma once
+
 #include "gpio.h"
 
 namespace LBR
 {
-class GpioCS
+class GpioChipSelect
 {
 public:
-    explicit GpioCS(Gpio& cs_pin_);
-    void ChipSelect.High();
-    void ChipSelect.Low();
+    explicit GpioChipSelect(Gpio& cs_pin_);
+    void ChipSelectEnable();
+    void ChipSelectDisable();
 
 private:
     Gpio& cs_pin;
