@@ -107,7 +107,7 @@ public:
     bool Read(uint8_t* rx_data, size_t buffer_len) override;
     bool Write(uint8_t* tx_data, size_t buffer_len) override;
     bool Transfer(uint8_t* tx_data, uint8_t* rx_data,
-                  size_t buffer_len) override;
+                  size_t tx_len, size_t rx_len) override;
 
 private:
     // Member variables

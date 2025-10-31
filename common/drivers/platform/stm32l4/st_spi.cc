@@ -151,7 +151,8 @@ bool HwSpi::Write(uint8_t* tx_data, size_t buffer_len)
  * @return true 
  * @return false 
  */
-bool HwSpi::Transfer(uint8_t* tx_data, uint8_t* rx_data, size_t buffer_len)
+bool HwSpi::Transfer(uint8_t* tx_data, uint8_t* rx_data, size_t tx_len,
+                     size_t rx_len)
 {
     // Check if SPI is enabled
     if (!(instance->CR1 & SPI_CR1_SPE))
@@ -165,29 +166,50 @@ bool HwSpi::Transfer(uint8_t* tx_data, uint8_t* rx_data, size_t buffer_len)
         return false;
     }
 
-    for (size_t i = 0; i < buffer_len; i++)
+    /*
+     * First send all tx bytes and clear the RXNE flag for each transmitted
+     * byte (we don't use these intermediate bytes for flash commands).
+     */
+    for (size_t i = 0; i < tx_len; i++)
     {
         // Wait until TX Buffer is empty
         while (!(instance->SR & SPI_SR_TXE))
         {
         }
 
-        /*
-         * Write to SPI Data Register (DR).
-         * Automatically starts clock once data is written to the DR.
-         */
+        // Write next tx byte to start clocking
         *(volatile uint8_t*)&instance->DR = tx_data[i];
 
-        /*
-         * Wait for RX buffer to be filled.
-         * Even if only writing, RXNE flag has to be cleared before proceeding to the next byte write.
-         */
+        // Wait for RX buffer to be filled (data received for this transfer)
         while (!(instance->SR & SPI_SR_RXNE))
         {
         }
 
-        // Read data from RX buffer
-        rx_data[i] = *(volatile uint8_t*)&instance->DR;
+        // Read and discard intermediate RX byte to clear RXNE
+        (void)(*(volatile uint8_t*)&instance->DR);
+    }
+
+    /*
+     * Now generate clock pulses by sending dummy bytes to read the expected
+     * response from the slave into rx_data[0..rx_len-1].
+     */
+    for (size_t j = 0; j < rx_len; j++)
+    {
+        // Wait until TX Buffer is empty before sending dummy byte
+        while (!(instance->SR & SPI_SR_TXE))
+        {
+        }
+
+        // Send dummy byte to generate clock for slave to shift out data
+        *(volatile uint8_t*)&instance->DR = 0x00;
+
+        // Wait until RX buffer has data
+        while (!(instance->SR & SPI_SR_RXNE))
+        {
+        }
+
+        // Read data from RX buffer into rx_data
+        rx_data[j] = *(volatile uint8_t*)&instance->DR;
     }
 
     // Wait until transmission is complete

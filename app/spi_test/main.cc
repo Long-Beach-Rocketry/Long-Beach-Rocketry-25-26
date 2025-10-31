@@ -23,13 +23,14 @@ int main(void)
     Spi& spi1 = BSP_Init(spi_instance, gpio_instance);
 
     // Send command byte 0x90 to read Manufacturer ID for the w25q
-    uint8_t tx_buffer[6] = {0x9F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+    uint8_t tx_buffer[4] = {0x90, 0x00, 0x00, 0x00};
     // Get the size of the array
     size_t tx_len = sizeof(tx_buffer);
 
     // Create an array of data to receive
-    uint8_t rx_buffer[6];
-    //size_t rx_len = sizeof(rx_buffer);
+    uint8_t
+        rx_buffer[2];  // Should see rx_buffer[0] = 239 and rx_buffer[1] = 23
+    size_t rx_len = sizeof(rx_buffer);
 
     StGpioSettings gpio_settings{GpioMode::GPOUT, GpioOtype::PUSH_PULL,
                                  GpioOspeed::VERY_HIGH, GpioPupd::NO_PULL, 0};
@@ -43,7 +44,7 @@ int main(void)
     {
         chip_select.ChipSelectEnable();
         // Loop write to PA7
-        spi1.Transfer(tx_buffer, rx_buffer, tx_len);
+        spi1.Transfer(tx_buffer, rx_buffer, tx_len, rx_len);
         chip_select.ChipSelectDisable();
     }
 }

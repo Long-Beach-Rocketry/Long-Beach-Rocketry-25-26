@@ -67,6 +67,7 @@
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "openocd",
+            "serverpath": "C:/openocd/bin/openocd.exe",
             "device": "STM32L4",
             "svdFile": "${workspaceRoot}/mcu_support/l4xx/STM32L4x2.svd",
             "searchDir": [
