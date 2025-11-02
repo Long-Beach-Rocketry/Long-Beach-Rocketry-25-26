@@ -17,17 +17,34 @@ int main(void) {
 
     float ax = 0, ay = 0, az = 0;
     float gx = 0, gy = 0, gz = 0;
+    float roll = 0, pitch = 0, heading = 0;
+    float lax = 0, lay = 0, laz = 0;
+    float gvx = 0, gvy = 0, gvz = 0;
+
+    uint8_t calibStatus = 0;
+    // Self-test results (?)
+    uint8_t postResult = imu.RunPowerOnSelfTest(); 
+    uint8_t bistResult = imu.RunBuiltInSelfTest();
 
     while (1) {
 
         imu.GetAcceleration(ax, ay, az);
         imu.GetGyroscope(gx, gy, gz);
-        DelayMs(100);
 
         imu.SensorFusionUpdate();
-        imu.GetEuler(heading, roll, pitch);
-        uinit8_t calibStatus = imu.Calibrate();
+        imu.GetFusedEuler(roll, pitch, heading);
+
+        imu.GetLinearAcceleration(lax, lay, laz);
+        imu.GetGravityVector(gvx, gvy, gvz);
+
         DelayMs(100);
+
+
+        calibStatus = imu.Calibrate();
+
+        DelayMs(100);
+
+        
     }
 }
 

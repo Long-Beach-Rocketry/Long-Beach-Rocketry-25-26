@@ -29,25 +29,51 @@ void Bno055::Init() {
     DelayMs(650); // Wait for sensor to power up
 
     id = ReadRegister(REG_CHIP_ID); // Read chip ID register
-    if (id != 0xA0) {
-        return;
+    for (int i = 0; i < 5 && id != 0xA0; ++i) {
+        DelayMs(10);
+        id = ReadRegister(REG_CHIP_ID);
+        DelayMs(50);
     }
+    if (id != 0xA0) return;
+    
 
     // Go to CONFIGMODE
-    SetMode(MODE_CONFIG);
+    SetMode(MODE::CONFIG);
     DelayMs(25);
 
     // Normal power mode
-    WriteRegister(REG_PWR_MODE, PWR_MODE_NORMAL);
-    DelayMs(10);
-
-    // Select page 0 for main registers
-    WriteRegister(REG_PAGE_ID, 0x00);
+    WriteRegister(REG_PWR_MODE, static_cast<uint8_t>(PowerMode::NORMAL));
 
     // Enter NDOF fusion mode
-    SetMode(MODE_NDOF);
+    SetMode(MODE::NDOF);
     DelayMs(20);
 
+    // Select page 0 for main registers
+    WriteRegister(REG_PAGE_ID, 0x01);
+
+    /* Accelerometer configuration */
+    uint8_t acc_cfg = 
+        (static_cast<uint8_t>(AccelOpMode::NORMAL) << 5) |
+        (static_cast<uint8_t>(AccelBandwidth::BW_62_5HZ) << 2) |
+        (static_cast<uint8_t>(AccelRange::RANGE_4G));
+    WriteRegister(0x08, acc_cfg); // ACC_CONFIG register
+
+    /* Gyroscope configuration */
+    uint8_t gyro_cfg = 
+        (static_cast<uint8_t>(GyroBandwidth::BW_116HZ) << 3) |
+        (static_cast<uint8_t>(GyroRange::DPS_2000));
+    WriteRegister(0x0A, gyro_cfg); // GYR_CONFIG_0 register
+    WriteRegister(0x0B, 0x00); // GYR_CONFIG_1 register
+
+    WriteRegister(REG_PAGE_ID, 0x00); // Back to page 0
+
+    WriteRegister(REG_PWR_MODE, PowerMode::NORMAL); // Normal operation
+    DelayMs(10);
+
+    WriteRegister(0x3B, 0x00); // Normal operation
+
+    SetMode(MODE::NDOF); // Back to NDOF mode
+    DelayMs(20);
 }
 
 /**
@@ -71,9 +97,9 @@ void Bno055::GetAcceleration(float& ax, float& ay, float& az) {
     ReadMultipleRegisters(REG_ACC_START, buf, 6);
 
     // Convert raw accelerometer data to m/s^2
-    int16_t x = static_cast<int16_t>((buf[1] << 8) | buf[0]);
-    int16_t y = static_cast<int16_t>((buf[3] << 8) | buf[2]);
-    int16_t z = static_cast<int16_t>((buf[5] << 8) | buf[4]);
+    int16_t x = (buf[1] << 8) | buf[0];
+    int16_t y = (buf[3] << 8) | buf[2];
+    int16_t z = (buf[5] << 8) | buf[4];
 
     // 1 LSB = 1 m/s^2 / 100 per datasheet 
     ax = x / 100.0f; // Assuming 1 LSB = 0.01 m/s^2
@@ -93,9 +119,9 @@ void Bno055::GetGyroscope(float& gx, float& gy, float& gz) {
     ReadMultipleRegisters(REG_GYR_START, buf, 6);
 
     // Convert raw gyroscope data to degrees per second
-    int16_t x = static_cast<int16_t>((buf[1]<< 8)  | buf[0]);
-    int16_t y = static_cast<int16_t>((buf[3] << 8) | buf[2]);
-    int16_t z = static_cast<int16_t>((buf[5] << 8) | buf[4]);
+    int16_t x = (buf[1] << 8) | buf[0];
+    int16_t y = (buf[3] << 8) | buf[2];
+    int16_t z = (buf[5] << 8) | buf[4];
 
     // 1 LSB = 1 dps / 16 per deg/s
     gx = x / 16.0f; // Assuming 1 LSB = 0.0625 deg/s
@@ -113,9 +139,9 @@ void Bno055::SensorFusionUpdate() {
     uint8_t buf[6];
     ReadMultipleRegisters(REG_EUL_START, buf, 6);
 
-    int16_t x = static_cast<int16_t>((buf[1] << 8) | buf[0]);
-    int16_t y = static_cast<int16_t>((buf[3] << 8) | buf[2]);  
-    int16_t z = static_cast<int16_t>((buf[5] << 8) | buf[4]);
+    int16_t x = (buf[1] << 8) | buf[0];
+    int16_t y = (buf[3] << 8) | buf[2];
+    int16_t z = (buf[5] << 8) | buf[4];
 
     // Convert to degrees - 1 LSB = 1/16 degree
     euler_[0] = x / 16.0f;
@@ -127,6 +153,7 @@ void Bno055::SensorFusionUpdate() {
 
 // Euler fused data
 void Bno055::GetFusedEuler(float& heading, float& roll, float& pitch) {
+    
     heading = euler_[0];
     roll    = euler_[1];
     pitch   = euler_[2];
@@ -138,12 +165,13 @@ void Bno055::GetFusedEuler(float& heading, float& roll, float& pitch) {
 */
 
 uint8_t Bno055::Calibrate() {
+    uint8_t sys, gyro, accel, mag;
+
     uint8_t calibStat = ReadRegister(REG_CALIB_STAT);
     sys     = (calibStat >> 6) & 0x03;       // System calibration status
     gyro    = (calibStat >> 4) & 0x03;      // Gyroscope calibration status
     accel   = (calibStat >> 2) & 0x03;     // Accelerometer calibration status
     mag     = calibStat & 0x03;              // Magnetometer calibration status
-
     return (sys << 6) | (gyro << 4) | (accel << 2) | mag;
 }
 
@@ -161,13 +189,21 @@ uint8_t Bno055::GetSystemError() {
     return ReadRegister(REG_SYS_ERR);
 }
 
+bool Bno055::IsSystemError() {
+    return GetSystemError() != 0;
+}
+
+bool Bno055::IsFullyCalibrated() {
+    uint8_t calib = Calibrate();
+    return (calib & 0xFF) == 0xFF; // All systems calibrated
+}
 /**
 * @brief Set the operation mode of the BNO055
 * @param mode The desired operation mode
 * This function writes to the operation mode register to change the sensor's mode.
 */
 
-void Bno055::SetMode(Mode mode) {
+void Bno055::SetMode(MODE mode) {
     WriteRegister(REG_OPR_MODE, static_cast<uint8_t>(mode));
     DelayMs(30); // Delay for mode switch
 }
@@ -212,6 +248,57 @@ void Bno055::ReadMultipleRegisters(uint8_t startReg, uint8_t* buffer, size_t len
     i2c_.read(std::span<uint8_t>(buffer, length), address_);
 }
 
+void Bno055::GetLinearAcceleration(float& lax, float& lay, float& laz) {
+    uint8_t buf[6];
+    ReadMultipleRegisters(REG_LIA_ACCEL_X_LSB, buf, 6);
+
+    int16_t x = (buf[1] << 8) | buf[0];
+    int16_t y = (buf[3] << 8) | buf[2];
+    int16_t z = (buf[5] << 8) | buf[4];
+
+    // 1 LSB = 1 m/s^2 / 100 per datasheet 
+    lax = x / 100.0f; // Assuming 1 LSB = 0.01 m/s^2
+    lay = y / 100.0f;
+    laz = z / 100.0f;
+}
+
+void Bno055::GetGravityVector(float& gx, float& gy, float& gz) {
+    uint8_t buf[6];
+    ReadMultipleRegisters(REG_GRAVITY_X_LSB, buf, 6);
+
+    int16_t x = (buf[1] << 8) | buf[0];
+    int16_t y = (buf[3] << 8) | buf[2];
+    int16_t z = (buf[5] << 8) | buf[4];
+
+    // 1 LSB = 1 m/s^2 / 100 per datasheet 
+    gx = x / 100.0f; // Assuming 1 LSB = 0.01 m/s^2
+    gy = y / 100.0f;
+    gz = z / 100.0f;
+
+}
+
+// Self-test functions (Added now may removed later)
+uint8_t Bno055::RunPowerOnSelfTest() {
+     return ReadRegister(REG_ST_RESULT);
+     // Return the self-test result register
+} 
+
+uint8_t Bno055::RunBuiltInSelfTest() {
+    // Trigger the built-in self-test
+    SetMode(MODE::CONFIG);
+    DelayMs(25);
+
+    uint8_t sys_trigger = ReadRegister(REG_SYS_TRIGGER);
+    sys_trigger |= 0x01; // Set the self-test bit
+    WriteRegister(REG_SYS_TRIGGER, sys_trigger);
+    DelayMs(1000); // Wait for self-test to complete
+
+    uint8_t result = ReadRegister(REG_ST_RESULT);
+
+    // Return to normal operation mode
+    SetMode(MODE::NDOF);
+    DelayMs(20);
+
+    return result;
 } // namespace LBR
 
-// Fix Calibrate, Euler fused data functions, and check scaling factors with datasheet once more.
