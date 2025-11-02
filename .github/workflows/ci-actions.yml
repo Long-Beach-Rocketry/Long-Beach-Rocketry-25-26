@@ -37,7 +37,7 @@ jobs:
       - name: Set up CMake
         uses: lukka/get-cmake@latest
         with:
-          cmake-version: "3.27"
+          cmakeVersion: "3.27"
 
       - name: Pull git submodules
         run: |
@@ -95,7 +95,7 @@ jobs:
       - name: Set up CMake
         uses: lukka/get-cmake@latest
         with:
-          cmake-version: "3.27"
+          cmakeVersion: "3.27"
 
       - name: Pull git submodules
         run: |

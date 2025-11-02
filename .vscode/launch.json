@@ -1,64 +1,95 @@
 {
-    "version": "0.2.0",
-    "projectName": "proj2",
-    "configurations": [
-        {
-            "cwd": "${workspaceFolder}",
-            "executable": "${workspaceRoot}/build/stm32f746/app/cli_app/cli_app",
-            "name": "DEBUG CLI F7",
-            "request": "launch",
-            "type": "cortex-debug",
-            "servertype": "openocd",
-            "device": "STM32F746",
-            "svdFile": "${workspaceRoot}/mcu_support/stm32/f7xx/f746/STM32F746.svd",
-            "searchDir": [
-                "${workspaceRoot}/mcu_support/stm32"
-            ],
-            "runToMain": true,
-            "configFiles": [
-                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
-                "${workspaceRoot}/mcu_support/stm32/f7xx/stm32f7x.cfg"
-            ],
-            "debuggerArgs": [
-                "-d",
-                "${workspaceRoot}",
-            ],
-            "preRestartCommands": [
-                "add-symbol-file /build/stm32f746/app/cli_app/cli_app",
-                "load",
-                "enable breakpoint",
-                "monitor reset"
-            ],
-            "showDevDebugOutput": true,
-        },
-        {
-            "cwd": "${workspaceFolder}",
-            "executable": "${workspaceRoot}/build/stm32l476/app/blink/blink",
-            "name": "DEBUG BLINK L4",
-            "request": "launch",
-            "type": "cortex-debug",
-            "servertype": "openocd",
-            "device": "STM32L4",
-            "svdFile": "${workspaceRoot}/mcu_support/l4xx/STM32L4x2.svd",
-            "searchDir": [
-                "${workspaceRoot}/mcu_support/stm32"
-            ],
-            "runToMain": true,
-            "configFiles": [
-                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
-                "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
-            ],
-            "debuggerArgs": [
-                "-d",
-                "${workspaceRoot}",
-            ],
-            "preRestartCommands": [
-                "add-symbol-file build/stm32l476/app/blink/blink",
-                "load",
-                "enable breakpoint",
-                "monitor reset"
-            ],
-            "showDevDebugOutput": true,
-        },
-    ]
+  "version": "0.2.0",
+  "projectName": "proj2",
+  "configurations": [
+    {
+      "cwd": "${workspaceFolder}",
+      "executable": "${workspaceRoot}/build/stm32l476/app/spi_test/spi_test",
+      "name": "DEBUG SPI L4",
+      "request": "launch",
+      "type": "cortex-debug",
+      "servertype": "openocd",
+      "device": "STM32L476",
+      "svdFile": "${workspaceRoot}/mcu_support/l4xx/STM32L4x2.svd",
+      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "runToEntryPoint": "main",
+      "configFiles": [
+        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+        "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
+      ],
+      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "preRestartCommands": [
+        "add-symbol-file build/stm32l476/app/spi_test/spi_test",
+        "load",
+        "enable breakpoint",
+        "monitor reset"
+      ],
+      "showDevDebugOutput": "both"
+    },
+    {
+      "cwd": "${workspaceRoot}",
+      "executable": "${workspaceRoot}/build/stm32l476/app/spi_test/spi_test",
+      "name": "DEBUG SPI L4 (external)",
+      "request": "launch",
+      "type": "cortex-debug",
+      "servertype": "external",
+      "device": "STM32L476",
+      "runToEntryPoint": "main",
+      "configFiles": [
+        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+        "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
+      ],
+      "svdFile": "${workspaceRoot}/mcu_support/l4xx/STM32L4x2.svd",
+      "showDevDebugOutput": "none"
+    }
+    ,
+    {
+      "cwd": "${workspaceFolder}",
+      "executable": "${workspaceRoot}/build/stm32l476/app/blink/blink",
+      "name": "DEBUG BLINK L4",
+      "request": "launch",
+      "type": "cortex-debug",
+      "servertype": "openocd",
+      "device": "STM32L4",
+      "svdFile": "${workspaceRoot}/mcu_support/l4xx/STM32L4x2.svd",
+      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "runToEntryPoint": "main",
+      "configFiles": [
+        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+        "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
+      ],
+      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "preRestartCommands": [
+        "add-symbol-file build/stm32l476/app/blink/blink",
+        "load",
+        "enable breakpoint",
+        "monitor reset"
+      ],
+      "showDevDebugOutput": "both"
+    },
+    {
+      "cwd": "${workspaceFolder}",
+      "executable": "${workspaceRoot}/build/stm32f746/app/cli_app/cli_app",
+      "name": "DEBUG CLI F7",
+      "request": "launch",
+      "type": "cortex-debug",
+      "servertype": "openocd",
+      "device": "STM32F746",
+      "svdFile": "${workspaceRoot}/mcu_support/stm32/f7xx/f746/STM32F746.svd",
+      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "runToEntryPoint": "main",
+      "configFiles": [
+        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+        "${workspaceRoot}/mcu_support/stm32/f7xx/stm32f7x.cfg"
+      ],
+      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "preRestartCommands": [
+        "add-symbol-file build/stm32f746/app/cli_app/cli_app",
+        "load",
+        "enable breakpoint",
+        "monitor reset"
+      ],
+      "showDevDebugOutput": "both"
+    }
+  ]
 }
