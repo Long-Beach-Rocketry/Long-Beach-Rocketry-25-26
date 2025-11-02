@@ -40,14 +40,14 @@ public:
      * @param data A uint8_t pointer that contains message to be sent.
      * @param size Variable of size_t type which specifies the size of message.
      */
-    void send_tx(const uint8_t* data, size_t size) override;
+    void send_tx(const std::span<char> data) override;
 
     /**
      * @brief Recieves data from serial input.
      * 
      * @param data A uint8_t pointer that holds data to be recieved from serial input.
      */
-    bool receive_rx(uint8_t* data, size_t size) override;
+    bool receive_rx(std::span<char> data) override;
     /**
      * @brief Initializes the USART and associated Rx and Tx pins.
      * 

@@ -1,26 +1,21 @@
 #include "usart_app_bsp.h"
 
-uint8_t rxb[] = "Message";
-uint8_t dat[20];
-// // uint8_t data = "message";
+std::string rxb = "Message";
 
-// static Board board = get_board();
+char data[16];
+std::span<char> rx_span(data, sizeof(data));
+
 Usart& usart = BSP_Init(USART2);
+
+bool rx_finished = false;
 
 int main(int argc, char** argv)
 {
 
-    // BSP_Init(USART2);
-
-    // uint8_t str_arr[] = "";
-    // uint8_t data[] = {};
-
-    usart.send_tx(rxb, sizeof(rxb));
+    usart.send_tx(rxb);
 
     NVIC_SetPriority(USART2_IRQn, 0);
     NVIC_EnableIRQ(USART2_IRQn);
-
-    // usart.receive_rx(data);
 
     while (1);
 
@@ -30,18 +25,7 @@ int main(int argc, char** argv)
 extern "C" void USART2_IRQHandler(void)
 {
 
-    //ADD SIZE PARAMTER!!
-    usart.receive_rx(dat, sizeof(dat));
+    usart.receive_rx(rx_span);
 
-    uint8_t temp[20];
-
-    for (size_t i = 0; i < sizeof(dat); i++)
-    {
-        temp[i] = ++dat[i];
-    }
-
-    // uint8_t arr[] = {temp};
-
-    usart.send_tx(temp, sizeof(temp));
-    // USART2->ISR &= ~USART_ISR_RXNE;
+    usart.send_tx(rx_span);
 }
