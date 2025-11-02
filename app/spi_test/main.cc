@@ -5,12 +5,6 @@
  */
 
 #include "cs_gpio.h"
-/**
- * @file main.cc
- * @brief Bare-metal SPI1 communication test on STM32L476 (clean, working).
- */
-
-#include "cs_gpio.h"
 #include "spi.h"
 #include "spi_app_bsp.h"
 #include "st_gpio.h"
@@ -23,13 +17,7 @@
 using namespace LBR;
 using namespace LBR::Stml4;
 
-static void busy_delay(uint32_t loops)
-{
-    while (loops--)
-    {
-        __asm__("nop");
-    }
-}
+
 
 int main(void)
 {
@@ -61,9 +49,6 @@ int main(void)
         cs.ChipSelectEnable();
         hw_spi.Transfer(tx_buf, rx_buf, sizeof(tx_buf));
         cs.ChipSelectDisable();
-
-        // Simple delay between transfers so signal is observable
-        busy_delay(200000);
     }
 
     return 0;
