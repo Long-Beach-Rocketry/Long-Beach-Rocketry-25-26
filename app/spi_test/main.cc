@@ -17,8 +17,6 @@
 using namespace LBR;
 using namespace LBR::Stml4;
 
-
-
 int main(void)
 {
     // Per-board peripheral base pointers
@@ -35,7 +33,7 @@ int main(void)
     StGpioParams cs_params{gpio_settings, 4, gpio_instance};
     static HwGpio cs_gpio{cs_params};
     cs_gpio.init();
-    cs_gpio.set(true); // idle high
+    cs_gpio.set(true);  // idle high
 
     GpioChipSelect cs{cs_gpio};
 
