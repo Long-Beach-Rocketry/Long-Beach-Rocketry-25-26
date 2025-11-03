@@ -9,6 +9,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include "helpers.h"
 #include "spi.h"
 #include "stm32l476xx.h"
 
@@ -106,17 +107,13 @@ public:
     bool Init();
     bool Read(uint8_t* rx_data, size_t buffer_len) override;
     bool Write(uint8_t* tx_data, size_t buffer_len) override;
-    bool Transfer(uint8_t* tx_data, uint8_t* rx_data,
-                  size_t tx_len, size_t rx_len) override;
+    bool Transfer(uint8_t* tx_data, uint8_t* rx_data, size_t tx_len,
+                  size_t rx_len) override;
 
 private:
     // Member variables
     SPI_TypeDef* instance;
     StSpiSettings settings;
-
-    // Private Member Functions
-    static inline void SetReg(volatile uint32_t* reg, uint32_t enum_val,
-                              uint32_t bit_num, uint32_t bit_length);
 };
 }  // namespace Stml4
 }  // namespace LBR

@@ -14,4 +14,5 @@ target_include_directories(spi_app_bsp PUBLIC
 target_link_libraries(spi_app_bsp
     PUBLIC
         driver
+        core
 )
