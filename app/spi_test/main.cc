@@ -4,6 +4,7 @@
  * @author Bex Saw
  */
 
+#include <array>
 #include "gpio_cs.h"
 #include "spi.h"
 #include "spi_app_bsp.h"
@@ -23,14 +24,11 @@ int main(void)
     Spi& spi1 = BSP_Init(spi_instance, gpio_instance);
 
     // Send command byte 0x90 to read Manufacturer ID for the w25q
-    uint8_t tx_buffer[4] = {0x90, 0x00, 0x00, 0x00};
-    // Get the size of the array
-    size_t tx_len = sizeof(tx_buffer);
+    std::array<uint8_t, 4> tx_buffer = {0x90, 0x00, 0x00, 0x00};
 
     // Create an array of data to receive
-    uint8_t
-        rx_buffer[2];  // Should see rx_buffer[0] = 239 and rx_buffer[1] = 23
-    size_t rx_len = sizeof(rx_buffer);
+    std::array<uint8_t, 2>
+        rx_buffer;  // Should see rx_buffer[0] = 239 and rx_buffer[1] = 23
 
     StGpioSettings gpio_settings{GpioMode::GPOUT, GpioOtype::PUSH_PULL,
                                  GpioOspeed::VERY_HIGH, GpioPupd::NO_PULL, 0};
@@ -44,7 +42,7 @@ int main(void)
     {
         chip_select.ChipSelectEnable();
         // Loop write to PA7
-        spi1.Transfer(tx_buffer, rx_buffer, tx_len, rx_len);
+        spi1.Transfer(tx_buffer, rx_buffer);
         chip_select.ChipSelectDisable();
     }
 }

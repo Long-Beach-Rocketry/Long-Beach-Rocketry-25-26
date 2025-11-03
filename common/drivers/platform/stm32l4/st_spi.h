@@ -9,7 +9,7 @@
 #pragma once
 
 #include <stdbool.h>
-#include "helpers.h"
+#include <span>
 #include "spi.h"
 #include "stm32l476xx.h"
 
@@ -105,10 +105,10 @@ public:
 
     // Member Functions
     bool Init();
-    bool Read(uint8_t* rx_data, size_t buffer_len) override;
-    bool Write(uint8_t* tx_data, size_t buffer_len) override;
-    bool Transfer(uint8_t* tx_data, uint8_t* rx_data, size_t tx_len,
-                  size_t rx_len) override;
+    bool Read(std::span<uint8_t> rx_data) override;
+    bool Write(std::span<uint8_t> tx_data) override;
+    bool Transfer(std::span<uint8_t> tx_data,
+                  std::span<uint8_t> rx_data) override;
 
 private:
     // Member variables

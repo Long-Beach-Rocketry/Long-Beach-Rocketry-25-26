@@ -7,7 +7,10 @@
  */
 
 #include "st_spi.h"
+#include <cstddef>
+#include "helpers.h"
 #include "stm32l476xx.h"
+
 namespace LBR
 {
 namespace Stml4
@@ -33,7 +36,7 @@ HwSpi::HwSpi(SPI_TypeDef* instance_, StSpiSettings& settings_)
  * @return true 
  * @return false 
  */
-bool HwSpi::Read(uint8_t* rx_data, size_t buffer_len)
+bool HwSpi::Read(std::span<uint8_t> rx_data)
 {
 
     // Check if SPI is already in communication
@@ -42,7 +45,7 @@ bool HwSpi::Read(uint8_t* rx_data, size_t buffer_len)
         return false;
     }
 
-    for (size_t i = 0; i < buffer_len; i++)
+    for (size_t i = 0; i < rx_data.size(); i++)
     {
         // TODO: ADD a timeout
 
@@ -81,7 +84,7 @@ bool HwSpi::Read(uint8_t* rx_data, size_t buffer_len)
  * @return true 
  * @return false 
  */
-bool HwSpi::Write(uint8_t* tx_data, size_t buffer_len)
+bool HwSpi::Write(std::span<uint8_t> tx_data)
 {
 
     // Check if SPI is already in communication
@@ -90,7 +93,7 @@ bool HwSpi::Write(uint8_t* tx_data, size_t buffer_len)
         return false;
     }
 
-    for (size_t i = 0; i < buffer_len; i++)
+    for (size_t i = 0; i < tx_data.size(); i++)
     {
         // Wait until TX Buffer is empty
         while (!(instance->SR & SPI_SR_TXE))
@@ -135,8 +138,7 @@ bool HwSpi::Write(uint8_t* tx_data, size_t buffer_len)
  * @return true 
  * @return false 
  */
-bool HwSpi::Transfer(uint8_t* tx_data, uint8_t* rx_data, size_t tx_len,
-                     size_t rx_len)
+bool HwSpi::Transfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
 {
     // Check if SPI is enabled
     if (!(instance->CR1 & SPI_CR1_SPE))
@@ -154,7 +156,7 @@ bool HwSpi::Transfer(uint8_t* tx_data, uint8_t* rx_data, size_t tx_len,
      * First send all tx bytes and clear the RXNE flag for each transmitted
      * byte (we don't use these intermediate bytes for flash commands).
      */
-    for (size_t i = 0; i < tx_len; i++)
+    for (size_t i = 0; i < tx_data.size(); i++)
     {
         // Wait until TX Buffer is empty
         while (!(instance->SR & SPI_SR_TXE))
@@ -177,7 +179,7 @@ bool HwSpi::Transfer(uint8_t* tx_data, uint8_t* rx_data, size_t tx_len,
      * Now generate clock pulses by sending dummy bytes to read the expected
      * response from the slave into rx_data[0..rx_len-1].
      */
-    for (size_t j = 0; j < rx_len; j++)
+    for (size_t j = 0; j < rx_data.size(); j++)
     {
         // Wait until TX Buffer is empty before sending dummy byte
         while (!(instance->SR & SPI_SR_TXE))

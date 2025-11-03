@@ -6,18 +6,18 @@
  * 
  */
 #pragma once
-#include <cstddef>
 #include <cstdint>
+#include <span>
 
 namespace LBR
 {
 class Spi
 {
 public:
-    virtual bool Read(uint8_t* rx_data, size_t buffer_len) = 0;
-    virtual bool Write(uint8_t* tx_data, size_t buffer_len) = 0;
-    virtual bool Transfer(uint8_t* tx_data, uint8_t* rx_data, size_t tx_len,
-                          size_t rx_len) = 0;
+    virtual bool Read(std::span<uint8_t> rx_data) = 0;
+    virtual bool Write(std::span<uint8_t> tx_data) = 0;
+    virtual bool Transfer(std::span<uint8_t> tx_data,
+                          std::span<uint8_t> rx_dat) = 0;
     virtual ~Spi() = default;
 };
 }  // namespace LBR
