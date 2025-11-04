@@ -22,6 +22,7 @@ if (TARGET spi_app_bsp)
 
     target_link_libraries_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
         spi_app_bsp
+        core
     )
 
     target_preprocess_for(${TARGET_DEVICE} ${EXECUTABLE} ${LINKER_SCRIPT} ${LDF} ${PREPROCESS_DEFS})

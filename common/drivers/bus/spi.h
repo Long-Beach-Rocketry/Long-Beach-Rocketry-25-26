@@ -17,7 +17,7 @@ public:
     virtual bool Read(std::span<uint8_t> rx_data) = 0;
     virtual bool Write(std::span<uint8_t> tx_data) = 0;
     virtual bool Transfer(std::span<uint8_t> tx_data,
-                          std::span<uint8_t> rx_dat) = 0;
+                          std::span<uint8_t> rx_data) = 0;
     virtual ~Spi() = default;
 };
 }  // namespace LBR

@@ -8,6 +8,7 @@
 
 #include "st_spi.h"
 #include <cstddef>
+#include <span>
 #include "helpers.h"
 #include "stm32l476xx.h"
 
