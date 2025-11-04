@@ -9,9 +9,12 @@
 #pragma once
 
 #include <stdbool.h>
+#include <cstddef>
 #include <span>
 #include "spi.h"
+#include "helpers.h"
 #include "stm32l476xx.h"
+
 
 namespace LBR
 {

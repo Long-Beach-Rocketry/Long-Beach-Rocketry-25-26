@@ -1,4 +1,3 @@
-#include "spi_app_bsp.h"
 #include "st_gpio.h"
 #include "st_spi.h"
 #include "st_spi_module.h"
