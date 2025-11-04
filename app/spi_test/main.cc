@@ -1,7 +1,7 @@
 /**
  * @file main.cc
  * @brief Bare-metal SPI1 communication test on STM32L476.
- * @author Bex Saw
+ * @author Bex Saw, Kent Hong
  */
 
 #include <array>

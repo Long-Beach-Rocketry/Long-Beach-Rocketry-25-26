@@ -206,8 +206,6 @@ bool HwSpi::Transfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
 /**
  * @brief Initializes SPI peripheral and its sck, mosi, miso, and nss pins
  *
- * @return SpiStatus::Ok initialization success
- * @return SpiStatus::InitErr initialization failed
  */
 bool HwSpi::Init()
 {
