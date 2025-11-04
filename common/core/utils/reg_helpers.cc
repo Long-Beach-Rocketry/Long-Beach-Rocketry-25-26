@@ -1,4 +1,4 @@
-#include "helpers.h"
+#include "reg_helpers.h"
 
 /**
  * @brief Sets any SPI register with the desired bits

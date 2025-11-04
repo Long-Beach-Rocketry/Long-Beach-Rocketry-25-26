@@ -7,7 +7,7 @@
 #include <array>
 #include "gpio_cs.h"
 #include "spi.h"
-#include "spi_app_bsp.h"
+#include "spi_app_bsp.cc"
 #include "st_gpio.h"
 #include "stm32l476xx.h"
 

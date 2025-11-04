@@ -1,5 +1,5 @@
 add_library(utils STATIC
-    helpers.cc
+    reg_helpers.cc
 )
 
 target_include_directories(utils PUBLIC
