@@ -9,7 +9,7 @@
 #include "spi.h"
 #include "spi_app_bsp.cc"
 #include "st_gpio.h"
-#include "stm32l476xx.h"
+//#include "stm32l476xx.h"
 
 using namespace LBR;
 using namespace LBR::Stml4;
