@@ -68,6 +68,12 @@ bool HwI2c::read(std::span<uint8_t> data, uint8_t dev_addr)
         byte = _base_addr->RXDR;
     }
 
+    // Detect stop
+    while (!(_base_addr->ISR & I2C_ISR_STOPF))
+    {
+    }
+    _base_addr->ICR |= I2C_ICR_STOPCF;
+
     return true;
 }
 
@@ -113,6 +119,12 @@ bool HwI2c::write(std::span<const uint8_t> data, uint8_t dev_addr)
         }
         _base_addr->TXDR = byte;
     }
+
+    // Detect stop
+    while (!(_base_addr->ISR & I2C_ISR_STOPF))
+    {
+    }
+    _base_addr->ICR |= I2C_ICR_STOPCF;
 
     return true;
 }

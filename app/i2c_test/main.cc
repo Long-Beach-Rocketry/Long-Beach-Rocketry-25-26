@@ -9,7 +9,7 @@ int main(int argc, char* argv[])
 {
     Board hw = board_init();
 
-    uint8_t dummy_addr = 0xAA;
+    uint8_t dummy_addr = 0x76;
     uint8_t val[1] = {0xAA};
     std::span<const uint8_t> write_val{val, 1};
 
@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
     {
         hw.i2c.write(write_val, dummy_addr);
 
-        for (volatile size_t i = 0; i < 1000000; i++);
+        for (volatile size_t i = 0; i < 100000; i++);
     }
 
     return 0;
