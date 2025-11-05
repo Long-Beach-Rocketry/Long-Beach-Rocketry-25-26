@@ -9,13 +9,11 @@ namespace LBR
 
 struct Board
 {
-    Gpio& clk;
-    Gpio& miso;
-    Gpio& mosi;
     Gpio& cs;
-    Spi& spi;
+    Spi& spi1;
 };
 
-Spi& BSP_Init(SPI_TypeDef* spi_instance, GPIO_TypeDef* gpio_instance);
+bool BSP_Init();
+Board& Get_Board();
 
 }  // namespace LBR

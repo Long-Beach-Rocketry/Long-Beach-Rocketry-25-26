@@ -1,6 +1,5 @@
 add_library(spi_app_bsp STATIC
     spi_app_bsp.cc
-    ${CMAKE_SOURCE_DIR}/common/drivers/platform/stm32l4/st_spi_module.cc
     ${CMAKE_SOURCE_DIR}/common/drivers/platform/stm32l4/st_spi.cc
     ${CMAKE_SOURCE_DIR}/common/core/periph/chip_select/gpio_cs.cc
 )

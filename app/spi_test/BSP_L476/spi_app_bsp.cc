@@ -1,16 +1,30 @@
 #include "board.h"
 #include "st_gpio.h"
 #include "st_spi.h"
-#include "st_spi_module.h"
 #include "stm32l476xx.h"
 
+using namespace LBR::Stml4;
 namespace LBR
 {
-// TODO: Initialize Board struct in board.h to fill in values for the 4 GPIOs and 1 SPI
+
+StGpioSettings cs_gpio_settings{GpioMode::GPOUT, GpioOtype::PUSH_PULL,
+                                GpioOspeed::VERY_HIGH, GpioPupd::NO_PULL, 0};
+StGpioParams cs_params{cs_gpio_settings, 4, GPIOA};
+HwGpio cs_gpio{cs_params};
+
+// Make SPI Register Config Settings
+Stml4::StSpiSettings spi_settings{
+    Stml4::SpiBaudRate::FPCLK_2, Stml4::SpiBusMode::MODE1,
+    Stml4::SpiBitOrder::MSB, Stml4::SpiRxThreshold::FIFO_8bit};
+HwSpi spi1{SPI1, spi_settings};
+
+Board board{.cs = cs_gpio, .spi1 = spi1};
 
 // Initialize SPI BSP
-Spi& BSP_Init(SPI_TypeDef* spi_instance, GPIO_TypeDef* gpio_instance)
+bool BSP_Init()
 {
+    // Reference status
+    bool result = true;
 
     // Enable GPIOA clock
     RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
@@ -18,25 +32,36 @@ Spi& BSP_Init(SPI_TypeDef* spi_instance, GPIO_TypeDef* gpio_instance)
     // Enable SPI clock
     RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
 
-    // Make SPI Register Config Settings
-    Stml4::StSpiSettings spi_settings{
-        Stml4::SpiBaudRate::FPCLK_2, Stml4::SpiBusMode::MODE1,
-        Stml4::SpiBitOrder::MSB, Stml4::SpiRxThreshold::FIFO_8bit};
-
     // Make GPIO Register Config Settings
     Stml4::StGpioSettings gpio_settings{
         Stml4::GpioMode::ALT_FUNC, Stml4::GpioOtype::PUSH_PULL,
         Stml4::GpioOspeed::VERY_HIGH, Stml4::GpioPupd::NO_PULL, 5};
-    Stml4::StGpioParams clk_params{gpio_settings, 5, gpio_instance};
-    Stml4::StGpioParams miso_params{gpio_settings, 6, gpio_instance};
-    Stml4::StGpioParams mosi_params{gpio_settings, 7, gpio_instance};
+    Stml4::StGpioParams sck_params{gpio_settings, 5, GPIOA};
+    Stml4::StGpioParams miso_params{gpio_settings, 6, GPIOA};
+    Stml4::StGpioParams mosi_params{gpio_settings, 7, GPIOA};
 
-    // Create ready to use SPI object based on the SPI & GPIO Register settings from earlier
-    Stml4::SpiModule spi_mod(spi_instance, spi_settings, clk_params,
-                             miso_params, mosi_params);
+    // Make GPIO Spi pins
+    Stml4::HwGpio sck{sck_params};
+    Stml4::HwGpio miso{miso_params};
+    Stml4::HwGpio mosi{mosi_params};
 
-    static Stml4::HwSpi spi = spi_mod.CreateSpi();
+    // Init SPI periph and check if it was successful
+    result = result && spi1.Init();
 
-    return spi;
+    // Init Spi pins
+    sck.init();
+    miso.init();
+    mosi.init();
+
+    // Init CS pin
+    cs_gpio.init();
+    cs_gpio.set(1);  // Initialize CS high (idle)
+
+    return result;
+}
+
+Board& Get_Board()
+{
+    return board;
 }
 }  // namespace LBR

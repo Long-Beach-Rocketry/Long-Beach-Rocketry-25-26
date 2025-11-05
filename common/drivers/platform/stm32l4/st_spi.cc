@@ -209,15 +209,35 @@ bool HwSpi::Transfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
  */
 bool HwSpi::Init()
 {
-    // TODO: Add static error checks to this (check for nullptrs, etc...)
+    // TODO: Runtime validation of enum values (will change to compile time checks in the future and maybe make a private function for these checks)
+    if (static_cast<uint8_t>(settings.baudrate) > 7)
+    {
+        return false;
+    }
+    if (static_cast<uint8_t>(settings.busmode) > 3)
+    {
+        return false;
+    }
+    if (static_cast<uint8_t>(settings.order) > 1)
+    {
+        return false;
+    }
+    if (static_cast<uint8_t>(settings.threshold) > 1)
+    {
+        return false;
+    }
 
-    /* Set to Master Mode (Keep in master mode unless we want our STM32l4xx to be
-     used as a slave device). Master Mode sets our STM32l4xx to act as the
-     master device to initiate/end SPI communication and drive the clock signal. */
+    /* 
+     * Set to Master Mode (Keep in master mode unless we want our STM32l4xx to be
+     * used as a slave device). Master Mode sets our STM32l4xx to act as the
+     * master device to initiate/end SPI communication and drive the clock signal. 
+     */
     instance->CR1 |= SPI_CR1_MSTR;
 
-    /* Enable Full-Duplex Mode (Can send and receive data simultaneously through
-     MOSI and MISO) */
+    /* 
+     * Enable Full-Duplex Mode (Can send and receive data simultaneously through
+     * MOSI and MISO) 
+     */
     instance->CR1 &= ~(SPI_CR1_RXONLY);
 
     // Configure SPI sck Baudrate
@@ -229,8 +249,10 @@ bool HwSpi::Init()
     // Configure Bit order
     SetReg(&instance->CR1, uint32_t(settings.order), 7, 1);
 
-    // Determine FIFO reception threshold to see how many bits in RX Buffer
-    // triggers an RXNE event
+    /* 
+     * Determine FIFO reception threshold to see how many bits in RX Buffer
+     * triggers an RXNE event
+     */
     SetReg(&instance->CR2, uint32_t(settings.threshold), 12, 1);
 
     // Configure the SPI data size to 8 bits
