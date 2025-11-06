@@ -1,18 +1,19 @@
 #include "usart_app_bsp.h"
 
-std::string rxb = "Message";
+char rxb[16] = "Message";
+std::span<char> tx_span(rxb, sizeof(rxb));
 
-char data[16];
+char data[64];
 std::span<char> rx_span(data, sizeof(data));
 
 Usart& usart = BSP_Init(USART2);
 
-bool rx_finished = false;
+bool rx_finished;
 
 int main(int argc, char** argv)
 {
 
-    usart.send_tx(rxb);
+    usart.send_tx(tx_span);
 
     NVIC_SetPriority(USART2_IRQn, 0);
     NVIC_EnableIRQ(USART2_IRQn);
@@ -25,7 +26,8 @@ int main(int argc, char** argv)
 extern "C" void USART2_IRQHandler(void)
 {
 
-    usart.receive_rx(rx_span);
-
-    usart.send_tx(rx_span);
+    if (usart.receive_rx(rx_span))
+    {
+        usart.send_tx(rx_span);
+    }
 }
