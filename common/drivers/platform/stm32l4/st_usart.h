@@ -40,7 +40,7 @@ public:
      * @param data A uint8_t pointer that contains message to be sent.
      * @param size Variable of size_t type which specifies the size of message.
      */
-    void send_tx(const std::span<char> data) override;
+    bool send_tx(const std::span<char> data) override;
 
     /**
      * @brief Recieves data from serial input.
