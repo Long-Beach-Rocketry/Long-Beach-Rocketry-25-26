@@ -6,19 +6,30 @@ StUsart::StUsart(USART_TypeDef* base_addr, uint32_t sys_clck,
 
 bool StUsart::receive_rx(std::span<char> data)
 {
-    for (auto& c : data)
-    {
-        while (!(base_addr->ISR & USART_ISR_RXNE))
-        {
-        }
+    static size_t index = 0;
 
-        c = base_addr->RDR;
+    //prevent overrun
+    if (base_addr->ISR & USART_ISR_ORE)
+    {
+        base_addr->ICR |= USART_ICR_ORECF;
     }
 
-    return true;
+    if ((base_addr->ISR & USART_ISR_RXNE) && index <= data.size())
+    {
+        data[index] = base_addr->RDR;
+
+        if (data[index] == '\n' || data[index] == '\r' || index > data.size())
+        {
+            index = 0;
+            return true;
+        }
+        index++;
+    }
+
+    return false;
 }
 
-void StUsart::send_tx(const std::span<char> data)
+bool StUsart::send_tx(const std::span<char> data)
 {
     for (auto byte : data)
     {
@@ -26,12 +37,17 @@ void StUsart::send_tx(const std::span<char> data)
         while (!(base_addr->ISR & USART_ISR_TXE))
         {
         }
+        if (byte == '\n' || byte == '\r')
+        {
+            return false;
+        }
         base_addr->TDR = static_cast<uint16_t>(byte);
     }
 
     while (!(base_addr->ISR & USART_ISR_TC))
     {
     }
+    return true;
 }
 
 void StUsart::init()

@@ -20,7 +20,7 @@ public:
       * @param size Size of data variable containing message;
       * 
       */
-    virtual void send_tx(const std::span<char> data) = 0;
+    virtual bool send_tx(const std::span<char> data) = 0;
 
     /**
       * @brief Recieves data from serial rx data line input.
