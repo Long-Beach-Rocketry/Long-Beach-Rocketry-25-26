@@ -40,8 +40,8 @@ namespace LBR {
     /* For sensor mode configuration */
      enum class MODE : uint8_t {
         CONFIG        = 0x00,
-        IMU           = 0x08,
-        NDOF          = 0x0C
+        IMU           = 0x08, // Accel + Gyro Fusion Only
+        NDOF          = 0x0C // Full Fusion (requires mag) -- Just have it here for now
     };
 
     /* For power mode configuration */
@@ -51,7 +51,10 @@ namespace LBR {
         SUSPEND   = 0x02
     };
 
-    // Have all this now (Need to ask and remove some stuff later)
+    /* Have all this now, I need to ask for specific then 
+    remove enum class altogether since technically the MODE 
+    already do the configuration for us (This is just options) */
+    
     /* For accelerometer configuration */
     enum class AccelRange : uint8_t {
         RANGE_2G  = 0b00,
