@@ -24,56 +24,27 @@ Bno055::Bno055(LBR::Stml4::HwI2c& i2c, uint8_t address)
 
 void Bno055::Init() {
     
-    uint8_t id = 0;
-
-    DelayMs(650); // Wait for sensor to power up
-
-    id = ReadRegister(REG_CHIP_ID); // Read chip ID register
+    DelayMs(650);  // Wait for sensor to power up
+    uint8_t id = ReadRegister(REG_CHIP_ID);
     for (int i = 0; i < 5 && id != 0xA0; ++i) {
         DelayMs(10);
         id = ReadRegister(REG_CHIP_ID);
-        DelayMs(50);
     }
     if (id != 0xA0) return;
     
 
-    // Go to CONFIGMODE
+    // Go to CONFIGMODE -- Default
     SetMode(MODE::CONFIG);
     DelayMs(25);
-
-    // Normal power mode
     WriteRegister(REG_PWR_MODE, static_cast<uint8_t>(PowerMode::NORMAL));
+    WriteRegister(REG_PAGE_ID, 0x00);
 
-    // Enter NDOF fusion mode
-    SetMode(MODE::NDOF);
+
+    
+    SetMode(MODE::IMU); // Back to IMU mode
     DelayMs(20);
 
-    // Select page 0 for main registers
-    WriteRegister(REG_PAGE_ID, 0x01);
-
-    /* Accelerometer configuration */
-    uint8_t acc_cfg = 
-        (static_cast<uint8_t>(AccelOpMode::NORMAL) << 5) |
-        (static_cast<uint8_t>(AccelBandwidth::BW_62_5HZ) << 2) |
-        (static_cast<uint8_t>(AccelRange::RANGE_4G));
-    WriteRegister(0x08, acc_cfg); // ACC_CONFIG register
-
-    /* Gyroscope configuration */
-    uint8_t gyro_cfg = 
-        (static_cast<uint8_t>(GyroBandwidth::BW_116HZ) << 3) |
-        (static_cast<uint8_t>(GyroRange::DPS_2000));
-    WriteRegister(0x0A, gyro_cfg); // GYR_CONFIG_0 register
-    WriteRegister(0x0B, 0x00); // GYR_CONFIG_1 register
-
-    WriteRegister(REG_PAGE_ID, 0x00); // Back to page 0
-
-    WriteRegister(REG_PWR_MODE, PowerMode::NORMAL); // Normal operation
-    DelayMs(10);
-
-    WriteRegister(0x3B, 0x00); // Normal operation
-
-    SetMode(MODE::NDOF); // Back to NDOF mode
-    DelayMs(20);
+    
 }
 
 /**
@@ -151,7 +122,11 @@ void Bno055::SensorFusionUpdate() {
 }
 
 
-// Euler fused data
+/** 
+* @brief Get Data For FusedEuler 
+* This including: heading, roll, pitch of the payload.
+*/
+
 void Bno055::GetFusedEuler(float& heading, float& roll, float& pitch) {
     
     heading = euler_[0];
@@ -168,22 +143,36 @@ uint8_t Bno055::Calibrate() {
     uint8_t sys, gyro, accel, mag;
 
     uint8_t calibStat = ReadRegister(REG_CALIB_STAT);
-    sys     = (calibStat >> 6) & 0x03;       // System calibration status
-    gyro    = (calibStat >> 4) & 0x03;      // Gyroscope calibration status
-    accel   = (calibStat >> 2) & 0x03;     // Accelerometer calibration status
-    mag     = calibStat & 0x03;              // Magnetometer calibration status
+    sys     = (calibStat >> 6) & 0x03;      
+    gyro    = (calibStat >> 4) & 0x03;      
+    accel   = (calibStat >> 2) & 0x03;     
+    mag     = calibStat & 0x03;    
     return (sys << 6) | (gyro << 4) | (accel << 2) | mag;
 }
 
 
 /**
-* @brief Read system status for status and error 
+* @brief Read system status for status, error, and IsFullyCalibrated.
 * @return The system status byte
 */
 
 uint8_t Bno055::GetSystemStatus() {
     return ReadRegister(REG_SYS_STATUS);
 }
+
+/* Maybe Add?
+const char* Bno055::DecodeSystemStatus(uint8_t status) {
+    switch (status) {
+        case 0x00: return "System idle";
+        case 0x01: return "System error";
+        case 0x02: return "Initializing peripherals";
+        case 0x03: return "System initialization";
+        case 0x04: return "Executing self-test";
+        case 0x05: return "Running - fusion algorithm off";
+        case 0x06: return "Running - fusion algorithm on";
+        default:   return "Unknown status";
+    }
+} */
 
 uint8_t Bno055::GetSystemError() {
     return ReadRegister(REG_SYS_ERR);
@@ -197,6 +186,7 @@ bool Bno055::IsFullyCalibrated() {
     uint8_t calib = Calibrate();
     return (calib & 0xFF) == 0xFF; // All systems calibrated
 }
+
 /**
 * @brief Set the operation mode of the BNO055
 * @param mode The desired operation mode
@@ -204,6 +194,7 @@ bool Bno055::IsFullyCalibrated() {
 */
 
 void Bno055::SetMode(MODE mode) {
+    if(mode > MODE::IMU) return; // Invalid MODE, ignore bro
     WriteRegister(REG_OPR_MODE, static_cast<uint8_t>(mode));
     DelayMs(30); // Delay for mode switch
 }
@@ -212,12 +203,12 @@ void Bno055::SetMode(MODE mode) {
 * @brief Write a value to a register on the BNO055
 * @param reg The register address to write to
 * @param value The value to write to the register
-* This function sends a write command over I2C to the specified register.
+* This function sends a write command over Yshi I2C to the specified register.
 */
 
 void Bno055::WriteRegister(uint8_t reg, uint8_t value) {
     uint8_t data[2] = {reg, value};
-    i2c_.write(std::span<const uint8_t>(data, 2), address_);
+    i2c_.write(data, 2, address_);
 }
 
 /**
@@ -228,9 +219,8 @@ void Bno055::WriteRegister(uint8_t reg, uint8_t value) {
 
 uint8_t Bno055::ReadRegister(uint8_t reg) {
     uint8_t value = 0;
-    uint8_t regAddr = reg;
-    i2c_.write(std::span<const uint8_t>(&regAddr, 1), address_);
-    i2c_.read(std::span<uint8_t>(&value, 1), address_);
+    i2c_.write(&reg, 1, address_);
+    i2c_.read(&value, 1, address_);
     return value;
 }
 
@@ -243,10 +233,17 @@ uint8_t Bno055::ReadRegister(uint8_t reg) {
 */
 
 void Bno055::ReadMultipleRegisters(uint8_t startReg, uint8_t* buffer, size_t length) {
-    uint8_t regAddr = startReg;
-    i2c_.write(std::span<const uint8_t>(&regAddr, 1), address_);
-    i2c_.read(std::span<uint8_t>(buffer, length), address_);
+    i2c_.write(&startReg, 1, address_);
+    i2c_.read(buffer, length, address_);
 }
+
+/**
+* @brief One of the Function that get the LinearAcceleration with Gravity removed
+* - May Remove or Keep Depends on TJ
+* @note Detecting launch. burnout, seperation events,
+*       it can also estimating velocitu or altitude chagnes when fused 
+*       -with barometer or gyoscope data. 
+*/
 
 void Bno055::GetLinearAcceleration(float& lax, float& lay, float& laz) {
     uint8_t buf[6];
@@ -261,6 +258,12 @@ void Bno055::GetLinearAcceleration(float& lax, float& lay, float& laz) {
     lay = y / 100.0f;
     laz = z / 100.0f;
 }
+
+/**
+* @brief Gives the direction and magnitude of gravity relative to the IMU's orientation.
+* @note It tells you which way "down" is in the sensors reference frame.
+* - Benefit: Detecting free-fall and determine orientation/tilt relative to the ground
+*/
 
 void Bno055::GetGravityVector(float& gx, float& gy, float& gz) {
     uint8_t buf[6];
@@ -277,13 +280,40 @@ void Bno055::GetGravityVector(float& gx, float& gy, float& gz) {
 
 }
 
-// Self-test functions (Added now may removed later)
-uint8_t Bno055::RunPowerOnSelfTest() {
-     return ReadRegister(REG_ST_RESULT);
-     // Return the self-test result register
-} 
+/* Self Tests */
 
-uint8_t Bno055::RunBuiltInSelfTest() {
+/** 
+* @brief checks if the IMU's internal senrsors or MCU are function
+* @note This is for StartUp Validation, Pre-Launch diagnostic, Fault Detection, etc.
+*/
+
+uint8_t Bno055::RunPowerOnSelfTest() {
+     uint8_t result = ReadRegister(REG_ST_RESULT);
+
+     bool mcu_pass  = (result >> 3) & 0x01;
+     bool gyro_pass = (result >> 2) & 0x01;
+     bool acc_pass  = (result >> 0) & 0x01;
+
+     if(!mcu_pass || !gyro_pass || !acc_pass ) {
+        if(!mcu_pass)   printf("BNO055 Self-Test FAIL: MCU\n");
+        if(!gyro_pass)  printf("BNO055 Self-Test FAIL: Gyroscope\n");
+        if(!acc_pass)   printf("BNO055 Self-Test FAIL: Accelerometer\n");
+     } else {
+        printf("BNO055 Self-Test PASS (MCU, Gyro, Accel OK)\n");
+     }
+
+     return result;
+
+    } 
+
+/* This is Optional treat it as a manual call to see */
+
+/** 
+* @brief manually triggers the IMU's internal diagnostic rountine while the system is running
+*/
+
+
+uint8_t Bno055::RunBuiltInSelfTest() { 
     // Trigger the built-in self-test
     SetMode(MODE::CONFIG);
     DelayMs(25);
@@ -291,14 +321,15 @@ uint8_t Bno055::RunBuiltInSelfTest() {
     uint8_t sys_trigger = ReadRegister(REG_SYS_TRIGGER);
     sys_trigger |= 0x01; // Set the self-test bit
     WriteRegister(REG_SYS_TRIGGER, sys_trigger);
-    DelayMs(1000); // Wait for self-test to complete
 
+    DelayMs(1000); // Wait for self-test to complete
     uint8_t result = ReadRegister(REG_ST_RESULT);
 
-    // Return to normal operation mode
-    SetMode(MODE::NDOF);
+    // Return to IMU operation mode
+    SetMode(MODE::IMU);
     DelayMs(20);
 
     return result;
+}
 } // namespace LBR
 
