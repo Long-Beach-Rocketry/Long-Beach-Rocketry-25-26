@@ -1,33 +1,20 @@
-#include "usart_app_bsp.h"
+#include "board.h"
 
-char rxb[16] = "Message";
-std::span<char> tx_span(rxb, sizeof(rxb));
+uint8_t rxb[16] = "Message";
+std::span<uint8_t> tx_span(rxb, sizeof(rxb));
 
-char data[64];
-std::span<char> rx_span(data, sizeof(data));
-
-Usart& usart = BSP_Init(USART2);
-
-bool rx_finished;
+uint8_t data[64];
+std::span<uint8_t> rx_span(data, sizeof(data));
 
 int main(int argc, char** argv)
 {
+    BSP_Init();
 
-    usart.send_tx(tx_span);
+    Board board = get_board();
 
-    NVIC_SetPriority(USART2_IRQn, 0);
-    NVIC_EnableIRQ(USART2_IRQn);
+    board.usart.send_tx(tx_span);
 
     while (1);
 
     return 0;
-}
-
-extern "C" void USART2_IRQHandler(void)
-{
-
-    if (usart.receive_rx(rx_span))
-    {
-        usart.send_tx(rx_span);
-    }
 }

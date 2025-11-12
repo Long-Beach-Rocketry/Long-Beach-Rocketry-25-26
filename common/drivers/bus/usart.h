@@ -4,8 +4,8 @@
  */
 
 #pragma once
+#include <cstdint>
 #include <span>
-#include <string>
 
 /**
   * @brief class that contains the functions needed to intialize and setup rx and tx functions.
@@ -20,7 +20,7 @@ public:
       * @param size Size of data variable containing message;
       * 
       */
-    virtual bool send_tx(const std::span<char> data) = 0;
+    virtual bool send_tx(const std::span<uint8_t> data) = 0;
 
     /**
       * @brief Recieves data from serial rx data line input.
@@ -29,5 +29,5 @@ public:
       * 
       * @return True on success.
       */
-    virtual bool receive_rx(std::span<char> data) = 0;
+    virtual bool receive_rx(std::span<uint8_t> data) = 0;
 };
