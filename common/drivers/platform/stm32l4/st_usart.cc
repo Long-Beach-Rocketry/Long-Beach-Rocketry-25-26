@@ -2,9 +2,9 @@
 
 StUsart::StUsart(USART_TypeDef* base_addr, uint32_t sys_clck,
                  uint32_t baud_rate)
-    : base_addr(base_addr), uartdiv(sys_clck / baud_rate) {};
+    : base_addr(base_addr), uartdiv(sys_clck / baud_rate){};
 
-bool StUsart::receive_rx(std::span<char> data)
+bool StUsart::receive_rx(std::span<uint8_t> data)
 {
     static size_t index = 0;
 
@@ -29,9 +29,9 @@ bool StUsart::receive_rx(std::span<char> data)
     return false;
 }
 
-bool StUsart::send_tx(const std::span<char> data)
+bool StUsart::send_tx(const std::span<uint8_t> data)
 {
-    for (auto byte : data)
+    for (auto& byte : data)
     {
 
         while (!(base_addr->ISR & USART_ISR_TXE))
@@ -50,11 +50,19 @@ bool StUsart::send_tx(const std::span<char> data)
     return true;
 }
 
-void StUsart::init()
+bool StUsart::init()
 {
 
-    StUsart::base_addr->CR1 &= ~USART_CR1_UE;
-    StUsart::base_addr->BRR = uartdiv;
-    StUsart::base_addr->CR1 |= USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;
-    StUsart::base_addr->CR1 |= USART_CR1_RXNEIE;
+    try
+    {
+        StUsart::base_addr->CR1 &= ~USART_CR1_UE;
+        StUsart::base_addr->BRR = uartdiv;
+        StUsart::base_addr->CR1 |= USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;
+        StUsart::base_addr->CR1 |= USART_CR1_RXNEIE;
+        return true;
+    }
+    catch (...)
+    {
+        return false;
+    }
 }
