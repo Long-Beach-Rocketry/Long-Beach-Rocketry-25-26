@@ -1,7 +1,8 @@
 #pragma once
-#include "gpio.h"
+#include "gpio_cs.h"
 #include "spi.h"
 #include "stm32l476xx.h"
+
 //do the cmake
 
 namespace LBR
@@ -9,7 +10,7 @@ namespace LBR
 
 struct Board
 {
-    Gpio& cs;
+    GpioChipSelect& cs;
     Spi& spi1;
 };
 

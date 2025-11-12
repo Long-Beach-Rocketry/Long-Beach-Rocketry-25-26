@@ -1,4 +1,5 @@
 #include "board.h"
+#include "gpio_cs.h"
 #include "st_gpio.h"
 #include "st_spi.h"
 #include "stm32l476xx.h"
@@ -18,13 +19,33 @@ Stml4::StSpiSettings spi_settings{
     Stml4::SpiBitOrder::MSB, Stml4::SpiRxThreshold::FIFO_8bit};
 HwSpi spi1{SPI1, spi_settings};
 
-Board board{.cs = cs_gpio, .spi1 = spi1};
+// Make GPIO Register Config Settings
+Stml4::StGpioSettings gpio_settings{
+    Stml4::GpioMode::ALT_FUNC, Stml4::GpioOtype::PUSH_PULL,
+    Stml4::GpioOspeed::VERY_HIGH, Stml4::GpioPupd::NO_PULL, 5};
+Stml4::StGpioParams sck_params{gpio_settings, 5, GPIOA};
+Stml4::StGpioParams miso_params{gpio_settings, 6, GPIOA};
+Stml4::StGpioParams mosi_params{gpio_settings, 7, GPIOA};
+
+// Make GPIO Spi pins
+Stml4::HwGpio sck{sck_params};
+Stml4::HwGpio miso{miso_params};
+Stml4::HwGpio mosi{mosi_params};
+
+// Create Chip Select Object to manual toggle cs pin
+GpioChipSelect chip_select{cs_gpio};
+
+Board board{.cs = chip_select, .spi1 = spi1};
+
+// Get struct of our ready to use Chip Select Pin and SPI object
+Board spi_board = Get_Board();
 
 // Initialize SPI BSP
 bool BSP_Init()
 {
     // Reference status
-    bool result = true;
+    bool result_spi = true, result_sck = true, result_miso = true,
+         result_mosi = true, result_cs = true;
 
     // Enable GPIOA clock
     RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
@@ -32,32 +53,19 @@ bool BSP_Init()
     // Enable SPI clock
     RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
 
-    // Make GPIO Register Config Settings
-    Stml4::StGpioSettings gpio_settings{
-        Stml4::GpioMode::ALT_FUNC, Stml4::GpioOtype::PUSH_PULL,
-        Stml4::GpioOspeed::VERY_HIGH, Stml4::GpioPupd::NO_PULL, 5};
-    Stml4::StGpioParams sck_params{gpio_settings, 5, GPIOA};
-    Stml4::StGpioParams miso_params{gpio_settings, 6, GPIOA};
-    Stml4::StGpioParams mosi_params{gpio_settings, 7, GPIOA};
-
-    // Make GPIO Spi pins
-    Stml4::HwGpio sck{sck_params};
-    Stml4::HwGpio miso{miso_params};
-    Stml4::HwGpio mosi{mosi_params};
-
     // Init SPI periph and check if it was successful
-    result = result && spi1.Init();
+    result_spi = result_spi && spi1.Init();
 
     // Init Spi pins
-    sck.init();
-    miso.init();
-    mosi.init();
+    result_sck = result_sck && sck.init();
+    result_miso = result_miso && miso.init();
+    result_mosi = result_mosi && mosi.init();
 
     // Init CS pin
-    cs_gpio.init();
-    cs_gpio.set(1);  // Initialize CS high (idle)
+    result_cs = result_cs && cs_gpio.init();
+    chip_select.ChipSelectEnable();
 
-    return result;
+    return result_spi && result_sck && result_miso && result_mosi && result_cs;
 }
 
 Board& Get_Board()
