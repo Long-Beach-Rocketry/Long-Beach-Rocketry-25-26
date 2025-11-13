@@ -45,6 +45,29 @@ bool bsp_init()
     return ret;
 }
 
+    ret = sda.init();
+    if (ret == false)
+    {
+        return false;
+    }
+
+    ret = scl.init();
+    if (ret == false)
+    {
+        return false;
+    }
+
+    ret = i2c.init();
+    if (ret == false)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+Board& get_board()
+{
     return board;
 }
 
