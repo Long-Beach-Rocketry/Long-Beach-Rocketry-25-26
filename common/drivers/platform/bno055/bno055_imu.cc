@@ -9,7 +9,8 @@
 #include "delay.h"
 #include "st_i2c.h"
 
-using namespace LBR::Utils;
+using namespace LBR::Stml4;
+using LBR::Utils::DelayMs;
 
 namespace LBR {
 
