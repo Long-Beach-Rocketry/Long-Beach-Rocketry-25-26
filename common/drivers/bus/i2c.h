@@ -25,7 +25,7 @@ public:
      * @param dev_addr address of target device
      * @return true if successful, false otherwise
      */
-    virtual bool read(std::span<uint8_t> data, uint8_t dev_addr) = 0;
+    virtual bool mem_read(std::span<uint8_t> data, uint8_t dev_addr) = 0;
 
     /**
      * @brief Writes data to external device
@@ -34,7 +34,7 @@ public:
      * @param dev_addr address of target device
      * @return true if successful, false otherwise
      */
-    virtual bool write(std::span<const uint8_t> data, uint8_t dev_addr) = 0;
+    virtual bool mem_write(std::span<const uint8_t> data, uint8_t dev_addr) = 0;
 
     ~I2c() = default;
 };

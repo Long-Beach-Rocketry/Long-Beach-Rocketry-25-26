@@ -1,3 +1,10 @@
+/**
+ * @file st_i2c.h
+ * @brief I2C driver for STM32L476xx
+ * @author Yshi Blanco
+ * @date 10/02/2025
+ */
+
 #pragma once
 
 #include <cstdint>
@@ -33,8 +40,8 @@ public:
      */
     bool init();
 
-    bool read(std::span<uint8_t> data, uint8_t dev_addr) override;
-    bool write(std::span<const uint8_t> data, uint8_t dev_addr) override;
+    bool mem_read(std::span<uint8_t> data, uint8_t dev_addr) override;
+    bool mem_write(std::span<const uint8_t> data, uint8_t dev_addr) override;
 
 private:
     I2C_TypeDef* _base_addr;

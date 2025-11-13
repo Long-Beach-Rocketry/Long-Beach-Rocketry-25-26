@@ -30,8 +30,20 @@ bool HwI2c::init()
     return true;
 }
 
-bool HwI2c::read(std::span<uint8_t> data, uint8_t dev_addr)
+bool HwI2c::mem_read(std::span<uint8_t> data, uint8_t dev_addr)
 {
+
+    if (_base_addr == nullptr)
+    {
+        return false;
+    }
+
+    // Check if init was called
+    if (!(_base_addr->CR1 & I2C_CR1_PE))
+    {
+        return false;
+    }
+
     /**
      * Setting target
      * Checking if communication in progress
@@ -77,8 +89,19 @@ bool HwI2c::read(std::span<uint8_t> data, uint8_t dev_addr)
     return true;
 }
 
-bool HwI2c::write(std::span<const uint8_t> data, uint8_t dev_addr)
+bool HwI2c::mem_write(std::span<const uint8_t> data, uint8_t dev_addr)
 {
+    if (_base_addr == nullptr)
+    {
+        return false;
+    }
+
+    // Check if init was called
+    if (!(_base_addr->CR1 & I2C_CR1_PE))
+    {
+        return false;
+    }
+
     /**
      * Setting target
      * Check if communication is in progress

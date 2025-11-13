@@ -7,7 +7,8 @@ using namespace LBR;
 
 int main(int argc, char* argv[])
 {
-    Board hw = board_init();
+    bsp_init();
+    Board hw = get_board();
 
     uint8_t dummy_addr = 0x76;
     uint8_t val[1] = {0xAA};
@@ -15,7 +16,7 @@ int main(int argc, char* argv[])
 
     while (1)
     {
-        hw.i2c.write(write_val, dummy_addr);
+        hw.i2c.mem_write(write_val, dummy_addr);
 
         for (volatile size_t i = 0; i < 100000; i++);
     }
