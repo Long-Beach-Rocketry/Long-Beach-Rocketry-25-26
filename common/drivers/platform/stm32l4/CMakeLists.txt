@@ -1,9 +1,11 @@
 add_library(hal STATIC
     st_gpio.cc
+    st_spi.cc
 )
 
 target_include_directories(hal PUBLIC
     .
+    ${CMAKE_SOURCE_DIR}/common/core/utils
     #bus #why this? i dont think needed
 )
 
