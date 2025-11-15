@@ -15,7 +15,9 @@ LBR::Stml4::StGpioParams tx_params = {tx_config, (uint8_t)2, GPIOA};
 LBR::Stml4::HwGpio rx_gpio(rx_params);
 LBR::Stml4::HwGpio tx_gpio(tx_params);
 
-StUsart usart(USART2, 4000000, 115200);
+StUsart usart(USART2, 4000000, 9600);
+
+Board board{.usart = usart, .rx = rx_gpio, .tx = tx_gpio};
 
 bool BSP_Init()
 {
@@ -23,9 +25,18 @@ bool BSP_Init()
     RCC->APB1ENR1 |= RCC_APB1ENR1_USART2EN | RCC_APB1ENR1_USART3EN;
     RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
 
-    usart.init();
-    rx_gpio.init();
-    tx_gpio.init();
+    if (!usart.init())
+    {
+        return false;
+    }
+    if (!rx_gpio.init())
+    {
+        return false;
+    }
+    if (!tx_gpio.init())
+    {
+        return false;
+    }
 
     NVIC_SetPriority(USART2_IRQn, 0);
     NVIC_EnableIRQ(USART2_IRQn);
@@ -33,9 +44,7 @@ bool BSP_Init()
     return true;
 }
 
-Board board{.usart = usart, .rx = rx_gpio, .tx = tx_gpio};
-
-Board& get_board(void)
+Board& get_board()
 {
     return board;
 }
@@ -43,8 +52,8 @@ Board& get_board(void)
 extern "C" void USART2_IRQHandler(void)
 {
 
-    if (board.usart.receive_rx(rx_span))
+    if (board.usart.receive_rx(rxb))
     {
-        board.usart.send_tx(rx_span);
+        board.usart.send_tx(rxb);
     }
 }

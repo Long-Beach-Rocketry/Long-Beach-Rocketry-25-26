@@ -2,11 +2,10 @@
 
 StUsart::StUsart(USART_TypeDef* base_addr, uint32_t sys_clck,
                  uint32_t baud_rate)
-    : base_addr(base_addr), uartdiv(sys_clck / baud_rate){};
+    : base_addr(base_addr), uartdiv(sys_clck / baud_rate) {};
 
-bool StUsart::receive_rx(std::span<uint8_t> data)
+bool StUsart::receive_rx(uint8_t& data)
 {
-    static size_t index = 0;
 
     //prevent overrun
     if (base_addr->ISR & USART_ISR_ORE)
@@ -14,35 +13,20 @@ bool StUsart::receive_rx(std::span<uint8_t> data)
         base_addr->ICR |= USART_ICR_ORECF;
     }
 
-    if ((base_addr->ISR & USART_ISR_RXNE) && index <= data.size())
+    while (!(base_addr->ISR & USART_ISR_RXNE))
     {
-        data[index] = base_addr->RDR;
-
-        if (data[index] == '\n' || data[index] == '\r' || index > data.size())
-        {
-            index = 0;
-            return true;
-        }
-        index++;
     }
+    data = base_addr->RDR;
 
-    return false;
+    return true;
 }
 
-bool StUsart::send_tx(const std::span<uint8_t> data)
+bool StUsart::send_tx(const uint8_t data)
 {
-    for (auto& byte : data)
+    while (!(base_addr->ISR & USART_ISR_TXE))
     {
-
-        while (!(base_addr->ISR & USART_ISR_TXE))
-        {
-        }
-        if (byte == '\n' || byte == '\r')
-        {
-            return false;
-        }
-        base_addr->TDR = static_cast<uint16_t>(byte);
     }
+    base_addr->TDR = data;
 
     while (!(base_addr->ISR & USART_ISR_TC))
     {
@@ -53,16 +37,13 @@ bool StUsart::send_tx(const std::span<uint8_t> data)
 bool StUsart::init()
 {
 
-    try
-    {
-        StUsart::base_addr->CR1 &= ~USART_CR1_UE;
-        StUsart::base_addr->BRR = uartdiv;
-        StUsart::base_addr->CR1 |= USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;
-        StUsart::base_addr->CR1 |= USART_CR1_RXNEIE;
-        return true;
-    }
-    catch (...)
+    if (StUsart::base_addr == nullptr)
     {
         return false;
     }
+    StUsart::base_addr->CR1 &= ~USART_CR1_UE;
+    StUsart::base_addr->BRR = uartdiv;
+    StUsart::base_addr->CR1 |= USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;
+    StUsart::base_addr->CR1 |= USART_CR1_RXNEIE;
+    return true;
 }
