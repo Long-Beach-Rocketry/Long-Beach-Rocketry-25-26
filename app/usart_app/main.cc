@@ -1,10 +1,8 @@
 #include "board.h"
 
-uint8_t rxb[16] = "Message";
-std::span<uint8_t> tx_span(rxb, sizeof(rxb));
+uint8_t txb[] = {"Message"};
 
-uint8_t data[64];
-std::span<uint8_t> rx_span(data, sizeof(data));
+uint8_t rxb;
 
 int main(int argc, char** argv)
 {
@@ -12,9 +10,11 @@ int main(int argc, char** argv)
 
     Board board = get_board();
 
-    board.usart.send_tx(tx_span);
+    board.usart.send_tx(*txb);
 
-    while (1);
+    while (1)
+    {
+    }
 
     return 0;
 }

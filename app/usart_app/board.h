@@ -2,9 +2,9 @@
 #include "gpio.h"
 #include "usart.h"
 
-extern std::span<uint8_t> tx_span;
+extern uint8_t rxb;
 
-extern std::span<uint8_t> rx_span;
+extern uint8_t txb[];
 
 struct Board
 {
@@ -15,4 +15,4 @@ struct Board
 };
 
 bool BSP_Init();
-Board& get_board(void);
+Board& get_board();
