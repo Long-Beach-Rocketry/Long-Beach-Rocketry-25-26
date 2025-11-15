@@ -37,9 +37,6 @@ GpioChipSelect chip_select{cs_gpio};
 
 Board board{.cs = chip_select, .spi1 = spi1};
 
-// Get struct of our ready to use Chip Select Pin and SPI object
-Board spi_board = Get_Board();
-
 // Initialize SPI BSP
 bool BSP_Init()
 {
