@@ -36,27 +36,13 @@ bool bsp_init()
     RCC->APB1ENR1 |= RCC_APB1ENR1_I2C1EN;
 
     // Initialize I2C and pins
-    bool ret;
+    bool ret = true;
 
-    ret = sda.init();
-    if (ret == false)
-    {
-        return false;
-    }
+    ret = ret && sda.init();
+    ret = ret && scl.init();
+    ret = ret && i2c.init();
 
-    ret = scl.init();
-    if (ret == false)
-    {
-        return false;
-    }
-
-    ret = i2c.init();
-    if (ret == false)
-    {
-        return false;
-    }
-
-    return true;
+    return ret;
 }
 
 Board& get_board()
