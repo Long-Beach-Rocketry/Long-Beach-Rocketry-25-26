@@ -1,6 +1,7 @@
 add_library(hal STATIC
     st_gpio.cc
     st_spi.cc
+    st_i2c.cc
 )
 
 target_include_directories(hal PUBLIC
