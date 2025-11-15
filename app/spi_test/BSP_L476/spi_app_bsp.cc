@@ -44,8 +44,7 @@ Board spi_board = Get_Board();
 bool BSP_Init()
 {
     // Reference status
-    bool result_spi = true, result_sck = true, result_miso = true,
-         result_mosi = true, result_cs = true;
+    bool result = true;
 
     // Enable GPIOA clock
     RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
@@ -54,18 +53,18 @@ bool BSP_Init()
     RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
 
     // Init SPI periph and check if it was successful
-    result_spi = result_spi && spi1.Init();
+    result = result && spi1.Init();
 
     // Init Spi pins
-    result_sck = result_sck && sck.init();
-    result_miso = result_miso && miso.init();
-    result_mosi = result_mosi && mosi.init();
+    result = result && sck.init();
+    result = result && miso.init();
+    result = result && mosi.init();
 
     // Init CS pin
-    result_cs = result_cs && cs_gpio.init();
+    result = result && cs_gpio.init();
     chip_select.ChipSelectEnable();
 
-    return result_spi && result_sck && result_miso && result_mosi && result_cs;
+    return result;
 }
 
 Board& Get_Board()
