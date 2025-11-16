@@ -1,13 +1,17 @@
-add_library(hal STATIC
-    # bno055_imu.cc
-)
+# Only build bno055 for STM32 targets (requires st_i2c.h and hal)
+if (TARGET_DEVICE MATCHES "STM32")
+    add_library(bno055 STATIC
+        bno055_imu.cc
+    )
 
-target_include_directories(hal PUBLIC
-    .
-    #bus #why this? i dont think needed
-)
+    target_include_directories(bno055 PUBLIC
+        .
+    )
 
-target_link_libraries(hal PUBLIC
-    st_l4_support
-    core #i dont see why needed
-)
+    # Depends on platform HAL wrapper and core
+    target_link_libraries(bno055 PUBLIC
+        hal
+        core
+        utils
+    )
+endif()
