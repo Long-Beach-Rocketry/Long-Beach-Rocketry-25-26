@@ -5,21 +5,28 @@
 #endif
 
 namespace LBR::Utils {
-    void DelayMs(uint32_t ms) {
-        
-        for (volatile uint32_t i = 0; i < ms * 4000; ++i) {
-            __NOP();
-        }
 
-        void DelayUs(uint32_t us) {
-        for (volatile uint32_t i = 0; i < us * 4; ++i) {
-            __NOP();
-        }
+void DelayMs(uint32_t ms) {
+#ifdef STM32L476xx
+    // Embedded target: busy-wait loop
+    for (uint32_t i = 0; i < ms * 4000; i++) {
+        __NOP();
     }
 #else
     // Native/host target: stub or use std sleep if needed
     (void)ms;
 #endif
 }
-}; // namespace LBR::Utils
+
+void DelayUs(uint32_t us) {
+#ifdef STM32L476xx
+    for (uint32_t i = 0; i < us * 4; i++) {
+        __NOP();
+    }
+#else
+    (void)us;
+#endif
+}
+
+} // namespace LBR::Utils
        

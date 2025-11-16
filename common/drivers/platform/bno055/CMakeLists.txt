@@ -12,6 +12,6 @@ if (TARGET_DEVICE MATCHES "STM32")
     target_link_libraries(bno055 PUBLIC
         hal
         core
-        utils
+        driver_utils
     )
 endif()
