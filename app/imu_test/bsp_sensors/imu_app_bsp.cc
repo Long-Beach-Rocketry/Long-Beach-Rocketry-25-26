@@ -1,44 +1,51 @@
 /**
 * @file imu_app_bsp.cc
 * @brief IMU application board support package implementation.
-* @author Bex Saw
-* @date 2025-10-24
 */
 
 #include "imu_app_bsp.h"
-#include "st_i2c_module.h"
-#include "delay.h"
+#include "st_i2c.h"
 #include "st_gpio.h"
+#include "stm32l4xx.h"
 
-LBR::Bno055& BSP_Init_IMU(I2c_TypeDef* i2c_instance, GPIO_TypeDef* gpio_instance) {
-    (void)gpio_instance;
+namespace LBR {
 
-     // Enable GPIOB clock
+Bno055& bsp_init_imu()
+{
+    // Enable GPIOB and I2C1 clocks
     RCC->AHB2ENR |= RCC_AHB2ENR_GPIOBEN;
-    // Enable I2C1 clock
     RCC->APB1ENR1 |= RCC_APB1ENR1_I2C1EN;
 
-    // Configure PB8 = SCL, PB9 = SDA
+    // Configure PB8 = I2C1_SCL, PB9 = I2C1_SDA (AF4, open-drain, pull-up)
     LBR::Stml4::StGpioSettings gpio_settings{
         LBR::Stml4::GpioMode::ALT_FUNC,
         LBR::Stml4::GpioOtype::OPEN_DRAIN,
         LBR::Stml4::GpioOspeed::HIGH,
         LBR::Stml4::GpioPupd::PULL_UP,
-
+        4 // AF4 for I2C1
     };
 
-    LBR::StGpioParams scl_params{gpio_settings, 8, GPIOB}; // PB8
-    LBR::StGpioParams sda_params{gpio_settings, 9, GPIOB}; // PB9
+    // Initialize GPIO pins for I2C
+    LBR::Stml4::StGpioParams scl{gpio_settings, 8, GPIOB};
+    LBR::Stml4::StGpioParams sda{gpio_settings, 9, GPIOB};
+    LBR::Stml4::HwGpio scl_gpio(scl);
+    LBR::Stml4::HwGpio sda_gpio(sda);
+    scl_gpio.init();
+    sda_gpio.init();
 
-    // Init I2C module 
-    LBR::StI2cParams i2c_params{i2c_instance, 100000}; // 100kHz
-    //Create I2C object
-    static LBR::Stml4::StI2cModule i2c_module(i2c_params, sda_pin, scl_pin);
-    i2c_module.InitI2c();
+    // I2C timing register for ~100kHz (depends on system clock). Placeholder typical value.
+    static constexpr uint32_t TIMINGR_100KHZ = 0x20303E5D;
+    static LBR::Stml4::StI2cParams i2c_params{I2C1, TIMINGR_100KHZ};
 
-    // Create IMU object
-    static LBR::Bno055 imu(i2c_module.GetI2c(),0x28); // IMU I2C address 0x28
-    imu.Init();
+    // Create I2C instance and initialize
+    static LBR::Stml4::HwI2c i2c(i2c_params);
+    i2c.init();
+
+    // Construct IMU driver (I2C + address)
+    static Bno055 imu(i2c, Bno055::ADDR_PRIMARY);
+    imu.init();
 
     return imu;
-    }
+}
+
+} // namespace LBR

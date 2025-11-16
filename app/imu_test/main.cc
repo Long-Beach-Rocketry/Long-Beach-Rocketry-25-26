@@ -9,16 +9,7 @@
 #include "delay.h"
 #include <cstdio> 
 
-// Need to pull yb-i2c after her modified driver is finalized
-/* This is for Ayush Packet to stream data to his UI interface 
-struct IMU_Packet { 
-    float ax, ay, az;       // acceleration 
-    float gx, gy, gz;       // gyroscope 
-    float roll, pitch, yaw; // fused Euler orientation
-    float lax, lay, laz;    // LinearAccel
-    float gvx, gvy, gvz;    // GravityVector
-};
-
+/* 
 idea:
 [BNO055 Sensor] 
     ↓ (I²C @ 100kHz)
@@ -28,58 +19,28 @@ idea:
     ↓ (Real-time data packets)
 [Ayush’s UI Application]
 */
+    
+int main() {
+    auto& imu = LBR::bsp_init_imu();
+    
+    uint8_t chip_id;
+    imu.get_chip_id(chip_id);
+    
+    printf("I2C Address: 0x%02X\n", LBR::Bno055::ADDR_PRIMARY);
+    printf("Chip ID from register 0x00: 0x%02X (expected 0xA0)\n\n", chip_id);
+    
+    LBR::Bno055Data data;
 
-int main(void) {
-    // 1. Initialize Board & IMU
-    auto& imu = BSP_Init_IMU(I2C1, GPIOB);
-    DelayMs(100);
+    while (1) {
+        imu.read_all(data);
 
-    printf("BNO055 IMU Initialization\n");
+        printf("Accel:  X=%.2f Y=%.2f Z=%.2f\n", data.accel.x, data.accel.y, data.accel.z);
+        printf("Gyro:   X=%.2f Y=%.2f Z=%.2f\n", data.gyro.x, data.gyro.y, data.gyro.z);
+        printf("LinAcc: X=%.2f Y=%.2f Z=%.2f\n", data.linear_accel.x, data.linear_accel.y, data.linear_accel.z);
+        printf("Grav:   X=%.2f Y=%.2f Z=%.2f\n", data.gravity.x, data.gravity.y, data.gravity.z);
+        printf("Quat:   W=%.3f X=%.3f Y=%.3f Z=%.3f\n\n", data.quat.w, data.quat.x, data.quat.y, data.quat.z);
 
-    // 2. Self Test Instance 
-    uint8_t post_result = imu.RunPowerOnSelfTest();
-    printf("POST Test: 0x%02X\n", post_result);
-
-    uint8_t bist_result = imu.RunBuildInSelfTest();
-    printf("BIST Result: 0x%02X\n\n", bist_result);
-
-    // 3. Variables to hold sensor data (for Ayush)
-    // IMU_Packet pkt = {0};
-
-    // 4. Main Loop (10Hz)
-    while (true) {
-
-        imu.Update();
-
-        // 5. Read all Sensors
-        imu.GetAcceleration(ax, ay, az);
-        imu.GetGyroscope(gx, gy, gz);
-        imu.SensorFusionUpdate();
-        imu.GetFusedEuler(roll, pitch, heading); // Actual Order: heading, roll, pitch
-        
-        // * Optional (Don't know yet)
-        imu.GetLinearAcceleration(lax, lay, laz);
-        imu.GetGravityVector(gvx, gvy, gvz);
-
-        // 6. Check System Status
-        uint8_t sys_err = imu.GetSystemError();
-        if (sys_err != 0) {
-            printf("IMU ERROR CODE: 0x%02X\n", sys_err)
-        }
-        // 7. System Calibration Update 
-        uint8_t calibStatus = imu.Calibrate();
-
-
-        // For Ayush (need to talk since his UI stream the waveform)
-        // This is for the data packet 
-        /*printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n",
-               pkt.ax, pkt.ay, pkt.az,
-               pkt.gx, pkt.gy, pkt.gz,
-               pkt.yaw, pkt.roll, pkt.pitch); */
-
-        // 8. Wait 100 ms -> 10 Hz
-        DelayMs(100);
+        LBR::Utils::DelayMs(100);
     }
 
 }
-

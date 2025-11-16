@@ -1,8 +1,29 @@
-add_subdirectory(bsp_sensors)
+set(EXECUTABLE imu_test)
+set(LDF ${CMAKE_CURRENT_BINARY_DIR}/${EXECUTABLE}.ld)
 
-add_executable(imu_test main.cc)
+set(PREPROCESS_DEFS
+	-DDEF_FLASH_START_ADDR=0x8000000
+	-DDEF_FLASH_SIZE=1024K
+)
 
-# Ensure headers from bsp_sensors are visible when building the executable
-target_include_directories(imu_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/bsp_sensors)
+# Only add BSP for this target device
+add_subdirectory_for(STM32L476 bsp_sensors)
 
-target_link_libraries(imu_test PRIVATE bsp_sensors core)
+if (TARGET bsp_sensors)
+
+	add_executable_for(${TARGET_DEVICE} ${EXECUTABLE} ${LDF}
+		main.cc
+		${STARTUP_FILE}
+	)
+
+	target_include_directories_for(${TARGET_DEVICE} ${EXECUTABLE}
+		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+	)
+
+	target_link_libraries_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
+		bsp_sensors
+	)
+
+	target_preprocess_for(${TARGET_DEVICE} ${EXECUTABLE} ${LINKER_SCRIPT} ${LDF} ${PREPROCESS_DEFS})
+
+endif()
