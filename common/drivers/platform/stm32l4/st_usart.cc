@@ -7,6 +7,10 @@ StUsart::StUsart(USART_TypeDef* base_addr, uint32_t sys_clck,
 bool StUsart::receive_rx(uint8_t& data)
 {
 
+    if (base_addr == nullptr)
+    {
+        return false;
+    }
     //prevent overrun
     if (base_addr->ISR & USART_ISR_ORE)
     {
@@ -23,6 +27,11 @@ bool StUsart::receive_rx(uint8_t& data)
 
 bool StUsart::send_tx(const uint8_t data)
 {
+
+    if (base_addr == nullptr)
+    {
+        return false;
+    }
     while (!(base_addr->ISR & USART_ISR_TXE))
     {
     }
