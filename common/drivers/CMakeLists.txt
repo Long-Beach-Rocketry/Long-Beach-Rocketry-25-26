@@ -11,5 +11,4 @@ target_include_directories(driver INTERFACE
 
 target_link_libraries(driver INTERFACE
     hal
-    utils
 )
