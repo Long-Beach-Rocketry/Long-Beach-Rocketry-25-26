@@ -30,7 +30,7 @@ bool HwI2c::init()
     return true;
 }
 
-bool HwI2c::mem_read(std::span<uint8_t> data, uint8_t dev_addr)
+bool HwI2c::burst_read(std::span<uint8_t> data, uint8_t dev_addr)
 {
 
     if (_base_addr == nullptr)
@@ -89,7 +89,7 @@ bool HwI2c::mem_read(std::span<uint8_t> data, uint8_t dev_addr)
     return true;
 }
 
-bool HwI2c::mem_write(std::span<const uint8_t> data, uint8_t dev_addr)
+bool HwI2c::burst_write(std::span<const uint8_t> data, uint8_t dev_addr)
 {
     if (_base_addr == nullptr)
     {
@@ -122,8 +122,7 @@ bool HwI2c::mem_write(std::span<const uint8_t> data, uint8_t dev_addr)
 
     // Configure for writing
     _base_addr->CR2 &= ~(I2C_CR2_NBYTES | I2C_CR2_RD_WRN);
-    _base_addr->CR2 |=
-        ((data.size() << (I2C_CR2_NBYTES_Pos + 1)) | I2C_CR2_AUTOEND);
+    _base_addr->CR2 |= ((data.size() << I2C_CR2_NBYTES_Pos) | I2C_CR2_AUTOEND);
 
     // Initiate write
     _base_addr->CR2 |= I2C_CR2_START;
@@ -150,6 +149,28 @@ bool HwI2c::mem_write(std::span<const uint8_t> data, uint8_t dev_addr)
     _base_addr->ICR |= I2C_ICR_STOPCF;
 
     return true;
+}
+
+bool HwI2c::mem_write(std::span<const uint8_t> data,
+                      std::span<const uint8_t> reg_addr, uint8_t dev_addr)
+{
+    bool ret = true;
+
+    ret = ret && burst_write(reg_addr, dev_addr);
+    ret = ret && burst_write(data, dev_addr);
+
+    return ret;
+}
+
+bool HwI2c::mem_read(std::span<uint8_t> data, std::span<const uint8_t> reg_addr,
+                     uint8_t dev_addr)
+{
+    bool ret = true;
+
+    ret = ret && burst_write(reg_addr, dev_addr);
+    ret = ret && burst_read(data, dev_addr);
+
+    return ret;
 }
 }  // namespace Stml4
 }  // namespace LBR

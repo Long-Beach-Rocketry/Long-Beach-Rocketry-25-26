@@ -40,12 +40,33 @@ public:
      */
     bool init();
 
-    bool mem_read(std::span<uint8_t> data, uint8_t dev_addr) override;
-    bool mem_write(std::span<const uint8_t> data, uint8_t dev_addr) override;
+    bool mem_read(std::span<uint8_t> data, std::span<const uint8_t> reg_addr,
+                  uint8_t dev_addr) override;
+    bool mem_write(std::span<const uint8_t> data,
+                   std::span<const uint8_t> reg_addr,
+                   uint8_t dev_addr) override;
 
 private:
     I2C_TypeDef* _base_addr;
     uint32_t _timingr;
+
+    /**
+     * @brief Read raw data from an I2C bus
+     * 
+     * @param data block of memory to read data into from the bus
+     * @param dev_addr address of target device
+     * @return true if successful, false otherwise
+     */
+    bool burst_read(std::span<uint8_t> data, uint8_t dev_addr);
+
+    /**
+     * @brief Write raw data to an I2C bus
+     * 
+     * @param data block of memory to write data into the bus
+     * @param dev_addr address of target device
+     * @return true if successful, false otherwise
+     */
+    bool burst_write(std::span<const uint8_t> data, uint8_t dev_addr);
 };
 }  // namespace Stml4
 }  // namespace LBR
