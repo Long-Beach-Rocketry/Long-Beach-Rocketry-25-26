@@ -5,20 +5,33 @@
  * 
  * @param spi_ 
  */
-LBR::W25q::W25q(Spi& spi_) : spi(spi_)
+LBR::W25q::W25q(Spi& spi_, GpioChipSelect& cs_) : spi(spi_), cs(cs_)
 {
 }
 
 /**
- * @brief Check BUSY status in status reg 1
+ * @brief Check BUSY bit in Status Reg-1
  * 
- * @return true 
- * @return false 
+ * @return true W25Q is currently in a write or erase cycle
+ * @return false W25Q is ready to accept commands
  */
 bool LBR::W25q::BusyCheck()
 {
+    // Init tx and rx buf to send command and receive data
+    uint8_t sr1_cmd = static_cast<uint8_t>(StatusRegister::STATUS_REGISTER_1);
+    std::array<uint8_t, 1> sr1_val;
 
-    return true;
+    // Chip select enable
+    cs.ChipSelectEnable();
+
+    // Send 0x05h command
+    spi.Transfer(std::span<uint8_t>(&sr1_cmd, 1), sr1_val);
+
+    // Chip select disable
+    cs.ChipSelectDisable();
+
+    // Check if BUSY bit is 1
+    return (sr1_val[0] & 0x01) != 0;
 }
 
 /**
@@ -32,19 +45,14 @@ bool LBR::W25q::BusyCheck()
 bool LBR::W25q::StatusRead(StatusRegister status_reg_num,
                            std::span<uint8_t> rxbuf)
 {
-    // Chip Select Enable
-
     // Check BUSY bit for any current erase or writes
-
-    // Chip Select Disable
+    while (BusyCheck())
+    {
+    }
 
     // Chip Select Enable
 
     // Send Status Read Command from status_reg_num
-
-    // Chip Select Disable
-
-    // Chip Select Enable
 
     // SPI Read
 
@@ -61,19 +69,16 @@ bool LBR::W25q::StatusRead(StatusRegister status_reg_num,
  */
 void LBR::W25q::Reset()
 {
-    // Chip Select Enable
-
     // Check BUSY bit for any current erase or writes
-
-    // Chip Select Disable
+    while (BusyCheck())
+    {
+    }
+    
+    // Create command tx buf
 
     // Chip Select Enable
 
     // Send Enable Reset (66h) command
-
-    // Chip Select Disable
-
-    // Chip Select Enable
 
     // Send Reset Device (99h) command
 
@@ -82,15 +87,30 @@ void LBR::W25q::Reset()
     // Add 30 microsecond delay using time
 }
 
-bool LBR::W25q::Read(uint16_t sector, uint8_t page, std::span<uint8_t> rxbuf)
+/**
+ * @brief Reads data from a sector, page, or word
+ * 
+ * @param sector 
+ * @param page 
+ * @param offset 
+ * @param rxbuf 
+ * @return true 
+ * @return false 
+ */
+bool LBR::W25q::Read(uint16_t sector, uint8_t page, uint8_t offset,
+                     std::span<uint8_t> rxbuf)
 {
-    // Calculate Address
+    // Return false if sector, page, or offset is outside of the threshold
+
+    // Calculate Address of where to start read
 
     // Separate Address into three bytes
 
-    // Chip Select Enable
+    // Create tx buf of read command and address bytes
 
     // Check BUSY bit for current erase or write
+
+    // Chip Select Enable
 
     // Send Read command (03h)
 
@@ -100,5 +120,88 @@ bool LBR::W25q::Read(uint16_t sector, uint8_t page, std::span<uint8_t> rxbuf)
 
     // Chip Select Disable
 
+    return true;
+}
+
+/**
+ * @brief Writes data to a page (256 bytes) and verifies the correct data was written
+ * 
+ * @param sector 4096 possible sectors from (0 - 4095)
+ * @param page 16 possible pages in a sector (0 - 15)
+ * @param offset 256 possible words in a page (0 - 255) ***Each word is a byte for the w25q***
+ * @param txbuf 
+ * @param rxbuf 
+ * @return true 
+ * @return false 
+ */
+bool LBR::W25q::PageProgram(uint16_t sector, uint8_t page, uint8_t offset,
+                            std::span<uint8_t> txbuf, std::span<uint8_t> rxbuf)
+{
+
+    // Return false if sector, page, or offset is outside of the threshold
+
+    // Calculate address of where to start write
+
+    // Separate Address into three bytes
+
+    // Combine page program instruction, calculated addr, and data into a txbuf to send
+
+    // Check BUSY bit for current erase or write
+
+    // Chip Select Enable
+
+    // SPI Write
+
+    // Chip Select Disable
+
+    // W25Q read
+
+    return true;
+}
+
+/**
+ * @brief Erase a sector
+ * 
+ * @param sector 
+ * @return true 
+ * @return false 
+ */
+bool LBR::W25q::SectorErase(uint16_t sector)
+{
+    return true;
+}
+
+/**
+ * @brief Erase entire chip
+ * 
+ * @return true 
+ * @return false 
+ */
+bool LBR::W25q::ChipErase()
+{
+    return true;
+}
+
+/**
+ * @brief Make a sector read only to prevent an accidental erase
+ * 
+ * @param sector 
+ * @return true 
+ * @return false 
+ */
+bool LBR::W25q::SectorProtect(uint16_t sector)
+{
+    return true;
+}
+
+/**
+ * @brief Make a block read only to prevent an accidental erase
+ * 
+ * @param block 
+ * @return true 
+ * @return false 
+ */
+bool LBR::W25q::BlockProtect(uint8_t block)
+{
     return true;
 }
