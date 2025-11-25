@@ -1,3 +1,10 @@
+/**
+ * @file st_i2c.cc
+ * @brief I2C driver implementation for STM32L476xx
+ * @author Yshi Blanco
+ * @date 10/02/2025
+ */
+
 #include "st_i2c.h"
 
 namespace LBR
@@ -151,26 +158,5 @@ bool HwI2c::burst_write(std::span<const uint8_t> data, uint8_t dev_addr)
     return true;
 }
 
-bool HwI2c::mem_write(std::span<const uint8_t> data,
-                      std::span<const uint8_t> reg_addr, uint8_t dev_addr)
-{
-    bool ret = true;
-
-    ret = ret && burst_write(reg_addr, dev_addr);
-    ret = ret && burst_write(data, dev_addr);
-
-    return ret;
-}
-
-bool HwI2c::mem_read(std::span<uint8_t> data, std::span<const uint8_t> reg_addr,
-                     uint8_t dev_addr)
-{
-    bool ret = true;
-
-    ret = ret && burst_write(reg_addr, dev_addr);
-    ret = ret && burst_read(data, dev_addr);
-
-    return ret;
-}
 }  // namespace Stml4
 }  // namespace LBR
