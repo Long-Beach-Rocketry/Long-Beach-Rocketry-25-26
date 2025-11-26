@@ -3,6 +3,7 @@ if (TARGET_DEVICE MATCHES "^(STM32L4)[0-9]+")
     add_subdirectory(platform/bno055)
 endif()
 
+add_subdirectory(bus)
 add_subdirectory(utils)
 
 add_library(driver INTERFACE)
@@ -14,5 +15,5 @@ target_include_directories(driver INTERFACE
 
 target_link_libraries(driver INTERFACE
     hal
-    driver_utils
+    utils
 )

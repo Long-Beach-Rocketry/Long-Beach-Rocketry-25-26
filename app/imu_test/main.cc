@@ -5,9 +5,9 @@
 * @date 2025-10-24
 */
 
-#include "imu_app_bsp.h"
+#include "board.h"
 #include "delay.h"
-#include <cstdio> 
+#include <cstdlib>
 
 /* 
 idea:
@@ -21,15 +21,16 @@ idea:
 */
     
 int main() {
-    auto& imu = LBR::bsp_init_imu();
+    LBR::bsp_init();
+    LBR::Board hw = LBR::get_board();
     
     uint8_t chip_id;
-    imu.get_chip_id(chip_id); // Expected 0xA0 for BNO055
+    hw.imu.get_chip_id(chip_id); // Expected 0xA0 for BNO055
     
     LBR::Bno055Data data;
 
     while (1) {
-        imu.read_all(data);
+        hw.imu.read_all(data);
         LBR::Utils::DelayMs(100);
     }
 
