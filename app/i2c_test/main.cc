@@ -12,8 +12,7 @@ int main(int argc, char* argv[])
 
     uint8_t dev_addr = 0x76;  // BMP390 device address
 
-    uint8_t addr[1] = {0x00};  // reg addr for chip ID
-    std::span<const uint8_t> reg_addr{addr, 1};
+    const uint8_t reg_addr = 0x00;  // reg addr for chip ID
 
     uint8_t read_val = 0;
     std::span<uint8_t, 1> chip_id{&read_val, 1};
