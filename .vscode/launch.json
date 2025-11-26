@@ -29,7 +29,7 @@
                 "enable breakpoint",
                 "monitor reset"
             ],
-            "showDevDebugOutput": true,
+            "showDevDebugOutput": true
         },
         {
             "cwd": "${workspaceFolder}",
@@ -58,7 +58,7 @@
                 "enable breakpoint",
                 "monitor reset"
             ],
-            "showDevDebugOutput": true,
+            "showDevDebugOutput": true
         },
         {
             "cwd": "${workspaceFolder}",
@@ -87,7 +87,7 @@
                 "enable breakpoint",
                 "monitor reset"
             ],
-            "showDevDebugOutput": true,
+            "showDevDebugOutput": true
         },
         {
             "cwd": "${workspaceFolder}",

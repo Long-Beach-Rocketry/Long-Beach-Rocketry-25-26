@@ -17,6 +17,10 @@ namespace LBR::Stml4 {
 
 namespace LBR {
 
+        // Function pointer types for I2C operations
+        using I2cMemReadFn = bool(*)(uint8_t dev_addr, uint8_t reg, uint8_t* data, size_t len);
+        using I2cMemWriteFn = bool(*)(uint8_t dev_addr, uint8_t reg, const uint8_t* data, size_t len);
+
         /**
         * @brief 3D Vector Type for Acceleration and Gyro.
          */
@@ -190,7 +194,8 @@ namespace LBR {
         };
 
 
-        explicit Bno055(LBR::Stml4::HwI2c& i2c, uint8_t addr = ADDR_PRIMARY);
+        explicit Bno055(LBR::Stml4::HwI2c& i2c, uint8_t addr = ADDR_PRIMARY, 
+                        I2cMemReadFn read_fn = nullptr, I2cMemWriteFn write_fn = nullptr);
 
         // Public API
         /** Initialize and configure the IMU */
@@ -221,5 +226,7 @@ namespace LBR {
        // I2C interface and device address
         LBR::Stml4::HwI2c& i2c_;
         uint8_t address_;
+        I2cMemReadFn mem_read_fn_;   // Optional callback for repeated start reads
+        I2cMemWriteFn mem_write_fn_; // Optional callback for writes
     };
 } // namespace LBR
