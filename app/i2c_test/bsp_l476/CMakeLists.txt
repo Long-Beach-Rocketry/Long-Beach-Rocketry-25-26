@@ -12,5 +12,6 @@ target_link_libraries(i2c_bsp PUBLIC
   #      app
 #        core
     driver
+    comm  
 )
 
