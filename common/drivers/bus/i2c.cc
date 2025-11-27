@@ -35,8 +35,8 @@ bool I2c::mem_read(std::span<uint8_t> data, const uint16_t reg_addr,
                    uint8_t dev_addr)
 {
     // Creating span for register address
-    const uint8_t reg[2] = {uint8_t((reg_addr >> 8) & 0xFF),
-                            uint8_t(reg_addr & 0xFF)};
+    const uint8_t reg[2] = {static_cast<uint8_t>((reg_addr >> 8) & 0xFF),
+                            static_cast<uint8_t>(reg_addr & 0xFF)};
     std::span<const uint8_t> register_addr{reg, 2};
 
     bool ret = true;
@@ -80,8 +80,8 @@ bool I2c::mem_write(std::span<const uint8_t> data, const uint16_t reg_addr,
                     uint8_t dev_addr)
 {
     // Creating span for register address
-    const uint8_t reg[2] = {uint8_t((reg_addr >> 8) & 0xFF),
-                            uint8_t(reg_addr & 0xFF)};
+    const uint8_t reg[2] = {static_cast<uint8_t>((reg_addr >> 8) & 0xFF),
+                            static_cast<uint8_t>(reg_addr & 0xFF)};
     std::span<const uint8_t> register_addr{reg, 2};
 
     bool ret = true;
