@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <cstdlib>
 #include <span>
 #include "bmp390.h"
@@ -15,6 +16,8 @@ int main(int argc, char* argv[])
     {
         press = hw.bmp390.get_pressure();
         temp = hw.bmp390.get_temperature();
+
+        printf("Pressure: %f\nTemperature: %f\n", press, temp);
 
         for (volatile size_t i = 0; i < 100000; i++);
     }
