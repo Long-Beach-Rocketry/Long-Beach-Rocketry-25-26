@@ -137,13 +137,13 @@ bool Bmp390::init()
 {
     // Configure power mode to Normal Mode and enable temp and press measurements
     bool status;
-    uint8_t val[1] =
-        PWR_CTRL_NORMAL_MODE | PWR_CTRL_TEMP_EN | PWR_CTRL_PRESS_EN;
+    uint8_t val[1] = {PWR_CTRL_NORMAL_MODE | PWR_CTRL_TEMP_EN |
+                      PWR_CTRL_PRESS_EN};
     std::span<const uint8_t> write_val{val, 1};
     status = _i2c.mem_write(write_val, PWR_CTRL_REG, _dev_addr);
 
     // Get calibration coefficients
-    _calib_coeffs = get_calib_coeffs();
+    get_calib_coeffs();
 
     return status;
 }

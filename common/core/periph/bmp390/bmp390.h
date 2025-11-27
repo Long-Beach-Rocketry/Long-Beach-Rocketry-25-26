@@ -11,15 +11,15 @@
 #include "i2c.h"
 
 /*** BMP390 Registers and Bit Definitions ***/
-#define PWR_CTRL_REG (0x1B)
-#define DATA_REG_START (0x04)
-#define CALIB_REG_START (0x31)
+inline constexpr uint8_t PWR_CTRL_REG = (0x1B);
+inline constexpr uint8_t DATA_REG_START = (0x04);
+inline constexpr uint8_t CALIB_REG_START = (0x31);
 
-#define PWR_CTRL_PRESS_EN (0x1)
-#define PWR_CTRL_TEMP_EN (0x2)
-#define PWR_CTRL_NORMAL_MODE (0x3 << 4)
-#define DATA_REG_LEN (6)
-#define CALIB_REG_LEN (21)
+inline constexpr uint8_t PWR_CTRL_PRESS_EN = (0x1);
+inline constexpr uint8_t PWR_CTRL_TEMP_EN = (0x2);
+inline constexpr uint8_t PWR_CTRL_NORMAL_MODE = (0x3 << 4);
+inline constexpr uint8_t DATA_REG_LEN = (6);
+inline constexpr uint8_t CALIB_REG_LEN = (21);
 
 namespace LBR
 {
@@ -95,7 +95,7 @@ public:
     ~Bmp390() = default;
 
 private:
-    I2c _i2c;
+    I2c& _i2c;
     uint8_t _dev_addr;
     Bmp390CalibCoeffs _calib_coeffs;  // zero-initialized until init
     Bmp390RawData _raw_data;          // zero-initialized until first read
