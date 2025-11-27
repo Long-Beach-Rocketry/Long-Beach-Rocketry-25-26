@@ -2,6 +2,8 @@ if (TARGET_DEVICE MATCHES "^(STM32L4)[0-9]+")
     add_subdirectory(platform/stm32l4)
 endif()
 
+add_subdirectory(bus)
+
 add_library(driver INTERFACE)
 
 target_include_directories(driver INTERFACE
@@ -12,4 +14,5 @@ target_include_directories(driver INTERFACE
 target_link_libraries(driver INTERFACE
     hal
     utils
+    comm
 )
