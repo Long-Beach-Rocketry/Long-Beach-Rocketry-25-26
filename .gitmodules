@@ -1,0 +1,6 @@
+[submodule "external/nanopb"]
+	path = external/nanopb
+	url = https://github.com/nanopb/nanopb.git
+[submodule "external/googletest"]
+	path = external/googletest
+	url = https://github.com/google/googletest.git
