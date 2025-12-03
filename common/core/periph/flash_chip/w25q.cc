@@ -73,7 +73,7 @@ void LBR::W25q::Reset()
     while (BusyCheck())
     {
     }
-    
+
     // Create command tx buf
 
     // Chip Select Enable
@@ -112,9 +112,7 @@ bool LBR::W25q::Read(uint16_t sector, uint8_t page, uint8_t offset,
 
     // Chip Select Enable
 
-    // Send Read command (03h)
-
-    // Send 24-bit address
+    // Send txbuf
 
     // SPI read
 
@@ -144,13 +142,13 @@ bool LBR::W25q::PageProgram(uint16_t sector, uint8_t page, uint8_t offset,
 
     // Separate Address into three bytes
 
-    // Combine page program instruction, calculated addr, and data into a txbuf to send
+    // Combine write enable, page program instruction, calculated addr, and data into a txbuf to send
 
     // Check BUSY bit for current erase or write
 
     // Chip Select Enable
 
-    // SPI Write
+    // SPI Write txbuf
 
     // Chip Select Disable
 
@@ -168,6 +166,32 @@ bool LBR::W25q::PageProgram(uint16_t sector, uint8_t page, uint8_t offset,
  */
 bool LBR::W25q::SectorErase(uint16_t sector)
 {
+    // Return false if sector outside of threshold
+
+    // Calculate address of where to start erase
+
+    // Combine write enable, sector erase instruction and 24 bit address in tx buffer
+
+    // Check BUSY bit for current erase or write
+
+    // Chip Select Enable
+
+    // SPI Write the txbuf
+
+    // Chip Select Disable
+
+    // Check BUSY bit for any current erase or writes
+    while (BusyCheck())
+    {
+    }
+
+    // WEL bit check
+    std::array<uint8_t, 1> rxbuf;
+    do
+    {
+        StatusRead(StatusRegister::STATUS_REGISTER_1, rxbuf);
+    } while (rxbuf[0] & 0x02);
+
     return true;
 }
 
@@ -179,6 +203,11 @@ bool LBR::W25q::SectorErase(uint16_t sector)
  */
 bool LBR::W25q::ChipErase()
 {
+    // Check BUSY bit for any current erase or writes
+    while (BusyCheck())
+    {
+    }
+
     return true;
 }
 
