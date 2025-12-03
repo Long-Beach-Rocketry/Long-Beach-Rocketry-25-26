@@ -17,7 +17,7 @@ Stml4::StGpioSettings sda_settings{
     Stml4::GpioMode::ALT_FUNC, Stml4::GpioOtype::OPEN_DRAIN,
     Stml4::GpioOspeed::LOW, Stml4::GpioPupd::PULL_UP, 4};
 
-const Stml4::StGpioParams sda_params{scl_settings, 9, GPIOB};
+const Stml4::StGpioParams sda_params{sda_settings, 9, GPIOB};
 
 // I2C config
 const Stml4::StI2cParams i2c_params{I2C1, 0x10909CEC};
