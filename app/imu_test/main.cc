@@ -7,6 +7,8 @@
 
 #include "board.h"
 #include "delay.h"
+#include "st_i2c.h"
+#include <cstdio>
 #include <cstdlib>
 
 /* 
@@ -19,11 +21,13 @@ idea:
     ↓ (Real-time data packets)
 [Ayush’s UI Application]
 */
+
+
     
 int main() {
     LBR::bsp_init();
     LBR::Board hw = LBR::get_board();
-    
+
     uint8_t chip_id;
     hw.imu.get_chip_id(chip_id); // Expected 0xA0 for BNO055
     

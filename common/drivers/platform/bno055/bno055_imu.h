@@ -194,9 +194,8 @@ namespace LBR {
         };
 
 
-        explicit Bno055(LBR::Stml4::HwI2c& i2c, uint8_t addr = ADDR_PRIMARY, 
-                        I2cMemReadFn read_fn = nullptr, I2cMemWriteFn write_fn = nullptr);
-
+        explicit Bno055(LBR::Stml4::HwI2c& i2c, uint8_t addr = ADDR_PRIMARY);
+        Bno055(LBR::Stml4::HwI2c& i2c, uint8_t addr, I2cMemReadFn read_fn, I2cMemWriteFn write_fn);
         // Public API
         /** Initialize and configure the IMU */
         void init();

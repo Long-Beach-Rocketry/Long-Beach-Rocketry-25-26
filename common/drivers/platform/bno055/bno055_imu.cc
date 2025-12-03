@@ -24,11 +24,10 @@ uint8_t Bno055::read_reg(uint8_t reg)
 {
     uint8_t value = 0;
     
-    // Use repeated start callback (required for bare-metal safety)
+    // Use repeated start callback (if provided)
     if (mem_read_fn_) {
         mem_read_fn_(address_, reg, &value, 1);
     }
-    // Note: No fallback - repeated start is required for BNO055 to work correctly
 
     return value;
 }
