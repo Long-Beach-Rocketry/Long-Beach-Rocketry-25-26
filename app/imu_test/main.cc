@@ -4,13 +4,18 @@
 
 using namespace LBR;
 
+volatile uint8_t chip_id = 0; // Global for debugger visibility
+
 int main(int argc, char* argv[])
 {
     bsp_init();
     Board hw = get_board();
 
-    (void)hw.imu.read_reg(LBR::Bno055::SysReg::CHIP_ID);
+    // Read chip ID and store in chip_id
+    uint8_t id = hw.imu.read_reg(LBR::Bno055::SysReg::CHIP_ID);
+    chip_id = id;
 
+    // Stop point for debugger (infinite loop)
     while (1)
     {
         // Simple busy-wait delay (approximate)
