@@ -53,6 +53,24 @@ namespace LBR {
 
     class Bno055 {
     public:
+        // I2C helpers for direct register access
+        uint8_t read_reg(uint8_t reg);
+        void write_reg(uint8_t reg, uint8_t value);
+        void read_multi(uint8_t startReg, uint8_t* buffer, size_t len);
+
+        // Operating & Fusion Modes
+        struct ModeReg {
+            static constexpr uint8_t CONFIG        = 0x00;
+            static constexpr uint8_t IMU           = 0x08;
+            static constexpr uint8_t NDOF          = 0x0C;
+        };
+
+        enum class Mode : uint8_t {
+            CONFIG = ModeReg::CONFIG,
+            IMU    = ModeReg::IMU,
+            NDOF   = ModeReg::NDOF
+        };
+        void set_mode(Mode mode);
 
         //I2C Addresses
         static constexpr uint8_t ADDR_PRIMARY   = 0x28;   ///< Default I2C Address 
@@ -124,12 +142,6 @@ namespace LBR {
         // Axis remap (if needed)
         static constexpr uint8_t AXIS_REMAP_CONFIG = 0x24;
 
-        // Operating & Fusion Modes
-        struct ModeReg {
-            static constexpr uint8_t CONFIG        = 0x00;
-            static constexpr uint8_t IMU           = 0x08;
-            static constexpr uint8_t NDOF          = 0x0C;
-        };
 
         // Power modes
         struct PowerReg {
@@ -139,12 +151,6 @@ namespace LBR {
 
         };
 
-        enum class Mode : uint8_t {
-            CONFIG = ModeReg::CONFIG,
-            IMU    = ModeReg::IMU,
-            NDOF   = ModeReg::NDOF
-        };
-    
         /* For accelerometer configuration */
         enum class AccelRange : uint8_t {
             RANGE_2G  = 0b00,
@@ -214,17 +220,11 @@ namespace LBR {
         uint8_t run_post();
         uint8_t run_bist();
 
-    private:
-
-        // I2C communication methods or helpers
-       void write_reg(uint8_t reg, uint8_t value);
-       uint8_t read_reg(uint8_t reg);
-       void read_multi(uint8_t startReg, uint8_t* buffer, size_t len);
-       void set_mode(Mode mode);
-        
-       // I2C interface and device address
+    public:
+        // I2C interface and device address
         LBR::Stml4::HwI2c& i2c_;
         uint8_t address_;
+    private:
         I2cMemReadFn mem_read_fn_;   // Optional callback for repeated start reads
         I2cMemWriteFn mem_write_fn_; // Optional callback for writes
     };

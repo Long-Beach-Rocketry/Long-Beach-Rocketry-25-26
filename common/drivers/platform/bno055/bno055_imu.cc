@@ -11,49 +11,39 @@
 #include <span>
 
 namespace LBR {
-
-using namespace LBR::Stml4;
-using LBR::Utils::DelayMs;
-
-Bno055::Bno055(LBR::Stml4::HwI2c& i2c, uint8_t addr, I2cMemReadFn read_fn, I2cMemWriteFn write_fn)
-    : i2c_(i2c), address_(addr), mem_read_fn_(read_fn), mem_write_fn_(write_fn) {}
-
 //low level I2C communication helpers
 
 uint8_t Bno055::read_reg(uint8_t reg)
 {
     uint8_t value = 0;
-    
-    // Use repeated start callback (if provided)
-    if (mem_read_fn_) {
-        mem_read_fn_(address_, reg, &value, 1);
-    }
-
+    i2c_.mem_read(std::span<uint8_t>(&value, 1), reg, address_);
     return value;
 }
 
 void Bno055::write_reg(uint8_t reg, uint8_t value)
 {
-    if (mem_write_fn_) {
-        mem_write_fn_(address_, reg, &value, 1);
-    }
-    // Note: No fallback - write callback required
+    i2c_.mem_write(std::span<const uint8_t>(&value, 1), reg, address_);
 }
 
 void Bno055::read_multi(uint8_t start, uint8_t* buf, size_t len)
 {
-    // Use repeated start callback (required for bare-metal safety)
-    if (mem_read_fn_) {
-        mem_read_fn_(address_, start, buf, len);
-    }
-    // Note: No fallback - repeated start is required for BNO055 to work correctly
+    i2c_.mem_read(std::span<uint8_t>(buf, len), start, address_);
 }
 
 void Bno055::set_mode(Mode mode)
 {
     write_reg(SysReg::OPR_MODE, static_cast<uint8_t>(mode));
-    DelayMs(30);
+    LBR::Utils::DelayMs(30);
 }
+
+using namespace LBR::Stml4;
+using LBR::Utils::DelayMs;
+
+Bno055::Bno055(LBR::Stml4::HwI2c& i2c, uint8_t addr, I2cMemReadFn read_fn, I2cMemWriteFn write_fn)
+    : i2c_(i2c), address_(addr) {}
+
+
+// Direct register access using mem_read/mem_write only
 
 
 /* Initialization */

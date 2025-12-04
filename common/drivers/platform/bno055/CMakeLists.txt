@@ -9,10 +9,11 @@ if (TARGET_DEVICE MATCHES "STM32")
         ${CMAKE_SOURCE_DIR}/common/drivers/utils
     )
 
-    # Depends on platform HAL wrapper and core
+    # Depends on platform HAL wrapper, core, and comm (I2C)
     target_link_libraries(bno055 PUBLIC
         hal
         core
         driver_utils
+        comm
     )
 endif()

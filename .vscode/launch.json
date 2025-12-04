@@ -121,6 +121,7 @@
         {
             "cwd": "${workspaceFolder}",
             "executable": "${workspaceRoot}/build/stm32l476/app/imu_test/imu_test",
+   
             "name": "DEBUG IMU BNO055",
             "request": "launch",
             "type": "cortex-debug",

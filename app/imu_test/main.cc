@@ -1,41 +1,21 @@
-/** 
-* @file main.cc
-* @brief Main file for IMU test application.
-* @author Bex Saw
-* @date 2025-10-24
-*/
-
-#include "board.h"
-#include "delay.h"
-#include "st_i2c.h"
-#include <cstdio>
 #include <cstdlib>
+#include <span>
+#include "board.h"
 
-/* 
-idea:
-[BNO055 Sensor] 
-    ↓ (I²C @ 100kHz)
-[FlightComputer]
-    ↓ (printf / UART or something else not sure yet)
-[USB/Serial Virtual COM Port]
-    ↓ (Real-time data packets)
-[Ayush’s UI Application]
-*/
+using namespace LBR;
 
+int main(int argc, char* argv[])
+{
+    bsp_init();
+    Board hw = get_board();
 
-    
-int main() {
-    LBR::bsp_init();
-    LBR::Board hw = LBR::get_board();
+    (void)hw.imu.read_reg(LBR::Bno055::SysReg::CHIP_ID);
 
-    uint8_t chip_id;
-    hw.imu.get_chip_id(chip_id); // Expected 0xA0 for BNO055
-    
-    LBR::Bno055Data data;
-
-    while (1) {
-        hw.imu.read_all(data);
-        LBR::Utils::DelayMs(100);
+    while (1)
+    {
+        // Simple busy-wait delay (approximate)
+        for (volatile size_t i = 0; i < 100000; i++);
     }
 
+    return 0;
 }
