@@ -40,12 +40,12 @@ public:
      */
     bool init();
 
-    bool mem_read(std::span<uint8_t> data, uint8_t dev_addr) override;
-    bool mem_write(std::span<const uint8_t> data, uint8_t dev_addr) override;
-
 private:
     I2C_TypeDef* _base_addr;
     uint32_t _timingr;
+
+    bool burst_read(std::span<uint8_t> data, uint8_t dev_addr) override;
+    bool burst_write(std::span<const uint8_t> data, uint8_t dev_addr) override;
 };
 }  // namespace Stml4
 }  // namespace LBR
