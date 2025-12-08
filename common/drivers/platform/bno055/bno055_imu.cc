@@ -1,3 +1,4 @@
+
 /**
  * @file bno055_imu.cc
  * @brief BNO055 IMU sensor implementation
@@ -11,6 +12,10 @@
 #include <span>
 
 namespace LBR {
+
+Bno055::Bno055(LBR::Stml4::HwI2c& i2c, uint8_t addr)
+    : i2c_(i2c), address_(addr), mem_read_fn_(nullptr), mem_write_fn_(nullptr) {}
+
 //low level I2C communication helpers
 
 uint8_t Bno055::read_reg(uint8_t reg)

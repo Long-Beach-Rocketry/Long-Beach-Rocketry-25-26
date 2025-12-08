@@ -7,105 +7,10 @@
 #include "st_i2c.h"
 #include "st_gpio.h"
 #include "stm32l4xx.h"
+#include "delay.h"
 
 namespace LBR {
 
-// Repeated start I2C helper for BNO055 sensor reads 
-static bool bsp_i2c_mem_read(uint8_t dev_addr, uint8_t reg, uint8_t* data, size_t len)
-{
-    I2C_TypeDef* i2c_base = I2C1;
-    
-    // Phase 1: Write register address (without AUTOEND for repeated start)
-    i2c_base->CR2 &= ~I2C_CR2_SADD;
-    i2c_base->CR2 |= (dev_addr << (I2C_CR2_SADD_Pos + 1));
-    i2c_base->CR2 &= ~(I2C_CR2_NBYTES | I2C_CR2_RD_WRN | I2C_CR2_AUTOEND);
-    i2c_base->CR2 |= (1 << I2C_CR2_NBYTES_Pos);
-    i2c_base->CR2 |= I2C_CR2_START;
-    
-    // Write register address
-    while (!(i2c_base->ISR & I2C_ISR_TXIS))
-    {
-        if (i2c_base->ISR & I2C_ISR_NACKF)
-        {
-            i2c_base->ICR |= I2C_ICR_NACKCF;
-            return false;
-        }
-    }
-    i2c_base->TXDR = reg;
-    
-    // Wait for TC (Transfer Complete)
-    while (!(i2c_base->ISR & I2C_ISR_TC))
-    {
-    }
-    
-    // Phase 2: Repeated START for read (no STOP between)
-    i2c_base->CR2 &= ~I2C_CR2_NBYTES;
-    i2c_base->CR2 |= (len << I2C_CR2_NBYTES_Pos) | I2C_CR2_RD_WRN | 
-                     I2C_CR2_AUTOEND | I2C_CR2_START;
-    
-    // Read data
-    for (size_t i = 0; i < len; i++)
-    {
-        while (!(i2c_base->ISR & I2C_ISR_RXNE))
-        {
-        }
-        data[i] = i2c_base->RXDR;
-    }
-    
-    // Wait for STOP
-    while (!(i2c_base->ISR & I2C_ISR_STOPF))
-    {
-    }
-    i2c_base->ICR |= I2C_ICR_STOPCF;
-    
-    return true;
-}
-
-// Repeated start I2C write helper for register writes
-static bool bsp_i2c_mem_write(uint8_t dev_addr, uint8_t reg, const uint8_t* data, size_t len)
-{
-    I2C_TypeDef* i2c_base = I2C1;
-    
-    // Write register address + data in single transaction
-    i2c_base->CR2 &= ~I2C_CR2_SADD;
-    i2c_base->CR2 |= (dev_addr << (I2C_CR2_SADD_Pos + 1));
-    i2c_base->CR2 &= ~(I2C_CR2_NBYTES | I2C_CR2_RD_WRN);
-    i2c_base->CR2 |= ((1 + len) << I2C_CR2_NBYTES_Pos) | I2C_CR2_AUTOEND;
-    i2c_base->CR2 |= I2C_CR2_START;
-    
-    // Write register address
-    while (!(i2c_base->ISR & I2C_ISR_TXIS))
-    {
-        if (i2c_base->ISR & I2C_ISR_NACKF)
-        {
-            i2c_base->ICR |= I2C_ICR_NACKCF;
-            return false;
-        }
-    }
-    i2c_base->TXDR = reg;
-    
-    // Write data
-    for (size_t i = 0; i < len; i++)
-    {
-        while (!(i2c_base->ISR & I2C_ISR_TXIS))
-        {
-            if (i2c_base->ISR & I2C_ISR_NACKF)
-            {
-                i2c_base->ICR |= I2C_ICR_NACKCF;
-                return false;
-            }
-        }
-        i2c_base->TXDR = data[i];
-    }
-    
-    // Wait for STOP
-    while (!(i2c_base->ISR & I2C_ISR_STOPF))
-    {
-    }
-    i2c_base->ICR |= I2C_ICR_STOPCF;
-    
-    return true;
-}
 
 bool bsp_init()
 {
@@ -138,8 +43,24 @@ bool bsp_init()
     static LBR::Stml4::HwI2c i2c(i2c_params);
     i2c.init();
 
+    // --- Add PA0 as reset pin ---
+    LBR::Stml4::StGpioSettings rst_settings{
+        LBR::Stml4::GpioMode::GPOUT,
+        LBR::Stml4::GpioOtype::PUSH_PULL,
+        LBR::Stml4::GpioOspeed::LOW,
+        LBR::Stml4::GpioPupd::NO_PULL,
+        0};
+    LBR::Stml4::StGpioParams rst_params{rst_settings, 0, GPIOA};
+    static LBR::Stml4::HwGpio rst(rst_params);
+    rst.init();
+    // BNO055 reset sequence
+    rst.set(false); // Hold BNO055 in reset
+    LBR::Utils::DelayMs(10);
+    rst.set(true);  // Release reset
+    LBR::Utils::DelayMs(650); // Wait for BNO055 to boot
+
     // Construct IMU driver with repeated start callback for bare-metal safety
-    static Bno055 imu(i2c, Bno055::ADDR_PRIMARY, bsp_i2c_mem_read, bsp_i2c_mem_write);
+    static Bno055 imu(i2c, Bno055::ADDR_PRIMARY);
     imu.init();
 
     return true;
@@ -175,7 +96,7 @@ Board& get_board()
     static LBR::Stml4::HwI2c i2c(i2c_params);
     i2c.init();
 
-    static Bno055 imu(i2c, Bno055::ADDR_PRIMARY, bsp_i2c_mem_read, bsp_i2c_mem_write);
+    static Bno055 imu(i2c, Bno055::ADDR_PRIMARY);
     imu.init();
 
     static Board board{.imu = imu};
