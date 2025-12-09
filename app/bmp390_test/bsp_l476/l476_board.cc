@@ -1,4 +1,5 @@
 #include <cstdint>
+#include "bmp390.h"
 #include "board.h"
 #include "st_gpio.h"
 #include "st_i2c.h"
@@ -27,7 +28,16 @@ Stml4::HwI2c i2c(i2c_params);
 Stml4::HwGpio scl(scl_params);
 Stml4::HwGpio sda(sda_params);
 
-Board board{.i2c = i2c};
+// Create BMP390 object
+/**
+ * @note SDO pin connection: Slave address LSB (GND = '0', VDDIO = '1')
+ *          GND -> 0x76
+ *          VDDIO -> 0x77
+ */
+const Bmp390Params bmp390_params{i2c, 0x76};
+Bmp390 bmp390(bmp390_params);
+
+Board board{.bmp390 = bmp390};
 
 bool bsp_init()
 {
@@ -41,6 +51,9 @@ bool bsp_init()
     ret = ret && sda.init();
     ret = ret && scl.init();
     ret = ret && i2c.init();
+
+    // Initialize sensor
+    ret = ret && bmp390.init();
 
     return ret;
 }
