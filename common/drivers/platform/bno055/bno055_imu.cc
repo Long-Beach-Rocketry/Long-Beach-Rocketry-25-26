@@ -1,4 +1,3 @@
-
 /**
  * @file bno055_imu.cc
  * @brief BNO055 IMU sensor implementation
@@ -8,190 +7,187 @@
 
 #include "bno055_imu.h"
 #include "delay.h"
-#include "st_i2c.h"  
+#include "i2c.h"
 #include <span>
 
 namespace LBR {
 
-Bno055::Bno055(LBR::Stml4::HwI2c& i2c, uint8_t addr)
-    : i2c_(i2c), address_(addr), mem_read_fn_(nullptr), mem_write_fn_(nullptr) {}
 
-//low level I2C communication helpers
 
-uint8_t Bno055::read_reg(uint8_t reg)
+Bno055::Bno055(LBR::I2c& i2c, uint8_t addr)
+    : i2c_(i2c), address_(addr) {}
+
+/* Mode Setting */
+bool Bno055::set_mode(uint8_t mode)
 {
-    uint8_t value = 0;
-    i2c_.mem_read(std::span<uint8_t>(&value, 1), reg, address_);
-    return value;
-}
-
-void Bno055::write_reg(uint8_t reg, uint8_t value)
-{
-    i2c_.mem_write(std::span<const uint8_t>(&value, 1), reg, address_);
-}
-
-void Bno055::read_multi(uint8_t start, uint8_t* buf, size_t len)
-{
-    i2c_.mem_read(std::span<uint8_t>(buf, len), start, address_);
-}
-
-void Bno055::set_mode(Mode mode)
-{
-    write_reg(SysReg::OPR_MODE, static_cast<uint8_t>(mode));
+    // OPR_MODE register address is 0x3D
+    uint8_t buf[1] = {mode};
+    bool ok = i2c_.mem_write(std::span<const uint8_t>(buf, 1), (uint8_t)0x3D, address_);
     LBR::Utils::DelayMs(30);
+    return ok;
 }
 
 using namespace LBR::Stml4;
 using LBR::Utils::DelayMs;
-
-Bno055::Bno055(LBR::Stml4::HwI2c& i2c, uint8_t addr, I2cMemReadFn read_fn, I2cMemWriteFn write_fn)
-    : i2c_(i2c), address_(addr) {}
 
 
 // Direct register access using mem_read/mem_write only
 
 
 /* Initialization */
-
+/**
+ * @brief Initialize and configure the IMU
+ * 
+ */
 void Bno055::init()
 {
     DelayMs(650);
 
-    uint8_t id = read_reg(SysReg::CHIP_ID);
+    uint8_t id = 0;
+    i2c_.mem_read(std::span<uint8_t>(&id, 1), (uint8_t)0x00, address_); // CHIP_ID = 0x00
     for (int i = 0; i < 5 && id != 0xA0; i++) {
         DelayMs(10);
-        id = read_reg(SysReg::CHIP_ID);
+        i2c_.mem_read(std::span<uint8_t>(&id, 1), (uint8_t)0x00, address_);
     }
     if (id != 0xA0) return;
 
-    set_mode(Mode::CONFIG);
+    set_mode(MODE_REG_CONFIG);
     DelayMs(25);
 
-    write_reg(SysReg::PWR_MODE, 0x00);
-    write_reg(SysReg::PAGE_ID,  0x00);
+    uint8_t pwr_mode = 0x00;
+    i2c_.mem_write(std::span<const uint8_t>(&pwr_mode, 1), (uint8_t)0x3E, address_); // PWR_MODE = 0x3E
+    uint8_t page_id = 0x00;
+    i2c_.mem_write(std::span<const uint8_t>(&page_id, 1), (uint8_t)0x07, address_); // PAGE_ID = 0x07
 
-    set_mode(Mode::IMU);
+    set_mode(MODE_REG_IMU);
     DelayMs(20);
 }
 
 /* Deinit */
+/**
+ * @brief Deinitialize the IMU and put it in low-power mode
+ * 
+ */
 void Bno055::deinit()
 {
     // Put device into deep suspend to save power
-    set_mode(Mode::CONFIG);
+    set_mode(MODE_REG_CONFIG);
     DelayMs(10);
-    write_reg(SysReg::PWR_MODE, PowerReg::SUSPEND);
+    uint8_t pwr_mode = 0x02; // SUSPEND
+    i2c_.mem_write(std::span<const uint8_t>(&pwr_mode, 1), (uint8_t)0x3E, address_); // PWR_MODE = 0x3E
     DelayMs(25);
 }
 
 /* Sensor Data Reads */
 
-// Helpers for combining LSB and MSB
 static inline int16_t combine(uint8_t lsb, uint8_t msb) 
 {
     return (static_cast<int16_t>(msb) << 8) | lsb;
 }
-
+/**
+ * @brief Read all sensor data from the IMU
+ * @param[out] out Output struct for sensor data
+ * @return true if successful, false otherwise
+ *
+ */
 bool Bno055::read_all(Bno055Data& out)
 {
     uint8_t buf[6 + 6 + 6 + 6 + 8];   // ACC + GYR + LIA + GRAV + QUAT
     size_t idx = 0;
 
-    // Read everything starting from ACC register
-    read_multi(RegStart::ACC, buf, sizeof(buf));
+    // Read everything starting from ACC register (0x08)
+    i2c_.mem_read(std::span<uint8_t>(buf, sizeof(buf)), (uint8_t)0x08, address_);
 
     // Parse accel
-    out.accel.x = combine(buf[0], buf[1]) / 100.0f;
-    out.accel.y = combine(buf[2], buf[3]) / 100.0f;
-    out.accel.z = combine(buf[4], buf[5]) / 100.0f;
+    constexpr float ACCEL_SCALE = 100.0f;
+    out.accel.x = combine(buf[0], buf[1]) / ACCEL_SCALE;
+    out.accel.y = combine(buf[2], buf[3]) / ACCEL_SCALE;
+    out.accel.z = combine(buf[4], buf[5]) / ACCEL_SCALE;
     idx += 6;
 
     // Parse gyro
-    out.gyro.x = combine(buf[idx+0], buf[idx+1]) / 16.0f;
-    out.gyro.y = combine(buf[idx+2], buf[idx+3]) / 16.0f;
-    out.gyro.z = combine(buf[idx+4], buf[idx+5]) / 16.0f;
+    constexpr float GYRO_SCALE = 16.0f;
+    out.gyro.x = combine(buf[idx+0], buf[idx+1]) / GYRO_SCALE;
+    out.gyro.y = combine(buf[idx+2], buf[idx+3]) / GYRO_SCALE;
+    out.gyro.z = combine(buf[idx+4], buf[idx+5]) / GYRO_SCALE;
     idx += 6;
 
     // Parse linear accel
-    out.linear_accel.x = combine(buf[idx+0], buf[idx+1]) / 100.0f;
-    out.linear_accel.y = combine(buf[idx+2], buf[idx+3]) / 100.0f;
-    out.linear_accel.z = combine(buf[idx+4], buf[idx+5]) / 100.0f;
+    out.linear_accel.x = combine(buf[idx+0], buf[idx+1]) / ACCEL_SCALE;
+    out.linear_accel.y = combine(buf[idx+2], buf[idx+3]) / ACCEL_SCALE;
+    out.linear_accel.z = combine(buf[idx+4], buf[idx+5]) / ACCEL_SCALE;
     idx += 6;
 
     // Parse gravity
-    out.gravity.x = combine(buf[idx+0], buf[idx+1]) / 100.0f;
-    out.gravity.y = combine(buf[idx+2], buf[idx+3]) / 100.0f;
-    out.gravity.z = combine(buf[idx+4], buf[idx+5]) / 100.0f;
+    out.gravity.x = combine(buf[idx+0], buf[idx+1]) / ACCEL_SCALE;
+    out.gravity.y = combine(buf[idx+2], buf[idx+3]) / ACCEL_SCALE;
+    out.gravity.z = combine(buf[idx+4], buf[idx+5]) / ACCEL_SCALE;
     idx += 6;
 
     // Parse quaternion
-    out.quat.w = combine(buf[idx+0], buf[idx+1]) / 16384.0f;
-    out.quat.x = combine(buf[idx+2], buf[idx+3]) / 16384.0f;
-    out.quat.y = combine(buf[idx+4], buf[idx+5]) / 16384.0f;
-    out.quat.z = combine(buf[idx+6], buf[idx+7]) / 16384.0f;
+    constexpr float QUAT_SCALE = 16384.0f;
+    out.quat.w = combine(buf[idx+0], buf[idx+1]) / QUAT_SCALE;
+    out.quat.x = combine(buf[idx+2], buf[idx+3]) / QUAT_SCALE;
+    out.quat.y = combine(buf[idx+4], buf[idx+5]) / QUAT_SCALE;
+    out.quat.z = combine(buf[idx+6], buf[idx+7]) / QUAT_SCALE;
 
     return true;
 }
 
-
-
-/* Status & Diagnostics */
-
-uint8_t Bno055::calibrate()
+bool Bno055::calibrate(uint8_t& value)
 {
-    return read_reg(SysReg::CALIB_STAT);
+    // CALIB_STAT register address is 0x35
+    return i2c_.mem_read(std::span<uint8_t>(&value, 1), (uint8_t)0x35, address_);
 }
 
-uint8_t Bno055::get_sys_status()
+bool Bno055::get_sys_status(uint8_t& value)
 {
-    return read_reg(SysReg::SYS_STATUS);
+    // SYS_STATUS register address is 0x39
+    return i2c_.mem_read(std::span<uint8_t>(&value, 1), (uint8_t)0x39, address_);
 }
 
-uint8_t Bno055::get_sys_error()
+bool Bno055::get_sys_error(uint8_t& value)
 {
-    return read_reg(SysReg::SYS_ERR);
+    // SYS_ERR register address is 0x3A
+    return i2c_.mem_read(std::span<uint8_t>(&value, 1), (uint8_t)0x3A, address_);
 }
 
-/* Built-in Self Tests */
-
-uint8_t Bno055::run_post()
+bool Bno055::run_post(uint8_t& status)
 {
-    set_mode(Mode::CONFIG);
-    DelayMs(25);
-
-    write_reg(SysReg::SYS_TRIGGER, 0x80);
-    DelayMs(650);
-
-    uint8_t status = read_reg(SysReg::ST_RESULT);
-
-    set_mode(Mode::IMU);
-    DelayMs(20);
-
-    return status;
+    set_mode(MODE_REG_CONFIG);
+    LBR::Utils::DelayMs(25);
+    uint8_t sys_trigger = 0x80;
+    i2c_.mem_write(std::span<const uint8_t>(&sys_trigger, 1), (uint8_t)0x3F, address_); // SYS_TRIGGER = 0x3F
+    LBR::Utils::DelayMs(650);
+    bool ok = i2c_.mem_read(std::span<uint8_t>(&status, 1), (uint8_t)0x36, address_); // ST_RESULT = 0x36
+    set_mode(MODE_REG_IMU);
+    LBR::Utils::DelayMs(20);
+    return ok;
 }
 
-uint8_t Bno055::run_bist()
+bool Bno055::run_bist(uint8_t& status)
 {
-    set_mode(Mode::CONFIG);
-    DelayMs(25);
-
-    write_reg(SysReg::SYS_TRIGGER, 0x01);
-    DelayMs(650);
-
-    uint8_t status = read_reg(SysReg::ST_RESULT);
-
-    set_mode(Mode::IMU);
-    DelayMs(20);
-
-    return status;
+    set_mode(MODE_REG_CONFIG);
+    LBR::Utils::DelayMs(25);
+    uint8_t sys_trigger = 0x01;
+    i2c_.mem_write(std::span<const uint8_t>(&sys_trigger, 1), (uint8_t)0x3F, address_); // SYS_TRIGGER = 0x3F
+    LBR::Utils::DelayMs(650);
+    bool ok = i2c_.mem_read(std::span<uint8_t>(&status, 1), (uint8_t)0x36, address_); // ST_RESULT = 0x36
+    set_mode(MODE_REG_IMU);
+    LBR::Utils::DelayMs(20);
+    return ok;
 }
 
-
-// Testing Purpose 
-
-uint8_t Bno055::get_chip_id(uint8_t& id)
+bool Bno055::get_chip_id(uint8_t& id)
 {
-    return read_reg(SysReg::CHIP_ID);
+    // CHIP_ID register address is 0x00
+    return i2c_.mem_read(std::span<uint8_t>(&id, 1), (uint8_t)0x00, address_);
+}
+
+bool Bno055::get_opr_mode(uint8_t& mode)
+{
+    // OPR_MODE register address is 0x3D
+    return i2c_.mem_read(std::span<uint8_t>(&mode, 1), (uint8_t)0x3D, address_);
 }
 
 } // namespace LBR
