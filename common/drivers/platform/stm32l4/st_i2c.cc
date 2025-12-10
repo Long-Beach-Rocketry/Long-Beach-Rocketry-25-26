@@ -1,3 +1,10 @@
+/**
+ * @file st_i2c.cc
+ * @brief I2C driver implementation for STM32L476xx
+ * @author Yshi Blanco
+ * @date 10/02/2025
+ */
+
 #include "st_i2c.h"
 
 namespace LBR
@@ -30,7 +37,7 @@ bool HwI2c::init()
     return true;
 }
 
-bool HwI2c::mem_read(std::span<uint8_t> data, uint8_t dev_addr)
+bool HwI2c::burst_read(std::span<uint8_t> data, uint8_t dev_addr)
 {
 
     if (_base_addr == nullptr)
@@ -72,24 +79,35 @@ bool HwI2c::mem_read(std::span<uint8_t> data, uint8_t dev_addr)
 
     for (uint8_t& byte : data)
     {
-        // Wait for transfer
-        while (!(_base_addr->ISR & I2C_ISR_RXNE))
+        // Wait for transfer with timeout
+        uint32_t rx_timeout = 100000;
+        while (!(_base_addr->ISR & I2C_ISR_RXNE) && --rx_timeout)
         {
         }
-
+        if (rx_timeout == 0)
+        {
+            // Timeout occurred
+            return false;
+        }
         byte = _base_addr->RXDR;
     }
 
-    // Detect stop
-    while (!(_base_addr->ISR & I2C_ISR_STOPF))
+    // Detect stop with timeout
+    uint32_t stop_timeout = 100000;
+    while (!(_base_addr->ISR & I2C_ISR_STOPF) && --stop_timeout)
     {
+    }
+    if (stop_timeout == 0)
+    {
+        // Timeout occurred
+        return false;
     }
     _base_addr->ICR |= I2C_ICR_STOPCF;
 
     return true;
 }
 
-bool HwI2c::mem_write(std::span<const uint8_t> data, uint8_t dev_addr)
+bool HwI2c::burst_write(std::span<const uint8_t> data, uint8_t dev_addr)
 {
     if (_base_addr == nullptr)
     {
@@ -122,8 +140,7 @@ bool HwI2c::mem_write(std::span<const uint8_t> data, uint8_t dev_addr)
 
     // Configure for writing
     _base_addr->CR2 &= ~(I2C_CR2_NBYTES | I2C_CR2_RD_WRN);
-    _base_addr->CR2 |=
-        ((data.size() << (I2C_CR2_NBYTES_Pos + 1)) | I2C_CR2_AUTOEND);
+    _base_addr->CR2 |= ((data.size() << I2C_CR2_NBYTES_Pos) | I2C_CR2_AUTOEND);
 
     // Initiate write
     _base_addr->CR2 |= I2C_CR2_START;
@@ -131,8 +148,9 @@ bool HwI2c::mem_write(std::span<const uint8_t> data, uint8_t dev_addr)
     // Write
     for (const uint8_t byte : data)
     {
-        // Wait for transfer or NACK
-        while (!(_base_addr->ISR & (I2C_ISR_TXIS | I2C_ISR_NACKF)))
+        // Wait for transfer or NACK with timeout
+        uint32_t timeout = 100000; // I added timeout to prevent infinite blocking
+        while (!(_base_addr->ISR & (I2C_ISR_TXIS | I2C_ISR_NACKF)) && --timeout)
         {
             if (_base_addr->ISR & I2C_ISR_NACKF)
             {
@@ -140,16 +158,28 @@ bool HwI2c::mem_write(std::span<const uint8_t> data, uint8_t dev_addr)
                 return false;
             }
         }
+        if (timeout == 0)
+        {
+            // Timeout occurred
+            return false;
+        }
         _base_addr->TXDR = byte;
     }
 
-    // Detect stop
-    while (!(_base_addr->ISR & I2C_ISR_STOPF))
+    // Detect stop with timeout
+    uint32_t stop_timeout = 100000;
+    while (!(_base_addr->ISR & I2C_ISR_STOPF) && --stop_timeout)
     {
+    }
+    if (stop_timeout == 0)
+    {
+        // Timeout occurred
+        return false;
     }
     _base_addr->ICR |= I2C_ICR_STOPCF;
 
     return true;
 }
+
 }  // namespace Stml4
 }  // namespace LBR
