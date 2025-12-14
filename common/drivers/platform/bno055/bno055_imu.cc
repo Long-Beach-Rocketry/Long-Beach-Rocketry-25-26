@@ -103,7 +103,7 @@ bool Bno055::read_all(Bno055Data& out)
     out.accel.x = combine(buf[0], buf[1]) / ACCEL_SCALE;
     out.accel.y = combine(buf[2], buf[3]) / ACCEL_SCALE;
     out.accel.z = combine(buf[4], buf[5]) / ACCEL_SCALE;
-    idx += 6;
+    idx += 12; // Skip accel (6) + mag (6)
 
     // Parse gyro
     constexpr float GYRO_SCALE = 16.0f;
