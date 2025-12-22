@@ -9,37 +9,36 @@
 #include "board.h"
 #include "bno055_imu.h"
 
+
 using namespace LBR;
 
+Bno055Data data;
+uint8_t chip_id = 0;
+uint8_t opr_mode = 0;
+uint8_t sys_status = 0;
+uint8_t self_test = 0;
+uint8_t sys_error = 0;
+
 int main(int argc, char* argv[]) {
-    
     bsp_init();
     Board hw = get_board();
 
-    // Variables for IMU data and diagnostics
-    Bno055Data data;
-    uint8_t chip_id = 0;
-    uint8_t opr_mode = 0;
-    uint8_t sys_status = 0;
-    uint8_t self_test = 0;
-    uint8_t sys_error = 0;
-
     // Initial Reads
-    hw.imu.get_chip_id(chip_id);
+    /* hw.imu.get_chip_id(chip_id);
     hw.imu.get_opr_mode(opr_mode);
     hw.imu.get_sys_status(sys_status);
     hw.imu.get_sys_error(sys_error);
-    hw.imu.run_post(self_test);
+    hw.imu.run_post(self_test); */
 
     while (1) {
         hw.imu.read_all(data);
-    
+
         (void)data;
-        (void)chip_id;
+        /* (void)chip_id;
         (void)opr_mode;
         (void)sys_status;
-        (void)sys_error;
         (void)self_test;
+        (void)sys_error; */
     }
     return 0;
 }
