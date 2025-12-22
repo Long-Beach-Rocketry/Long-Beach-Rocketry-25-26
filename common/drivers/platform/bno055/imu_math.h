@@ -5,22 +5,23 @@
  * @date 2025-12-09
  */
 
-
 #pragma once
 #ifndef LBR_IMU_MATH_H
 #define LBR_IMU_MATH_H
 
-namespace LBR {
+namespace LBR
+{
 
-struct Vec3 {
+struct Vec3
+{
     float x, y, z;
 };
 
-struct Quaternion {
+struct Quaternion
+{
     float w, x, y, z;
 };
 
+}  // namespace LBR
 
-} // namespace LBR
-
-#endif // LBR_IMU_MATH_H
+#endif  // LBR_IMU_MATH_H

@@ -8,7 +8,8 @@
 #pragma once
 #include "bno055_imu.h"
 
-namespace LBR {
+namespace LBR
+{
 
 Bno055& bsp_init_imu();
 

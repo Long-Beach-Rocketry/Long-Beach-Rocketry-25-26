@@ -5,10 +5,8 @@
  * @date 2025-10-21
  */
 
-
-#include "board.h"
 #include "bno055_imu.h"
-
+#include "board.h"
 
 using namespace LBR;
 
@@ -19,7 +17,8 @@ uint8_t sys_status = 0;
 uint8_t self_test = 0;
 uint8_t sys_error = 0;
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
     bsp_init();
     Board hw = get_board();
 
@@ -30,7 +29,8 @@ int main(int argc, char* argv[]) {
     hw.imu.get_sys_error(sys_error);
     hw.imu.run_post(self_test); */
 
-    while (1) {
+    while (1)
+    {
         hw.imu.read_all(data);
 
         (void)data;

@@ -4,14 +4,14 @@
 */
 
 #include "../board.h"
-#include "st_i2c.h"
+#include "delay.h"
 #include "i2c.h"
 #include "st_gpio.h"
+#include "st_i2c.h"
 #include "stm32l4xx.h"
-#include "delay.h"
 
-namespace LBR {
-
+namespace LBR
+{
 
 /**
  * @brief Initialize board peripherals and IMU
@@ -25,11 +25,9 @@ bool bsp_init()
 
     // Configure PB8 = I2C1_SCL, PB9 = I2C1_SDA (AF4, open-drain, pull-up)
     Stml4::StGpioSettings gpio_settings{
-        Stml4::GpioMode::ALT_FUNC,
-        Stml4::GpioOtype::OPEN_DRAIN,
-        Stml4::GpioOspeed::HIGH,
-        Stml4::GpioPupd::PULL_UP,
-        4 // AF4 for I2C1
+        Stml4::GpioMode::ALT_FUNC, Stml4::GpioOtype::OPEN_DRAIN,
+        Stml4::GpioOspeed::HIGH, Stml4::GpioPupd::PULL_UP,
+        4  // AF4 for I2C1
     };
 
     // Initialize GPIO pins for I2C
@@ -50,19 +48,16 @@ bool bsp_init()
 
     // Add PA0 as reset pin
     Stml4::StGpioSettings rst_settings{
-        Stml4::GpioMode::GPOUT,
-        Stml4::GpioOtype::PUSH_PULL,
-        Stml4::GpioOspeed::LOW,
-        Stml4::GpioPupd::NO_PULL,
-        0};
+        Stml4::GpioMode::GPOUT, Stml4::GpioOtype::PUSH_PULL,
+        Stml4::GpioOspeed::LOW, Stml4::GpioPupd::NO_PULL, 0};
     Stml4::StGpioParams rst_params{rst_settings, 0, GPIOA};
     static Stml4::HwGpio rst(rst_params);
     rst.init();
     // BNO055 reset sequence
-    rst.set(false); // Hold BNO055 in reset
+    rst.set(false);  // Hold BNO055 in reset
     Utils::DelayMs(10);
-    rst.set(true);  // Release reset
-    Utils::DelayMs(650); // Wait for BNO055 to boot
+    rst.set(true);        // Release reset
+    Utils::DelayMs(650);  // Wait for BNO055 to boot
 
     // Construct IMU driver using generic I2c interface
     static Bno055 imu(static_cast<LBR::I2c&>(i2c), Bno055::ADDR_PRIMARY);
@@ -70,7 +65,8 @@ bool bsp_init()
     // Error checking for IMU register read
     uint8_t chip_id = 0;
     bool ok = imu.get_chip_id(chip_id);
-    if (!ok || chip_id != 0xA0) {
+    if (!ok || chip_id != 0xA0)
+    {
         // Handle IMU read failure (log, retry, etc.)
         return false;
     }
@@ -89,11 +85,9 @@ Board& get_board()
 
     // Configure PB8 = I2C1_SCL, PB9 = I2C1_SDA (AF4, open-drain, pull-up)
     Stml4::StGpioSettings gpio_settings{
-        Stml4::GpioMode::ALT_FUNC,
-        Stml4::GpioOtype::OPEN_DRAIN,
-        Stml4::GpioOspeed::HIGH,
-        Stml4::GpioPupd::PULL_UP,
-        4 // AF4 for I2C1
+        Stml4::GpioMode::ALT_FUNC, Stml4::GpioOtype::OPEN_DRAIN,
+        Stml4::GpioOspeed::HIGH, Stml4::GpioPupd::PULL_UP,
+        4  // AF4 for I2C1
     };
 
     // Initialize GPIO pins for I2C
@@ -116,7 +110,8 @@ Board& get_board()
     // Error checking for IMU register read
     uint8_t chip_id = 0;
     bool ok = imu.get_chip_id(chip_id);
-    if (!ok || chip_id != 0xA0) {
+    if (!ok || chip_id != 0xA0)
+    {
         // Handle IMU read failure (log, retry, etc.)
         // Optionally return a default board or error state
     }
@@ -124,4 +119,4 @@ Board& get_board()
     return board;
 }
 
-} // namespace LBR
+}  // namespace LBR

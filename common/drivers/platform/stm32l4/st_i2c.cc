@@ -149,7 +149,8 @@ bool HwI2c::burst_write(std::span<const uint8_t> data, uint8_t dev_addr)
     for (const uint8_t byte : data)
     {
         // Wait for transfer or NACK with timeout
-        uint32_t timeout = 100000; // I added timeout to prevent infinite blocking
+        uint32_t timeout =
+            100000;  // I added timeout to prevent infinite blocking
         while (!(_base_addr->ISR & (I2C_ISR_TXIS | I2C_ISR_NACKF)) && --timeout)
         {
             if (_base_addr->ISR & I2C_ISR_NACKF)

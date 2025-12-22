@@ -4,12 +4,15 @@
 #include "stm32l476xx.h"
 #endif
 
-namespace LBR::Utils {
+namespace LBR::Utils
+{
 
-void DelayMs(uint32_t ms) {
+void DelayMs(uint32_t ms)
+{
 #ifdef STM32L476xx
     // Embedded target: busy-wait loop
-    for (uint32_t i = 0; i < ms * 4000; i++) {
+    for (uint32_t i = 0; i < ms * 4000; i++)
+    {
         __NOP();
     }
 #else
@@ -18,9 +21,11 @@ void DelayMs(uint32_t ms) {
 #endif
 }
 
-void DelayUs(uint32_t us) {
+void DelayUs(uint32_t us)
+{
 #ifdef STM32L476xx
-    for (uint32_t i = 0; i < us * 4; i++) {
+    for (uint32_t i = 0; i < us * 4; i++)
+    {
         __NOP();
     }
 #else
@@ -28,5 +33,4 @@ void DelayUs(uint32_t us) {
 #endif
 }
 
-} // namespace LBR::Utils
-       
+}  // namespace LBR::Utils
