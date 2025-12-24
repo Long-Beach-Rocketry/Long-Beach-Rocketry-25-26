@@ -25,7 +25,7 @@ bool LBR::W25q::BusyCheck()
     cs.ChipSelectEnable();
 
     // Send 0x05h command
-    spi.Transfer(std::span<uint8_t>(&sr1_cmd, 1), sr1_val);
+    spi.Transfer(std::array<uint8_t, 1>{sr1_cmd}, sr1_val);
 
     // Chip select disable
     cs.ChipSelectDisable();
@@ -149,6 +149,7 @@ bool LBR::W25q::PageProgram(uint16_t sector, uint8_t page, uint8_t offset,
     // Chip Select Enable
 
     // SPI Write txbuf
+    spi.Write(std::span<const uint8_t>(buf.data(), tx_len));
 
     // Chip Select Disable
 
@@ -173,12 +174,17 @@ bool LBR::W25q::SectorErase(uint16_t sector)
     // Combine write enable, sector erase instruction and 24 bit address in tx buffer
 
     // Check BUSY bit for current erase or write
+    while (BusyCheck())
+    {
+    }
 
     // Chip Select Enable
+    cs.ChipSelectEnable();
 
     // SPI Write the txbuf
 
     // Chip Select Disable
+    cs.ChipSelectDisable();
 
     // Check BUSY bit for any current erase or writes
     while (BusyCheck())
