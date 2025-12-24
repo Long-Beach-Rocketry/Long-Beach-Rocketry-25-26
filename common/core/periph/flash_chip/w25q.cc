@@ -25,7 +25,8 @@ bool LBR::W25q::BusyCheck()
     cs.ChipSelectEnable();
 
     // Send 0x05h command
-    spi.Transfer(std::array<uint8_t, 1>{sr1_cmd}, sr1_val);
+    std::array<uint8_t, 1> sr1_cmd_buf = {sr1_cmd};
+    spi.Transfer(sr1_cmd_buf, sr1_val);
 
     // Chip select disable
     cs.ChipSelectDisable();
@@ -51,6 +52,10 @@ bool LBR::W25q::StatusRead(StatusRegister status_reg_num,
     }
 
     // Chip Select Enable
+
+    // Create tx buf of status reg number to read out of
+    std::array<uint8_t, 1> status_reg_cmd = {
+        static_cast<uint8_t>(status_reg_num)};
 
     // Send Status Read Command from status_reg_num
 
@@ -149,7 +154,7 @@ bool LBR::W25q::PageProgram(uint16_t sector, uint8_t page, uint8_t offset,
     // Chip Select Enable
 
     // SPI Write txbuf
-    spi.Write(std::span<const uint8_t>(buf.data(), tx_len));
+    spi.Write(std::span<uint8_t>(buf.data(), tx_len));
 
     // Chip Select Disable
 
