@@ -25,7 +25,8 @@ bool LBR::W25q::BusyCheck()
     cs.ChipSelectEnable();
 
     // Send 0x05h command
-    spi.Transfer(std::array<uint8_t, 1>{sr1_cmd}, sr1_val);
+    std::array<uint8_t, 1> sr1_cmd_buf = {sr1_cmd};
+    spi.Transfer(sr1_cmd_buf, sr1_val);
 
     // Chip select disable
     cs.ChipSelectDisable();
@@ -53,9 +54,12 @@ bool LBR::W25q::StatusRead(StatusRegister status_reg_num,
     // Chip Select Enable
     cs.ChipSelectEnable();
 
+    // Create tx buf of status reg number to read out of
+    std::array<uint8_t, 1> status_reg_cmd = {
+        static_cast<uint8_t>(status_reg_num)};
+
     // Send Status Read Command from status_reg_num
-    spi.Transfer(std::array<uint8_t, 1>{static_cast<uint8_t>(status_reg_num)},
-                 rxbuf);
+    spi.Transfer(status_reg_cmd, rxbuf);
 
     // Chip Select Disable
     cs.ChipSelectDisable();
@@ -73,8 +77,11 @@ void LBR::W25q::WriteEnable()
     // Chip Select Enable
     cs.ChipSelectEnable();
 
+    // Create Write Enable Command tx buf
+    std::array<uint8_t, 1> write_en_cmd = {0x06u};
+
     // Write Enable instruction 06h
-    spi.Write(std::array<uint8_t, 1>{0x06u});
+    spi.Write(write_en_cmd);
 
     // Chip Select Disable
     cs.ChipSelectDisable();
@@ -96,8 +103,11 @@ void LBR::W25q::Reset()
     // Chip Select Enable
     cs.ChipSelectEnable();
 
+    // Create Reset CMD tx buf
+    std::array<uint8_t, 2> reset_cmd = {0x66u, 0x99u};
+
     // Send Enable Reset (66h) command and Reset Device (99h) command
-    spi.Write(std::array<uint8_t, 2>{0x66u, 0x99u});
+    spi.Write(reset_cmd);
 
     // Chip Select Disable
     cs.ChipSelectDisable();
@@ -215,7 +225,7 @@ bool LBR::W25q::PageProgram(uint8_t block, uint8_t sector, uint8_t page,
     cs.ChipSelectEnable();
 
     // SPI Write txbuf
-    spi.Write(std::span<const uint8_t>(buf.data(), tx_len));
+    spi.Write(std::span<uint8_t>(buf.data(), tx_len));
 
     // Chip Select Disable
     cs.ChipSelectDisable();
@@ -291,7 +301,8 @@ bool LBR::W25q::ChipErase()
     cs.ChipSelectEnable();
 
     // Send Chip Erase instruction C7h or 60h
-    spi.Write(std::array<uint8_t, 1>{0xC7});
+    std::array<uint8_t, 1> chip_erase_cmd = {0xC7};
+    spi.Write(chip_erase_cmd);
 
     // CS High
     cs.ChipSelectDisable();
