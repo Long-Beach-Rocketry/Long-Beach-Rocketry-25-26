@@ -38,7 +38,7 @@ GpioChipSelect chip_select{cs_gpio};
 Board board{.cs = chip_select, .spi1 = spi1};
 
 // Initialize SPI BSP
-bool BSP_Init()
+bool BspInit()
 {
     // Reference status
     bool result = true;
@@ -64,7 +64,7 @@ bool BSP_Init()
     return result;
 }
 
-Board& Get_Board()
+Board& GetBoard()
 {
     return board;
 }

@@ -1,0 +1,38 @@
+#include <cstdint>
+#include "spi.h"
+#include "gpio_cs.h"
+#include <span>
+#include <array>
+
+namespace LBR
+{
+
+enum class StatusRegister : uint8_t {
+    STATUS_REGISTER_1 = 0x05,
+    STATUS_REGISTER_2 = 0x35,
+    STATUS_REGISTER_3 = 0x15
+};
+
+class W25q
+{
+public:
+    W25q(Spi& spi_, GpioChipSelect& cs_);
+
+    bool StatusRead(StatusRegister status_reg_num, std::span<uint8_t> rxbuf);
+    void Reset();
+    bool Read(uint8_t block, uint8_t sector, uint8_t page, uint8_t offset, std::span<uint8_t> rxbuf);
+    bool PageProgram(uint8_t block, uint8_t sector, uint8_t page, uint8_t offset, std::span<uint8_t> txbuf, std::span<uint8_t> rxbuf);
+    bool SectorErase(uint8_t block, uint8_t sector);
+    bool ChipErase();
+
+    // In case we want to erase entire chip except some blocks
+    bool SectorProtect(uint16_t sector);
+    bool BlockProtect(uint8_t block);
+
+private:
+    bool BusyCheck();
+    void WriteEnable();
+    Spi& spi;
+    GpioChipSelect& cs;
+};
+}  // namespace LBR

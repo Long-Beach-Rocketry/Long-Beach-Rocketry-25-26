@@ -5,8 +5,8 @@ endif()
 add_library(driver INTERFACE)
 
 target_include_directories(driver INTERFACE
-    bus
-    io 
+    ${CMAKE_CURRENT_SOURCE_DIR}/bus
+    ${CMAKE_CURRENT_SOURCE_DIR}/io 
 )
 
 target_link_libraries(driver INTERFACE
