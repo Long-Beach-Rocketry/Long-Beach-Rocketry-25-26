@@ -25,7 +25,7 @@ bool LBR::W25q::BusyCheck()
     cs.ChipSelectEnable();
 
     // Send 0x05h command
-    spi.Transfer(std::span<uint8_t>(&sr1_cmd, 1), sr1_val);
+    spi.Transfer(std::array<uint8_t, 1>{sr1_cmd}, sr1_val);
 
     // Chip select disable
     cs.ChipSelectDisable();
@@ -74,7 +74,7 @@ void LBR::W25q::WriteEnable()
     cs.ChipSelectEnable();
 
     // Write Enable instruction 06h
-    spi.Write(std::array<uint8_t, 1>{0x06});
+    spi.Write(std::array<uint8_t, 1>{0x06u});
 
     // Chip Select Disable
     cs.ChipSelectDisable();
@@ -97,7 +97,7 @@ void LBR::W25q::Reset()
     cs.ChipSelectEnable();
 
     // Send Enable Reset (66h) command and Reset Device (99h) command
-    spi.Write(std::array<uint8_t, 2>{0x66, 0x99});
+    spi.Write(std::array<uint8_t, 2>{0x66u, 0x99u});
 
     // Chip Select Disable
     cs.ChipSelectDisable();
@@ -182,6 +182,12 @@ bool LBR::W25q::PageProgram(uint8_t block, uint8_t sector, uint8_t page,
         return false;
     }
 
+    // Cannot overflow pages when writing
+    if (offset + txbuf.size() > 256)
+    {
+        return false;
+    }
+
     // Calculate 24 bit Address of where to start write
     uint32_t addr = 0x00;
     addr += (static_cast<uint32_t>(block) * 0x010000u);
@@ -189,11 +195,13 @@ bool LBR::W25q::PageProgram(uint8_t block, uint8_t sector, uint8_t page,
     addr += (static_cast<uint32_t>(page) * 0x000100u);
     addr += (static_cast<uint32_t>(offset) * 0x000001u);
 
-    // Combine page program instruction, calculated addr, and data into a txbuf to send
-    // TODO: Append txbuf that contains all 256 bytes or under onto tx_buf
-    std::array<uint8_t, 6> tx_buf = {0x02, static_cast<uint8_t>(addr >> 16),
-                                     static_cast<uint8_t>(addr >> 8),
-                                     static_cast<uint8_t>(addr), txbuf};
+    // Combine page program instruction, calculated addr, and data into a buf to send
+    std::array<uint8_t, 260> buf{0x02u, static_cast<uint8_t>(addr >> 16),
+                                 static_cast<uint8_t>(addr >> 8),
+                                 static_cast<uint8_t>(addr), 0x00};
+
+    std::memcpy(&buf[4], txbuf.data(), txbuf.size());
+    size_t tx_len = 4 + txbuf.size();
 
     // Check BUSY bit for current erase or write
     while (BusyCheck())
@@ -207,14 +215,14 @@ bool LBR::W25q::PageProgram(uint8_t block, uint8_t sector, uint8_t page,
     cs.ChipSelectEnable();
 
     // SPI Write txbuf
+    spi.Write(std::span<const uint8_t>(buf.data(), tx_len));
 
     // Chip Select Disable
     cs.ChipSelectDisable();
 
     // W25Q read to verify correct data was written
     this->Read(block, sector, page, offset, rxbuf);
-
-    return true;
+    return std::equal(rxbuf.begin(), rxbuf.end(), txbuf.begin(), txbuf.end());
 }
 
 /**
@@ -233,15 +241,20 @@ bool LBR::W25q::SectorErase(uint8_t block, uint8_t sector)
     // Combine sector erase instruction and 24 bit address in tx buffer
 
     // Check BUSY bit for current erase or write
+    while (BusyCheck())
+    {
+    }
 
     // Write Enable
     this->WriteEnable();
 
     // Chip Select Enable
+    cs.ChipSelectEnable();
 
     // SPI Write the txbuf
 
     // Chip Select Disable
+    cs.ChipSelectDisable();
 
     // Check BUSY bit for any current erase or writes
     while (BusyCheck())
