@@ -26,6 +26,19 @@ struct StI2cParams
     uint32_t timingr;
 };
 
+enum TransferMode : uint8_t
+{
+    GENERATE_STARTSTOP = 0,
+    GENERATE_START_ONLY,
+    GENERATE_STOP_ONLY
+};
+
+enum Dir : uint8_t
+{
+    WRITE = 0,
+    READ
+};
+
 class HwI2c : public I2c
 {
 
@@ -40,12 +53,25 @@ public:
      */
     bool init();
 
+    bool mem_read(std::span<uint8_t> data, const uint8_t reg_addr,
+                  uint8_t dev_addr) override;
+    bool mem_read(std::span<uint8_t> data, const uint16_t reg_addr,
+                  uint8_t dev_addr) override;
+    bool mem_write(std::span<const uint8_t> data, const uint8_t reg_addr,
+                   uint8_t dev_addr) override;
+    bool mem_write(std::span<const uint8_t> data, const uint16_t reg_addr,
+                   uint8_t dev_addr) override;
+
 private:
     I2C_TypeDef* _base_addr;
     uint32_t _timingr;
 
-    bool burst_read(std::span<uint8_t> data, uint8_t dev_addr) override;
-    bool burst_write(std::span<const uint8_t> data, uint8_t dev_addr) override;
+    bool initiate_transfer(uint8_t dev_addr, uint8_t mode, uint8_t dir,
+                           size_t num_bytes) override;
+    bool detect_stop() override;
+
+    bool burst_read(std::span<uint8_t> data) override;
+    bool burst_write(std::span<const uint8_t> data) override;
 };
 }  // namespace Stml4
 }  // namespace LBR

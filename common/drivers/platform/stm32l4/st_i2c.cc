@@ -6,6 +6,7 @@
  */
 
 #include "st_i2c.h"
+#include <array>
 
 namespace LBR
 {
@@ -37,9 +38,69 @@ bool HwI2c::init()
     return true;
 }
 
-bool HwI2c::burst_read(std::span<uint8_t> data, uint8_t dev_addr)
+bool HwI2c::mem_read(std::span<uint8_t> data, const uint8_t reg_addr,
+                     uint8_t dev_addr)
 {
+    bool ret{true};
 
+    ret = ret && initiate_transfer(dev_addr, GENERATE_START_ONLY, WRITE, 1);
+    std::array<uint8_t, 1> reg{reg_addr};
+    std::span<const uint8_t> register_addr{reg};
+    ret = ret && burst_write(register_addr);
+    ret = ret &&
+          initiate_transfer(dev_addr, GENERATE_STARTSTOP, READ, data.size());
+    ret = ret && burst_read(data);
+    return ret && detect_stop();
+}
+
+bool HwI2c::mem_read(std::span<uint8_t> data, const uint16_t reg_addr,
+                     uint8_t dev_addr)
+{
+    bool ret{true};
+
+    ret = ret && initiate_transfer(dev_addr, GENERATE_START_ONLY, WRITE, 2);
+    std::array<uint8_t, 2> reg{static_cast<uint8_t>((reg_addr >> 8) & 0xFF),
+                               static_cast<uint8_t>(reg_addr & 0xFF)};
+    std::span<const uint8_t> register_addr{reg};
+    ret = ret && burst_write(register_addr);
+    ret = ret &&
+          initiate_transfer(dev_addr, GENERATE_STARTSTOP, READ, data.size());
+    ret = ret && burst_read(data);
+    return ret && detect_stop();
+}
+
+bool HwI2c::mem_write(std::span<const uint8_t> data, const uint8_t reg_addr,
+                      uint8_t dev_addr)
+{
+    bool ret{true};
+
+    ret = ret && initiate_transfer(dev_addr, GENERATE_STARTSTOP, WRITE,
+                                   1 + data.size());
+    std::array<uint8_t, 1> reg{reg_addr};
+    std::span<const uint8_t> register_addr{reg};
+    ret = ret && burst_write(register_addr);
+    ret = ret && burst_write(data);
+    return ret && detect_stop();
+}
+
+bool HwI2c::mem_write(std::span<const uint8_t> data, const uint16_t reg_addr,
+                      uint8_t dev_addr)
+{
+    bool ret{true};
+
+    ret = ret && initiate_transfer(dev_addr, GENERATE_STARTSTOP, WRITE,
+                                   2 + data.size());
+    std::array<uint8_t, 2> reg{static_cast<uint8_t>((reg_addr >> 8) & 0xFF),
+                               static_cast<uint8_t>(reg_addr & 0xFF)};
+    std::span<const uint8_t> register_addr{reg};
+    ret = ret && burst_write(register_addr);
+    ret = ret && burst_write(data);
+    return ret && detect_stop();
+}
+
+bool HwI2c::initiate_transfer(uint8_t dev_addr, uint8_t mode, uint8_t dir,
+                              size_t num_bytes)
+{
     if (_base_addr == nullptr)
     {
         return false;
@@ -60,23 +121,40 @@ bool HwI2c::burst_read(std::span<uint8_t> data, uint8_t dev_addr)
         return false;
     }
 
-    _base_addr->CR2 &= ~I2C_CR2_SADD;  // Clearing address
-    _base_addr->CR2 |= (dev_addr << (I2C_CR2_SADD_Pos + 1));  // Setting address
-
     // Make sure I2C bus is idle
     if (_base_addr->ISR & I2C_ISR_BUSY)
     {
         return false;
     }
 
-    // Configure for reading
-    _base_addr->CR2 &= ~I2C_CR2_NBYTES;
-    _base_addr->CR2 |= ((data.size() << I2C_CR2_NBYTES_Pos) | I2C_CR2_RD_WRN |
-                        I2C_CR2_AUTOEND);
+    _base_addr->CR2 &=
+        ~(I2C_CR2_NBYTES | I2C_CR2_RD_WRN | I2C_CR2_SADD | I2C_CR2_AUTOEND);
 
-    // Initiate read
-    _base_addr->CR2 |= I2C_CR2_START;
+    // Configure according to mode
+    switch (mode)
+    {
+        case GENERATE_STARTSTOP:
+            _base_addr->CR2 |= I2C_CR2_AUTOEND;
+            break;
+        case GENERATE_START_ONLY:
+            break;
+        case GENERATE_STOP_ONLY:
+            _base_addr->CR2 |= I2C_CR2_STOP;
+            return detect_stop();
+        default:
+            return false;
+    }
 
+    // Configuring and initiating transfer
+    _base_addr->CR2 |=
+        ((num_bytes << I2C_CR2_NBYTES_Pos) | (dir << I2C_CR2_RD_WRN_Pos) |
+         (dev_addr << (I2C_CR2_SADD_Pos + 1)) | I2C_CR2_START);
+
+    return true;
+}
+
+bool HwI2c::burst_read(std::span<uint8_t> data)
+{
     for (uint8_t& byte : data)
     {
         // Wait for transfer
@@ -87,53 +165,11 @@ bool HwI2c::burst_read(std::span<uint8_t> data, uint8_t dev_addr)
         byte = _base_addr->RXDR;
     }
 
-    // Detect stop
-    while (!(_base_addr->ISR & I2C_ISR_STOPF))
-    {
-    }
-    _base_addr->ICR |= I2C_ICR_STOPCF;
-
     return true;
 }
 
-bool HwI2c::burst_write(std::span<const uint8_t> data, uint8_t dev_addr)
+bool HwI2c::burst_write(std::span<const uint8_t> data)
 {
-    if (_base_addr == nullptr)
-    {
-        return false;
-    }
-
-    // Check if init was called
-    if (!(_base_addr->CR1 & I2C_CR1_PE))
-    {
-        return false;
-    }
-
-    /**
-     * Setting target
-     * Check if communication is in progress
-     */
-    if (_base_addr->CR2 & I2C_CR2_START)
-    {
-        return false;
-    }
-
-    _base_addr->CR2 &= ~I2C_CR2_SADD;  // Clearing address
-    _base_addr->CR2 |= (dev_addr << (I2C_CR2_SADD_Pos + 1));  // Setting address
-
-    // Make sure I2C bus is idle
-    if (_base_addr->ISR & I2C_ISR_BUSY)
-    {
-        return false;
-    }
-
-    // Configure for writing
-    _base_addr->CR2 &= ~(I2C_CR2_NBYTES | I2C_CR2_RD_WRN);
-    _base_addr->CR2 |= ((data.size() << I2C_CR2_NBYTES_Pos) | I2C_CR2_AUTOEND);
-
-    // Initiate write
-    _base_addr->CR2 |= I2C_CR2_START;
-
     // Write
     for (const uint8_t byte : data)
     {
@@ -149,7 +185,11 @@ bool HwI2c::burst_write(std::span<const uint8_t> data, uint8_t dev_addr)
         _base_addr->TXDR = byte;
     }
 
-    // Detect stop
+    return true;
+}
+
+bool HwI2c::detect_stop()
+{
     while (!(_base_addr->ISR & I2C_ISR_STOPF))
     {
     }
