@@ -5,7 +5,6 @@
  * @date 12/24/2025
  */
 
-#include <cstdint>
 #include "pwm.h"
 #include "stm32l476xx.h"
 
@@ -15,12 +14,57 @@ namespace Stml4
 {
 
 /**
+ * @note Timers 15, 16, 17 are only capable of edge-aligned mode
+ * @note CENTER_ALIGNED_DOWN: flag when counting down
+ *       CENTER_ALIGNED_UP: flag set when counting up
+ *       CENTER_ALIGNED_BOTH: flag set when counting up and down
+ */
+enum class PwmMode : uint8_t
+{
+    EDGE_ALIGNED = 0,
+    CENTER_ALIGNED_DOWN,
+    CENTER_ALIGNED_UP,
+    CENTER_ALIGNED_BOTH
+};
+
+/**
+ * @note MODE1: Outputs HIGH while compare reg < count, else LOW
+ *       MODE2: Ouputs LOW while compare reg < count, else HIGH
+ */
+enum class PwmOutputMode : uint8_t
+{
+    MODE1 = 6,
+    MODE2 = 7
+};
+
+/**
+ * @note Timers 15, 16, 17 are not capable of downcounting
+ * @note If in center-aligned mode, the direction cannot be controlled
+ */
+enum class PwmDir : uint8_t
+{
+    UPCOUNTING = 0,
+    DOWNCOUNTING = TIM_CR1_DIR
+};
+
+/**
+ * @brief Struct containing parameters to configure PWM
+ */
+struct StPwmSettings
+{
+    PwmMode mode;
+    PwmOutputMode output_mode;
+    PwmDir dir;
+};
+
+/**
  * @brief Collection of timer base address and timer channel
  */
 struct StPwmParams
 {
     TIM_TypeDef* base_addr;
     uint8_t channel;
+    StPwmSettings settings;
 };
 
 class HwPwm : public Pwm
@@ -46,28 +90,7 @@ public:
 private:
     TIM_TypeDef* _base_addr;
     uint8_t _channel;
-
-    /**
-     * @brief Gets clock frequency of the AHB bus
-     * @return Clock frequency in Hz
-     */
-    uint32_t get_hclk_freq();
-
-    /**
-     * @brief Gets clock frequency of the APB1 bus
-     * @return Clock frequency in Hz
-     * 
-     * @note used by timers 2-7
-     */
-    uint32_t get_pclk1_freq();
-
-    /**
-     * @brief Gets clock frequency of the APB2 bus
-     * @return Clock frequency in Hz
-     * 
-     * @note used by timers 1, 8, 15, 16, 17
-     */
-    uint32_t get_pclk2_freq();
+    StPwmSettings _settings;
 };
 
 }  // namespace Stml4
