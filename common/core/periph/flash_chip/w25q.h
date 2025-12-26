@@ -38,7 +38,6 @@ public:
     bool PageProgram(uint8_t block, uint8_t sector, uint8_t page,
                      uint8_t offset, std::span<uint8_t> txbuf,
                      std::span<uint8_t> rxbuf);
-    // TODO: Implement BlockErase()
     bool BlockErase(uint8_t block);
     bool SectorErase(uint8_t block, uint8_t sector);
     bool ChipErase();
