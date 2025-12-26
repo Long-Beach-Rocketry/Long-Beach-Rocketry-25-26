@@ -11,4 +11,5 @@ target_include_directories(w25q INTERFACE
 
 target_link_libraries(w25q INTERFACE
     driver
+    chip_select
 )
