@@ -23,7 +23,7 @@ public:
      * @param freq Desired frequency in Hz
      * @return true if successful, false otherwise
      */
-    virtual bool set_freq(uint32 freq) = 0;
+    virtual bool set_freq(uint32_t freq) = 0;
 
     /**
      * @brief Sets the duty cycle for the PWM peripheral
