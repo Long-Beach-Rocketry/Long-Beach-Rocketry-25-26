@@ -64,10 +64,9 @@ bool LBR::W25q::BusyCheck()
  * @brief Modify Status Reg values (used for block or sector protect)
  * 
  * @param status_reg_num 
- * @return true 
- * @return false 
+ * @return none
  */
-bool LBR::W25q::StatusRegWrite(StatusWrite status_reg_num, uint8_t status_byte)
+void LBR::W25q::StatusRegWrite(StatusWrite status_reg_num, uint8_t status_byte)
 {
     // Check for current writes or erases
     while (this->BusyCheck())
@@ -102,8 +101,6 @@ bool LBR::W25q::StatusRegWrite(StatusWrite status_reg_num, uint8_t status_byte)
     {
         StatusRegRead(StatusRead::STATUS_REGISTER_1, rxbuf);
     } while (rxbuf[0] & 0x02);
-
-    return true;
 }
 
 /**
@@ -111,10 +108,9 @@ bool LBR::W25q::StatusRegWrite(StatusWrite status_reg_num, uint8_t status_byte)
  * 
  * @param status_reg_num 
  * @param rxbuf 
- * @return true 
- * @return false 
+ * @return none
  */
-bool LBR::W25q::StatusRegRead(StatusRead status_reg_num,
+void LBR::W25q::StatusRegRead(StatusRead status_reg_num,
                               std::span<uint8_t> rxbuf)
 {
     // Check BUSY bit for any current erase or writes
@@ -140,8 +136,7 @@ bool LBR::W25q::StatusRegRead(StatusRead status_reg_num,
 /**
  * @brief All on-going operations will be halted, the device will return to the default power-on state, and lose all current volatile settings 
  * 
- * @return true 
- * @return false 
+ * @return none
  */
 void LBR::W25q::Reset()
 {
@@ -200,11 +195,12 @@ bool LBR::W25q::Read(uint16_t sector, uint8_t page, uint8_t offset,
 /**
  * @brief Writes data to a page (256 bytes) and verifies the correct data was written
  * 
- * @param sector 4096 possible sectors from (0 - 4095)
+ * @param block 256 possible blocks from (0 - 255)
+ * @param sector 16 possible sectors per block from (0 - 15)
  * @param page 16 possible pages in a sector (0 - 15)
  * @param offset 256 possible words in a page (0 - 255) ***Each word is a byte for the w25q***
- * @param txbuf 
- * @param rxbuf 
+ * @param txbuf Data you want written into the flash chip
+ * @param rxbuf Buffer to verify correct data was written into flash chip
  * @return true 
  * @return false 
  */
@@ -338,10 +334,9 @@ bool LBR::W25q::SectorErase(uint16_t sector)
 /**
  * @brief Erase entire chip
  * 
- * @return true 
- * @return false 
+ * @return none
  */
-bool LBR::W25q::ChipErase()
+void LBR::W25q::ChipErase()
 {
     // Check BUSY bit for any current erase or writes
     while (this->BusyCheck())

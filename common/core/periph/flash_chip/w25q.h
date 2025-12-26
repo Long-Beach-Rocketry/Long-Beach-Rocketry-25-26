@@ -30,8 +30,8 @@ public:
     W25q(Spi& spi_, GpioChipSelect& cs_);
 
     void W25qInit();
-    bool StatusRegWrite(StatusWrite status_reg_num, uint8_t status_byte);
-    bool StatusRegRead(StatusRead status_reg_num, std::span<uint8_t> rxbuf);
+    void StatusRegWrite(StatusWrite status_reg_num, uint8_t status_byte);
+    void StatusRegRead(StatusRead status_reg_num, std::span<uint8_t> rxbuf);
     void Reset();
     bool Read(uint16_t sector, uint8_t page, uint8_t offset, std::span<uint8_t> rxbuf);
     bool PageProgram(uint16_t sector, uint8_t page, uint8_t offset, std::span<uint8_t> txbuf, std::span<uint8_t> rxbuf);
