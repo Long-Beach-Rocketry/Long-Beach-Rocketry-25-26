@@ -30,8 +30,8 @@ public:
     W25q(Spi& spi_, GpioChipSelect& cs_);
 
     void W25qInit();
-    bool StatusRegWrite(StatusWrite status_reg_num, uint8_t status_byte);
-    bool StatusRegRead(StatusRead status_reg_num, std::span<uint8_t> rxbuf);
+    void StatusRegWrite(StatusWrite status_reg_num, uint8_t status_byte);
+    void StatusRegRead(StatusRead status_reg_num, std::span<uint8_t> rxbuf);
     void Reset();
     bool Read(uint8_t block, uint8_t sector, uint8_t page, uint8_t offset,
               std::span<uint8_t> rxbuf);
@@ -40,7 +40,7 @@ public:
                      std::span<uint8_t> rxbuf);
     bool BlockErase(uint8_t block);
     bool SectorErase(uint8_t block, uint8_t sector);
-    bool ChipErase();
+    void ChipErase();
 
     // In case we want to erase entire chip except some blocks
     bool BlockLock(uint8_t block);
