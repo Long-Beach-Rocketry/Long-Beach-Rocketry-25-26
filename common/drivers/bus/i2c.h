@@ -69,7 +69,7 @@ public:
      * @param dev_addr address of target device
      * @return true if successful, false otherwise
      */
-    virtual bool burst_read(std::span<uint8_t> data, uint8_t dev_addr) = 0;
+    virtual bool read(std::span<uint8_t> data, uint8_t dev_addr) = 0;
 
     /**
      * @brief Write raw data to an I2C bus
@@ -78,8 +78,7 @@ public:
      * @param dev_addr address of target device
      * @return true if successful, false otherwise
      */
-    virtual bool burst_write(std::span<const uint8_t> data,
-                             uint8_t dev_addr) = 0;
+    virtual bool write(std::span<const uint8_t> data, uint8_t dev_addr) = 0;
 
     ~I2c() = default;
 };
