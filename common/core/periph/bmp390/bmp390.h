@@ -10,17 +10,6 @@
 #include <span>
 #include "i2c.h"
 
-/*** BMP390 Registers and Bit Definitions ***/
-inline constexpr uint8_t PWR_CTRL_REG = (0x1B);
-inline constexpr uint8_t DATA_REG_START = (0x04);
-inline constexpr uint8_t CALIB_REG_START = (0x31);
-
-inline constexpr uint8_t PWR_CTRL_PRESS_EN = (0x1);
-inline constexpr uint8_t PWR_CTRL_TEMP_EN = (0x2);
-inline constexpr uint8_t PWR_CTRL_NORMAL_MODE = (0x3 << 4);
-inline constexpr uint8_t DATA_REG_LEN = (6);
-inline constexpr uint8_t CALIB_REG_LEN = (21);
-
 namespace LBR
 {
 /**
@@ -121,17 +110,5 @@ private:
      * @return Compensated temperature value
      */
     float compensate_temperature(void);
-
-    /**
-     * @brief Combines two bytes into a 16-bit value
-     * @return 16-bit unsigned integer
-     */
-    uint16_t combine_uint16(uint8_t msb, uint8_t lsb);
-
-    /**
-     * @brief Combines two bytes into a 16-bit signed value
-     * @return 16-bit signed integer
-     */
-    int16_t combine_int16(uint8_t msb, uint8_t lsb);
 };
 }  // namespace LBR
