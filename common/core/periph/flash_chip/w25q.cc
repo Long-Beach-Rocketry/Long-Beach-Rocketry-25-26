@@ -1,46 +1,42 @@
 #include "w25q.h"
 
-/**
- * @brief Construct a new LBR::W25q::W25q object
- * 
- * @param spi_ 
- */
-LBR::W25q::W25q(Spi& spi_, GpioChipSelect& cs_) : spi(spi_), cs(cs_)
+namespace LBR
+{
+
+W25q::W25q(Spi& spi_, GpioChipSelect& cs_) : spi{spi_}, cs{cs_}
 {
 }
 
-/**
- * @brief Enable individual block and sector locks on device startup
- * 
- * @return void
- */
-void LBR::W25q::W25qInit()
+bool W25q::W25qInit()
 {
     // Read status reg to get current bits
     std::array<uint8_t, 1> status_reg_3;
-    this->StatusRegRead(StatusRead::STATUS_REGISTER_3, status_reg_3);
-
-    // Make new byte to write into status reg 3 to enable WPS bit
-    status_reg_3[0] |= 0x04u;
+    if (!this->StatusRegRead(StatusRead::STATUS_REGISTER_3, status_reg_3))
+    {
+        return false;
+    }
 
     // Set WPS to enable individual block and sector lock
-    this->StatusRegWrite(StatusWrite::STATUS_REGISTER_3, status_reg_3[0]);
+    if (!this->StatusRegWrite(StatusWrite::STATUS_REGISTER_3, (kWpsMask),
+                              (kWpsMask)))
+    {
+        return false;
+    }
 
     // By default on startup, all block lock bits are set to 1. We have to unlock all the blocks to write into them.
-    this->WriteEnable();
+    if (!this->WriteEnable())
+    {
+        return false;
+    }
     cs.ChipSelectEnable();
-    std::array<uint8_t, 1> global_unlock_cmd{0x98u};
-    spi.Write(global_unlock_cmd);
+    std::array<uint8_t, 1> global_unlock_cmd{Opcode::kGlobalBlockUnlock};
+    bool status = spi.Write(global_unlock_cmd);
     cs.ChipSelectDisable();
+
+    return status;
 }
 
-/**
- * @brief Check BUSY bit in Status Reg-1
- * 
- * @return true W25Q is currently in a write or erase cycle
- * @return false W25Q is ready to accept commands
- */
-bool LBR::W25q::BusyCheck()
+bool W25q::BusyCheck()
 {
     // Init tx and rx buf to send command and receive data
     uint8_t sr1_cmd = static_cast<uint8_t>(StatusRead::STATUS_REGISTER_1);
@@ -51,42 +47,69 @@ bool LBR::W25q::BusyCheck()
 
     // Send 0x05h command
     std::array<uint8_t, 1> sr1_cmd_buf = {sr1_cmd};
-    spi.Transfer(sr1_cmd_buf, sr1_val);
+    bool status = spi.SeqTransfer(sr1_cmd_buf, sr1_val);
 
     // Chip select disable
     cs.ChipSelectDisable();
 
+    // Check if Sequential Transfer failed
+    if (!status)
+    {
+        return false;
+    }
+
     // Check if BUSY bit is 1
-    return (sr1_val[0] & 0x01) != 0;
+    return sr1_val[0] & kBusyMask;
 }
 
-/**
- * @brief Modify Status Reg values (used for block or sector protect)
- * 
- * @param status_reg_num 
- * @return none
- */
-void LBR::W25q::StatusRegWrite(StatusWrite status_reg_num, uint8_t status_byte)
+bool W25q::StatusRegWrite(StatusWrite status_reg_num, uint8_t mask, uint8_t val)
 {
     // Check for current writes or erases
     while (this->BusyCheck())
     {
     }
 
-    // Enable Write
-    this->WriteEnable();
+    // Get current value in desired status reg
+    std::array<uint8_t, 1> status_reg_val;
+    StatusRead status_read_cmd;
+    if (status_reg_num == StatusWrite::STATUS_REGISTER_1)
+    {
+        status_read_cmd = StatusRead::STATUS_REGISTER_1;
+    }
+    else if (status_reg_num == StatusWrite::STATUS_REGISTER_2)
+    {
+        status_read_cmd = StatusRead::STATUS_REGISTER_2;
+    }
+    else
+    {
+        status_read_cmd = StatusRead::STATUS_REGISTER_3;
+    }
+    if (!this->StatusRegRead(status_read_cmd, status_reg_val))
+    {
+        return false;
+    }
 
-    // Chip Select Enable
-    cs.ChipSelectEnable();
+    // Create new byte to send to the status reg
+    uint8_t new_byte = (status_reg_val[0] & ~mask) | (val & mask);
 
-    // Create tx buf of status reg number and the byte of data to write into
-    std::array<uint8_t, 2> txbuf = {static_cast<uint8_t>(status_reg_num),
-                                    status_byte};
+    // Enable Volatile Write
+    if (!this->VolatileWriteEnable())
+    {
+        return false;
+    }
 
     // Write a byte of data to desired status reg
-    spi.Write(txbuf);
-
+    std::array<uint8_t, 2> txbuf = {static_cast<uint8_t>(status_reg_num),
+                                    new_byte};
+    cs.ChipSelectEnable();
+    bool status = spi.Write(txbuf);
     cs.ChipSelectDisable();
+
+    // Check if SPI write failed
+    if (!status)
+    {
+        return false;
+    }
 
     // Add delay of tw
 
@@ -99,25 +122,22 @@ void LBR::W25q::StatusRegWrite(StatusWrite status_reg_num, uint8_t status_byte)
     std::array<uint8_t, 1> rxbuf;
     do
     {
-        StatusRegRead(StatusRead::STATUS_REGISTER_1, rxbuf);
-    } while (rxbuf[0] & 0x02);
+        if (!StatusRegRead(StatusRead::STATUS_REGISTER_1, rxbuf))
+        {
+            return false;
+        }
+    } while (rxbuf[0] & kWelMask);
+
+    // Check if correct value was written into the Status Reg
+    if (!this->StatusRegRead(status_read_cmd, status_reg_val))
+    {
+        return false;
+    }
+    return (status_reg_val[0] & mask) == (val & mask);
 }
 
-/**
- * @brief Read specified status register
- * 
- * @param status_reg_num 
- * @param rxbuf 
- * @return none
- */
-void LBR::W25q::StatusRegRead(StatusRead status_reg_num,
-                              std::span<uint8_t> rxbuf)
+bool W25q::StatusRegRead(StatusRead status_reg_num, std::span<uint8_t> rxbuf)
 {
-    // Check BUSY bit for any current erase or writes
-    while (this->BusyCheck())
-    {
-    }
-
     // Chip Select Enable
 
     // Create tx buf of status reg number to read out of
@@ -130,15 +150,10 @@ void LBR::W25q::StatusRegRead(StatusRead status_reg_num,
 
     // Chip Select Disable
 
-    return true;
+    return status;
 }
 
-/**
- * @brief All on-going operations will be halted, the device will return to the default power-on state, and lose all current volatile settings 
- * 
- * @return none
- */
-void LBR::W25q::Reset()
+bool LBR::W25q::Reset()
 {
     // Check BUSY bit for any current erase or writes
     while (this->BusyCheck())
@@ -189,7 +204,7 @@ bool LBR::W25q::Read(uint16_t sector, uint8_t page, uint8_t offset,
 
     // Chip Select Disable
 
-    return true;
+    return status;
 }
 
 /**
@@ -221,7 +236,7 @@ bool LBR::W25q::PageProgram(uint16_t sector, uint8_t page, uint8_t offset,
     // Chip Select Enable
 
     // SPI Write txbuf
-    spi.Write(std::span<uint8_t>(buf.data(), tx_len));
+    bool status = spi.Write(std::span<uint8_t>(buf.data(), tx_len));
 
     // Chip Select Disable
 
@@ -230,14 +245,7 @@ bool LBR::W25q::PageProgram(uint16_t sector, uint8_t page, uint8_t offset,
     return true;
 }
 
-/**
- * @brief Erase a 64KB block
- * 
- * @param block 
- * @return true 
- * @return false 
- */
-bool LBR::W25q::BlockErase(uint8_t block)
+bool W25q::BlockErase(uint8_t block)
 {
     // Return false if block outside of threshold
     if (block > 255)
@@ -246,13 +254,12 @@ bool LBR::W25q::BlockErase(uint8_t block)
     }
 
     // Calculate address of where to start erase
-    uint32_t addr = 0x00;
-    addr += (static_cast<uint32_t>(block) * 0x010000u);
+    uint32_t addr = static_cast<uint32_t>(block) * kBlockSizeBytes;
 
     // Combine block erase instruction and 24 bit address in tx buffer
-    std::array<uint8_t, 4> txbuf{0xD8u, static_cast<uint8_t>(addr >> 16),
-                                 static_cast<uint8_t>(addr >> 8),
-                                 static_cast<uint8_t>(addr)};
+    std::array<uint8_t, 4> txbuf{
+        Opcode::kBlockErase64Kb, static_cast<uint8_t>(addr >> 16),
+        static_cast<uint8_t>(addr >> 8), static_cast<uint8_t>(addr)};
 
     // Check BUSY bit for current erase or write
     while (this->BusyCheck())
@@ -260,10 +267,19 @@ bool LBR::W25q::BlockErase(uint8_t block)
     }
 
     // Erase the 64KB block
-    this->WriteEnable();
+    if (!this->WriteEnable())
+    {
+        return false;
+    }
     cs.ChipSelectEnable();
-    spi.Write(txbuf);
+    bool status = spi.Write(txbuf);
     cs.ChipSelectDisable();
+
+    // Check if SPI Write failed
+    if (!status)
+    {
+        return false;
+    }
 
     // Check BUSY bit for any current erase or writes
     while (this->BusyCheck())
@@ -274,8 +290,11 @@ bool LBR::W25q::BlockErase(uint8_t block)
     std::array<uint8_t, 1> rxbuf;
     do
     {
-        StatusRegRead(StatusRead::STATUS_REGISTER_1, rxbuf);
-    } while (rxbuf[0] & 0x02);
+        if (!StatusRegRead(StatusRead::STATUS_REGISTER_1, rxbuf))
+        {
+            return false;
+        }
+    } while (rxbuf[0] & kWelMask);
 
     return true;
 }
@@ -296,9 +315,8 @@ bool LBR::W25q::SectorErase(uint16_t sector)
     }
 
     // Calculate address of where to start erase
-    uint32_t addr = 0x00;
-    addr += (static_cast<uint32_t>(block) * 0x010000u);
-    addr += (static_cast<uint32_t>(sector) * 0x001000u);
+    uint32_t addr = static_cast<uint32_t>(block) * kBlockSizeBytes;
+    addr += (static_cast<uint32_t>(sector) * kSectorSizeBytes);
 
     // Combine write enable, sector erase instruction and 24 bit address in tx buffer
 
@@ -311,10 +329,16 @@ bool LBR::W25q::SectorErase(uint16_t sector)
     cs.ChipSelectEnable();
 
     // Send cmd and addr to flash chip
-    spi.Write(txbuf);
+    bool status = spi.Write(txbuf);
 
     // Chip Select Disable
     cs.ChipSelectDisable();
+
+    // Check if SPI Write failed
+    if (!status)
+    {
+        return false;
+    }
 
     // Check BUSY bit for any current erase or writes
     while (this->BusyCheck())
@@ -325,18 +349,16 @@ bool LBR::W25q::SectorErase(uint16_t sector)
     std::array<uint8_t, 1> rxbuf;
     do
     {
-        StatusRegRead(StatusRead::STATUS_REGISTER_1, rxbuf);
-    } while (rxbuf[0] & 0x02);
+        if (!StatusRegRead(StatusRead::STATUS_REGISTER_1, rxbuf))
+        {
+            return false;
+        }
+    } while (rxbuf[0] & kWelMask);
 
     return true;
 }
 
-/**
- * @brief Erase entire chip
- * 
- * @return none
- */
-void LBR::W25q::ChipErase()
+bool W25q::ChipErase()
 {
     // Check BUSY bit for any current erase or writes
     while (this->BusyCheck())
@@ -350,92 +372,97 @@ void LBR::W25q::ChipErase()
 }
 
 /**
- * @brief Make a block read only to prevent an accidental erase
+ * @brief Helper function for BlockLockStatusRead()
  * 
- * @param block 
- * @return true Block successfully locked
- * @return false Block is already locked
+ * @param block_lock_byte 
+ * @return true Block is locked, false Block is unlocked
  */
-bool LBR::W25q::BlockLock(uint8_t block)
+static inline bool IsBlockLocked(uint8_t block_lock_byte)
 {
-    std::array<uint8_t, 1> block_lock_status;
+    return block_lock_byte & LBR::W25q::kBlockBitMask;
+}
 
+bool W25q::BlockLock(uint8_t block)
+{
     // Calculate address of which block to check
-    uint32_t addr = 0x00;
-    addr += (static_cast<uint32_t>(block) * 0x010000u);
+    uint32_t addr = static_cast<uint32_t>(block) * kBlockSizeBytes;
 
     // Check if Block is already locked
-    if (this->BlockLockStatusRead(addr, block_lock_status))
+    uint8_t block_lock_byte;
+    if (!(this->BlockLockStatusRead(addr, block_lock_byte)))
+    {
+        return false;
+    }
+    if (IsBlockLocked(block_lock_byte))
     {
         return false;
     }
 
     // Lock the Block
-    this->WriteEnable();
-    std::array<uint8_t, 4> txbuf{0x36u, static_cast<uint8_t>(addr >> 16),
-                                 static_cast<uint8_t>(addr >> 8),
-                                 static_cast<uint8_t>(addr)};
+    if (!this->WriteEnable())
+    {
+        return false;
+    }
+    std::array<uint8_t, 4> txbuf{
+        Opcode::kIndividualBlockLock, static_cast<uint8_t>(addr >> 16),
+        static_cast<uint8_t>(addr >> 8), static_cast<uint8_t>(addr)};
     cs.ChipSelectEnable();
-    spi.Write(txbuf);
+    bool status = spi.Write(txbuf);
     cs.ChipSelectDisable();
 
-    return true;
+    return status;
 }
 
-/**
- * @brief Make a block writeable from read only mode
- * 
- * @param block 
- * @return true Block was successfully unlocked
- * @return false Block was already unlocked
- */
-bool LBR::W25q::BlockUnlock(uint8_t block)
+bool W25q::BlockUnlock(uint8_t block)
 {
-    std::array<uint8_t, 1> block_lock_status;
-
     // Calculate address of which block to check
-    uint32_t addr = 0x00;
-    addr += (static_cast<uint32_t>(block) * 0x010000u);
+    uint32_t addr = static_cast<uint32_t>(block) * kBlockSizeBytes;
 
-    if (!(this->BlockLockStatusRead(block, block_lock_status)))
+    // Check if block is already unlocked
+    uint8_t block_lock_byte;
+    if (!(this->BlockLockStatusRead(addr, block_lock_byte)))
+    {
+        return false;
+    }
+    if (!IsBlockLocked(block_lock_byte))
     {
         return false;
     }
 
     // Unlock the Block
-    this->WriteEnable();
-    std::array<uint8_t, 4> txbuf{0x39u, static_cast<uint8_t>(addr >> 16),
-                                 static_cast<uint8_t>(addr >> 8),
-                                 static_cast<uint8_t>(addr)};
+    if (!this->WriteEnable())
+    {
+        return false;
+    }
+    std::array<uint8_t, 4> txbuf{
+        Opcode::kIndividualBlockUnlock, static_cast<uint8_t>(addr >> 16),
+        static_cast<uint8_t>(addr >> 8), static_cast<uint8_t>(addr)};
     cs.ChipSelectEnable();
-    spi.Write(txbuf);
+    bool status = spi.Write(txbuf);
     cs.ChipSelectDisable();
 
-    return true;
+    return status;
 }
 
-/**
- * @brief Check if an individual block is locked or not
- * 
- * @param block 
- * @param block_lock_status 
- * @return true Block is currently locked
- * @return false Block is not locked
- */
-bool LBR::W25q::BlockLockStatusRead(uint32_t block_addr,
-                                    std::array<uint8_t, 1> block_lock_status)
+bool W25q::BlockLockStatusRead(uint32_t block_addr, uint8_t& block_lock_byte)
 {
     // Wait for current writes or erases to finish
     while (this->BusyCheck())
     {
     }
 
-    cs.ChipSelectEnable();
-    std::array<uint8_t, 4> txbuf{0x3Du, static_cast<uint8_t>(block_addr >> 16),
+    // Send Block address and Block Lock Read cmd
+    std::array<uint8_t, 4> txbuf{Opcode::kReadBlockLock,
+                                 static_cast<uint8_t>(block_addr >> 16),
                                  static_cast<uint8_t>(block_addr >> 8),
                                  static_cast<uint8_t>(block_addr)};
-    spi.Transfer(txbuf, block_lock_status);
+    std::array<uint8_t, 1> block_lock_status;
+    cs.ChipSelectEnable();
+    bool status = spi.SeqTransfer(txbuf, block_lock_status);
     cs.ChipSelectDisable();
 
-    return static_cast<bool>(block_lock_status[0] & 0x01u);
+    block_lock_byte = block_lock_status[0];
+
+    return status;
 }
+}  // namespace LBR

@@ -103,14 +103,50 @@ struct StSpiSettings
 class HwSpi : public Spi
 {
 public:
+    /**
+    * @brief Construct a new HwSpi object
+    *
+    * @param instance_ The SPI peripheral being used
+    * @param settings_ The SPI control register settings
+    *
+    */
     explicit HwSpi(SPI_TypeDef* instance_, StSpiSettings& settings_);
 
-    // Member Functions
-    bool Init();
+    /**
+    * @brief Read data from a slave device.
+    * 
+    * @param rx_data 8 byte array to store read data.
+    * @param buffer_len Size of array.
+    * @return true SPI Read success, false Read failed
+    */
     bool Read(std::span<uint8_t> rx_data) override;
+
+    /**
+    * @brief Write data to a slave device.
+    * 
+    * @param tx_data 8 byte array of the data to be sent.
+    * @param buffer_len Size of array
+    * @return true SPI Write success, false Write failed
+    */
     bool Write(std::span<uint8_t> tx_data) override;
-    bool Transfer(std::span<uint8_t> tx_data,
-                  std::span<uint8_t> rx_data) override;
+
+    /**
+    * @brief Sequential Write and Read data to a slave device.
+    * 
+    * @param tx_data 8 byte array of the data to be sent.
+    * @param rx_data 8 byte array to store read data.
+    * @param buffer_len Size of arrays
+    * @return true SPI Sequential transfer success, false Sequential transfer failed
+    */
+    bool SeqTransfer(std::span<uint8_t> tx_data,
+                     std::span<uint8_t> rx_data) override;
+
+    /**
+    * @brief Initializes SPI peripheral and its sck, mosi, miso, and nss pins
+    *
+    * @return true Initialization success, false Initialization failed
+    */
+    bool Init();
 
 private:
     // Member variables

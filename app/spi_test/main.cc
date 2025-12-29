@@ -30,7 +30,7 @@ int main(void)
         // Drive CS Pin low to allow write
         spi_board.cs.ChipSelectEnable();
         // Loop write to PA7
-        spi_board.spi1.Transfer(tx_buffer, rx_buffer);
+        spi_board.spi1.SeqTransfer(tx_buffer, rx_buffer);
         // Drive CS Pin high to end write
         spi_board.cs.ChipSelectDisable();
     }
