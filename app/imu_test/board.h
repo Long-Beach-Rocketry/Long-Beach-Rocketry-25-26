@@ -6,10 +6,10 @@
  */
 
 #pragma once
+#include "bno055_imu.h"
 #include "delay.h"
 #include "gpio.h"
 #include "i2c.h"
-#include "bno055_imu.h"
 
 namespace LBR
 {

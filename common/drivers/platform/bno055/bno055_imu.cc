@@ -24,7 +24,6 @@ bool Bno055::set_mode(Mode mode)
     return ok;
 }
 
-
 /**
  * @brief Initialize and configure the IMU
  * 
@@ -152,8 +151,7 @@ bool Bno055::get_sys_status(uint8_t& value)
 bool Bno055::get_sys_error(uint8_t& value)
 {
     static constexpr uint8_t SYS_ERR_REG = 0x3A;  // SYS_ERR register
-    return i2c_.mem_read(std::span<uint8_t>(&value, 1), SYS_ERR_REG,
-                         address_);
+    return i2c_.mem_read(std::span<uint8_t>(&value, 1), SYS_ERR_REG, address_);
 }
 
 bool Bno055::run_post(uint8_t& status)
@@ -168,8 +166,8 @@ bool Bno055::run_post(uint8_t& status)
     // Per BNO055 datasheet, delay for self-test completion.
     LBR::Utils::DelayMs(650);
     static constexpr uint8_t ST_RESULT_REG = 0x36;  // ST_RESULT register
-    bool ok = i2c_.mem_read(std::span<uint8_t>(&status, 1), ST_RESULT_REG,
-                            address_);
+    bool ok =
+        i2c_.mem_read(std::span<uint8_t>(&status, 1), ST_RESULT_REG, address_);
     set_mode(Bno055::IMU);
     // Per BNO055 datasheet, delay after switching to IMU mode.
     LBR::Utils::DelayMs(20);
@@ -188,8 +186,8 @@ bool Bno055::run_bist(uint8_t& status)
     // Per BNO055 datasheet, delay for BIST completion.
     LBR::Utils::DelayMs(650);
     static constexpr uint8_t ST_RESULT_REG = 0x36;  // ST_RESULT register
-    bool ok = i2c_.mem_read(std::span<uint8_t>(&status, 1), ST_RESULT_REG,
-                            address_);
+    bool ok =
+        i2c_.mem_read(std::span<uint8_t>(&status, 1), ST_RESULT_REG, address_);
     set_mode(Bno055::IMU);
     // Per BNO055 datasheet, delay after switching to IMU mode.
     LBR::Utils::DelayMs(20);

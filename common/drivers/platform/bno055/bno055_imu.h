@@ -10,9 +10,9 @@
 
 #include <cstddef>
 #include <cstdint>
-#include "imu_math.h"
-#include "i2c.h"
 #include "delay.h"
+#include "i2c.h"
+#include "imu_math.h"
 
 namespace LBR
 {
@@ -29,11 +29,11 @@ namespace LBR
  */
 struct Bno055Data
 {
-    Vec3 accel;      
-    Vec3 gyro;        
-    Vec3 linear_accel; 
-    Vec3 gravity;   
-    Quaternion quat;   
+    Vec3 accel;
+    Vec3 gyro;
+    Vec3 linear_accel;
+    Vec3 gravity;
+    Quaternion quat;
 };
 
 /**
