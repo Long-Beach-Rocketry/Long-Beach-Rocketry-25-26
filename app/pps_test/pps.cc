@@ -1,60 +1,61 @@
-/**
-* @file pps.cc
-* @brief PPS module implementation
-* @note This module manages the positioning system state machine.
-* @author Bex Saw
-* @date 2025/12/31
-*/
-
 
 #include "pps.h"
-#include "bsp/motor_if.h"
 
 namespace LBR {
 
 Pps::Pps() {
-    state_ = PpsState::Idle;
-    // Init IMU, PWM, etc. if needed (not sure yet)
-    // limit_switch_min_ = readLmsMin();
-    // limit_switch_max_ = readLmsMax();
+    state_ = PpsState::Idle; // Only set initial state, do not init hardware here
 }
 
 void Pps::update() {
-    // Read sensors
-    // auto [roll, pitch, yaw] = getOrientation(); from IMU
-    // limit_switch_min_ = readLmsMin(); from GPIO
-    // limit_switch_max_ = readLmsMax(); from GPIO
+    // Update limit switches from GPIO
+    // limit_switch_min_ = readLmsMin();
+    // limit_switch_max_ = readLmsMax();
 
     switch (state_) {
+        case PpsState::Start:
+            // Initial state: prepare system, wait for Idle
+            state_ = PpsState::Idle;
+            break;
         case PpsState::Idle:
-            // Idle: Motor stopped, waiting for command
-            // PWM: Stop motor
-            // Limit switch: Monitor only
-            if (shouldHome()) state_ = PpsState::Homing;
+            // Idle: waiting for start sequence command
+            if (shouldDeploy()) state_ = PpsState::Deploy;
             break;
-        case PpsState::Homing:
-            // Homing: Move motor toward home position
-            // PWM: Drive motor in home direction
-            // Limit switch: Check home (min) switch, stop when triggered
-            if (limit_switch_min_) state_ = PpsState::MovingToTarget;
+        case PpsState::Deploy:
+            // Deploy: move mechanism to deployed position (limit_switch_max_)
+            // PWM: drive motor to extend
+            if (limit_switch_max_) state_ = PpsState::Rotate;
             break;
-        case PpsState::MovingToTarget:
-            // MovingToTarget: Move motor toward target/endstop
-            // PWM: Drive motor in target direction
-            // Limit switch: Check end (max) switch, stop when triggered
-            if (limit_switch_max_) state_ = PpsState::AtEndstop;
+        case PpsState::Rotate:
+            // Rotate: move to dig position (could be a specific angle or position)
+            // PWM: rotate mechanism
+            // TODO: check if at dig position
+            // if (atDigPosition())
+            state_ = PpsState::FlipAuger;
             break;
-        case PpsState::AtEndstop:
-            // AtEndstop: Motor stopped at end of travel
-            // PWM: Stop motor
-            // Limit switch: Wait for reset or new command
-            if (faultCondition()) state_ = PpsState::Fault;
+        case PpsState::FlipAuger:
+            // Flip auger to start drill
+            // PWM: actuate auger
+            // TODO: check if flip done
+            // if (flipDone())
+            state_ = PpsState::Drill;
             break;
-        case PpsState::Fault:
-            // Fault: Error detected, motor stopped for safety
-            // PWM: Stop motor
-            // Limit switch: No action, system halted
-            // Remain in fault or reset
+        case PpsState::Drill:
+            // Drill: perform drilling operation
+            // PWM: run drill motor
+            // TODO: check if drill done
+            // if (drillDone())
+            state_ = PpsState::SampleRead;
+            break;
+        case PpsState::SampleRead:
+            // SampleRead: read sample sensor
+            // TODO: check if sample OK
+            // if (sampleOk())
+            state_ = PpsState::Done;
+            break;
+        case PpsState::Done:
+            // Done: sequence complete
+            // Optionally reset or return to Idle state
             break;
     }
 }
