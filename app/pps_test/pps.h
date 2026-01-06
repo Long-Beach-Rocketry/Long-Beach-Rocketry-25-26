@@ -1,40 +1,28 @@
 /**
  * @file pps.h
  * @brief PPS module interface
- * @note This module manages the positioning system state machine.
+ * @note This module manages the PPS state machine for deployment, rotation, drilling, and sample read.
  * @author Bex Saw
- * @date 2025/12/31
+ * @date 2026/01/05
  */
- 
+
 #pragma once
-#include "bsp/motor_if.h"
-#include <cstdint>
-// #include "bno055_imu.h"
-// #include "st_pwm.h" << If STM32L4
-// #include "pwm.h" << If generic
+#include "bsp/motor_if.h" // Use generic motor interface for portability
+// #include "bno055_imu.h" // Uncomment if IMU is used
 
 namespace LBR {
 
-/**
- * @brief PPS state machine states.
- * @note Idle - waiting for command.
- *       Homing - moving to home position.
- *       MovingToTarget - moving to target position.
- *       AtEndstop - reached endstop.
- *       Fault - error state.
- */
 enum class PpsState {
-    Idle,
-    Homing,
-    MovingToTarget,
-    AtEndstop,
-    Fault
+    Start,        // Initial state
+    Idle,         // Waiting for command
+    Deploy,       // Deploy to limit switch
+    Rotate,       // Rotate to dig position
+    FlipAuger,    // Flip auger to start drill
+    Drill,        // Drilling operation
+    SampleRead,   // Read sample sensor
+    Done          // Sequence complete
 };
 
-/**
- * @brief PPS context structure.
- * @note Holds the state and sensor data for the PPS module.
- */
 class Pps {
 public:
     Pps();
@@ -42,32 +30,48 @@ public:
     PpsState getState() const;
 
 private:
-    /**
-    * @brief Check if homing should start.
-    * @note Placeholder for homing condition logic.
-    */
-    inline bool shouldHome() const {
-        // TODO: Add logic to determine if homing should start (e.g., based on command, IMU, etc.)
-        return false;
-    }
-    /**
-    * @brief Check for fault conditions.
-    * @note Placeholder for fault detection logic.
-    */
-    inline bool faultCondition() const {
-        // TODO: Add logic to detect faults (e.g., IMU error, timeout, etc.)
-        return false;
-    }
-   
-    PpsState state_ = PpsState::Idle;
-        // IMU data fields (quaternion, etc.)
-        //...
-        // PWM control fields
-        //...
+    // IMU data fields (quaternion, etc.)
+    // ...
+    // PWM control fields
+    // ...
 
-        // GPIO/limit switch state
-        bool limit_switch_min_ = false;
-        bool limit_switch_max_ = false;
-    };
+    // Limit switches: min = stowed/home position, max = fully deployed position
+    bool limit_switch_min_ = false; // True when mechanism is at home/stowed position
+    bool limit_switch_max_ = false; // True when mechanism is at deployed/limit position
+
+    PpsState state_;
+
+    /**
+     * @brief Check if deploy sequence should start.
+     * @return true if deployment should begin, false otherwise.
+     * @note Used to determine when to transition from Idle to Deploy state.
+     */
+    bool shouldDeploy();
+
+    /**
+     * @brief Check if mechanism is at dig position.
+     * @return true if at dig position, false otherwise.
+     */
+    bool atDigPosition();
+
+    /**
+     * @brief Check if auger flip is complete.
+     * @return true if flip is done, false otherwise.
+     */
+    bool flipDone();
+
+    /**
+     * @brief Check if drilling operation is complete.
+     * @return true if drilling is done, false otherwise.
+     */
+    bool drillDone();
+
+    /**
+     * @brief Check if sample sensor indicates OK.
+     * @return true if sample is OK, false otherwise.
+     */
+    bool sampleOk();
+};
 
 } // namespace LBR
+        
