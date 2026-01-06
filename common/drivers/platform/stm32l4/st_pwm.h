@@ -91,6 +91,8 @@ private:
     TIM_TypeDef* _base_addr;
     uint8_t _channel;
     StPwmSettings _settings;
+    uint32_t _curr_freq;
+    float _curr_duty_cycle;
 };
 
 }  // namespace Stml4
