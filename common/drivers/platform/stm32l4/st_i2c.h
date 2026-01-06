@@ -7,8 +7,7 @@
 
 #pragma once
 
-#include <cstdint>
-#include <span>
+#include <array>
 #include "i2c.h"
 #include "stm32l476xx.h"
 
@@ -40,8 +39,16 @@ public:
      */
     bool init();
 
-    bool mem_read(std::span<uint8_t> data, uint8_t dev_addr) override;
-    bool mem_write(std::span<const uint8_t> data, uint8_t dev_addr) override;
+    bool mem_read(std::span<uint8_t> data, const uint8_t reg_addr,
+                  uint8_t dev_addr) override;
+    bool mem_read(std::span<uint8_t> data, const uint16_t reg_addr,
+                  uint8_t dev_addr) override;
+    bool mem_write(std::span<const uint8_t> data, const uint8_t reg_addr,
+                   uint8_t dev_addr) override;
+    bool mem_write(std::span<const uint8_t> data, const uint16_t reg_addr,
+                   uint8_t dev_addr) override;
+    bool read(std::span<uint8_t> data, uint8_t dev_addr) override;
+    bool write(std::span<const uint8_t> data, uint8_t dev_addr) override;
 
 private:
     I2C_TypeDef* _base_addr;
