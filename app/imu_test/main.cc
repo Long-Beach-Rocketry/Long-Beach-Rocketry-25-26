@@ -27,7 +27,6 @@ int main(int argc, char* argv[])
         hw.imu.read_all(data);
 
         (void)data;
-      
     }
     return 0;
 }
