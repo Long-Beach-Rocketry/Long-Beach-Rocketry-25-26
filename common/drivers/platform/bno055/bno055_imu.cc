@@ -1,14 +1,9 @@
-/**
- * @file bno055_imu.cc
- * @brief BNO055 IMU sensor implementation
- * @author Bex
- * @date 2025-10-22
- */
-
 #include "bno055_imu.h"
+#include <array>
 
 namespace LBR
 {
+using LBR::Utils::DelayMs;
 
 Bno055::Bno055(LBR::I2c& i2c, uint8_t addr) : i2c_(i2c), address_(addr)
 {
@@ -21,16 +16,14 @@ Bno055::Bno055(LBR::I2c& i2c, uint8_t addr) : i2c_(i2c), address_(addr)
  */
 bool Bno055::set_mode(Mode mode)
 {
-    uint8_t buf[1] = {static_cast<uint8_t>(mode)};
-    bool ok = i2c_.mem_write(std::span<const uint8_t>(buf, 1), REG_OPR_MODE,
-                             address_);
+    std::array<uint8_t, 1> buf{static_cast<uint8_t>(mode)};
+    bool ok = i2c_.mem_write(buf, REG_OPR_MODE, address_);
     // Per BNO055 datasheet, a delay is required after changing OPR_MODE
     // to allow the sensor to switch modes and stabilize.
-    LBR::Utils::DelayMs(30);
+    DelayMs(30);
     return ok;
 }
 
-using LBR::Utils::DelayMs;
 
 /**
  * @brief Initialize and configure the IMU
@@ -53,7 +46,7 @@ void Bno055::init()
     if (id != 0xA0)
         return;
 
-    set_mode(Mode::CONFIG);
+    set_mode(Bno055::CONFIG);
     // Per BNO055 datasheet, delay after switching to CONFIG mode.
     LBR::Utils::DelayMs(25);
 
@@ -64,7 +57,7 @@ void Bno055::init()
     i2c_.mem_write(std::span<const uint8_t>(&page_id, 1), (uint8_t)0x07,
                    address_);  // PAGE_ID = 0x07
 
-    set_mode(Mode::IMU);
+    set_mode(Bno055::IMU);
     // Per BNO055 datasheet, delay after switching to IMU mode.
     LBR::Utils::DelayMs(20);
 }
@@ -76,12 +69,13 @@ void Bno055::init()
 void Bno055::deinit()
 {
     // Put device into deep suspend to save power
-    set_mode(Mode::CONFIG);
+    set_mode(Bno055::CONFIG);
     // Per BNO055 datasheet, delay after switching to CONFIG mode.
     LBR::Utils::DelayMs(10);
-    uint8_t pwr_mode = 0x02;  // SUSPEND
-    i2c_.mem_write(std::span<const uint8_t>(&pwr_mode, 1), (uint8_t)0x3E,
-                   address_);  // PWR_MODE = 0x3E
+    static constexpr uint8_t PWR_MODE_SUSPEND = 0x02;
+    static constexpr uint8_t PWR_MODE_REG = 0x3E;
+    std::array<uint8_t, 1> pwr_mode{PWR_MODE_SUSPEND};
+    i2c_.mem_write(pwr_mode, PWR_MODE_REG, address_);
     // Per BNO055 datasheet, delay after entering suspend mode.
     LBR::Utils::DelayMs(25);
 }
@@ -143,38 +137,40 @@ bool Bno055::read_all(Bno055Data& out)
 
 bool Bno055::calibrate(uint8_t& value)
 {
-    // CALIB_STAT register address is 0x35
-    return i2c_.mem_read(std::span<uint8_t>(&value, 1), (uint8_t)0x35,
+    static constexpr uint8_t CALIB_STAT_REG = 0x35;  // CALIB_STAT register
+    return i2c_.mem_read(std::span<uint8_t>(&value, 1), CALIB_STAT_REG,
                          address_);
 }
 
 bool Bno055::get_sys_status(uint8_t& value)
 {
-    // SYS_STATUS register address is 0x39
-    return i2c_.mem_read(std::span<uint8_t>(&value, 1), (uint8_t)0x39,
+    static constexpr uint8_t SYS_STATUS_REG = 0x39;  // SYS_STATUS register
+    return i2c_.mem_read(std::span<uint8_t>(&value, 1), SYS_STATUS_REG,
                          address_);
 }
 
 bool Bno055::get_sys_error(uint8_t& value)
 {
-    // SYS_ERR register address is 0x3A
-    return i2c_.mem_read(std::span<uint8_t>(&value, 1), (uint8_t)0x3A,
+    static constexpr uint8_t SYS_ERR_REG = 0x3A;  // SYS_ERR register
+    return i2c_.mem_read(std::span<uint8_t>(&value, 1), SYS_ERR_REG,
                          address_);
 }
 
 bool Bno055::run_post(uint8_t& status)
 {
-    set_mode(Mode::CONFIG);
+    set_mode(Bno055::CONFIG);
     // Per BNO055 datasheet, delay after switching to CONFIG mode.
     LBR::Utils::DelayMs(25);
     uint8_t sys_trigger = 0x80;
-    i2c_.mem_write(std::span<const uint8_t>(&sys_trigger, 1), (uint8_t)0x3F,
-                   address_);  // SYS_TRIGGER = 0x3F
+    static constexpr uint8_t SYS_TRIGGER_REG = 0x3F;  // SYS_TRIGGER register
+    i2c_.mem_write(std::span<const uint8_t>(&sys_trigger, 1), SYS_TRIGGER_REG,
+                   address_);
     // Per BNO055 datasheet, delay for self-test completion.
     LBR::Utils::DelayMs(650);
-    bool ok = i2c_.mem_read(std::span<uint8_t>(&status, 1), (uint8_t)0x36,
-                            address_);  // ST_RESULT = 0x36
-    set_mode(Mode::IMU);
+    static constexpr uint8_t ST_RESULT_REG = 0x36;  // ST_RESULT register
+    bool ok = i2c_.mem_read(std::span<uint8_t>(&status, 1), ST_RESULT_REG,
+                            address_);
+    set_mode(Bno055::IMU);
     // Per BNO055 datasheet, delay after switching to IMU mode.
     LBR::Utils::DelayMs(20);
     return ok;
@@ -182,17 +178,19 @@ bool Bno055::run_post(uint8_t& status)
 
 bool Bno055::run_bist(uint8_t& status)
 {
-    set_mode(Mode::CONFIG);
+    set_mode(Bno055::CONFIG);
     // Per BNO055 datasheet, delay after switching to CONFIG mode.
     LBR::Utils::DelayMs(25);
     uint8_t sys_trigger = 0x01;
-    i2c_.mem_write(std::span<const uint8_t>(&sys_trigger, 1), (uint8_t)0x3F,
-                   address_);  // SYS_TRIGGER = 0x3F
+    static constexpr uint8_t SYS_TRIGGER_REG = 0x3F;  // SYS_TRIGGER register
+    i2c_.mem_write(std::span<const uint8_t>(&sys_trigger, 1), SYS_TRIGGER_REG,
+                   address_);
     // Per BNO055 datasheet, delay for BIST completion.
     LBR::Utils::DelayMs(650);
-    bool ok = i2c_.mem_read(std::span<uint8_t>(&status, 1), (uint8_t)0x36,
-                            address_);  // ST_RESULT = 0x36
-    set_mode(Mode::IMU);
+    static constexpr uint8_t ST_RESULT_REG = 0x36;  // ST_RESULT register
+    bool ok = i2c_.mem_read(std::span<uint8_t>(&status, 1), ST_RESULT_REG,
+                            address_);
+    set_mode(Bno055::IMU);
     // Per BNO055 datasheet, delay after switching to IMU mode.
     LBR::Utils::DelayMs(20);
     return ok;
@@ -200,8 +198,8 @@ bool Bno055::run_bist(uint8_t& status)
 
 bool Bno055::get_chip_id(uint8_t& id)
 {
-    // CHIP_ID register address is 0x00
-    return i2c_.mem_read(std::span<uint8_t>(&id, 1), (uint8_t)0x00, address_);
+    static constexpr uint8_t CHIP_ID_REG = 0x00;  // CHIP_ID register
+    return i2c_.mem_read(std::span<uint8_t>(&id, 1), CHIP_ID_REG, address_);
 }
 
 bool Bno055::get_opr_mode(Mode& mode)

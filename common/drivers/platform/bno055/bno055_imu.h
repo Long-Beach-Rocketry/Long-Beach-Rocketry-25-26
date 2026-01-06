@@ -10,9 +10,9 @@
 
 #include <cstddef>
 #include <cstdint>
-#include "../../../core/math/imu_math.h"
-#include "../../bus/i2c.h"
-#include "../../utils/delay.h"
+#include "imu_math.h"
+#include "i2c.h"
+#include "delay.h"
 
 namespace LBR
 {
@@ -29,11 +29,11 @@ namespace LBR
  */
 struct Bno055Data
 {
-    Vec3 accel;         ///< Acceleration in m/s^2
-    Vec3 gyro;          ///< Angular velocity in rad/s
-    Vec3 linear_accel;  ///< Linear acceleration in m/s^2
-    Vec3 gravity;       ///< Gravity vector in m/s^2
-    Quaternion quat;    ///< Orientation as unit quaternion
+    Vec3 accel;      
+    Vec3 gyro;        
+    Vec3 linear_accel; 
+    Vec3 gravity;   
+    Quaternion quat;   
 };
 
 /**
@@ -50,7 +50,7 @@ public:
      * @enum Mode
      * @brief IMU operating modes
      */
-    enum class Mode : uint8_t
+    enum Mode : uint8_t
     {
         CONFIG = 0x00,
         IMU = 0x08,
@@ -84,6 +84,7 @@ public:
 
     /**
      * @brief Deinitialize the IMU and put it in low-power mode
+     * @note @TJMalaska Check this function
      */
     void deinit();
 

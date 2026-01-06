@@ -6,6 +6,7 @@ if (TARGET_DEVICE MATCHES "STM32")
 
     target_include_directories(bno055 PUBLIC
         .
+        ${CMAKE_SOURCE_DIR}/common/core/math
         ${CMAKE_SOURCE_DIR}/common/drivers/utils
     )
 

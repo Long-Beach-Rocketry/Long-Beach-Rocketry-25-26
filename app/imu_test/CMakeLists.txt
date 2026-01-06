@@ -7,7 +7,7 @@ set(PREPROCESS_DEFS
 )
 
 # Only add BSP for this target device
-add_subdirectory_for(STM32L476 bsp_sensors)
+add_subdirectory_for(STM32L476 bsp_l476)
 
 if (TARGET bsp_sensors)
 

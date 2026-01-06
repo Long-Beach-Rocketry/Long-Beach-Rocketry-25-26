@@ -1,11 +1,4 @@
-/**
-* @file imu_app_bsp.cc
-* @brief IMU application board support package implementation.
-*/
-
 #include "../board.h"
-#include "delay.h"
-#include "i2c.h"
 #include "st_gpio.h"
 #include "st_i2c.h"
 #include "stm32l4xx.h"
@@ -13,10 +6,6 @@
 namespace LBR
 {
 
-/**
- * @brief Initialize board peripherals and IMU
- * @return true if successful, false otherwise
- */
 bool bsp_init()
 {
     // Enable GPIOB and I2C1 clocks
@@ -73,10 +62,6 @@ bool bsp_init()
     return true;
 }
 
-/**
- * @brief Get board instance with initialized IMU
- * @return Reference to board
- */
 Board& get_board()
 {
     // Enable GPIOB and I2C1 clocks
