@@ -30,17 +30,19 @@ int main(void)
     status = flash.StatusRegRead(W25q::StatusRead::STATUS_REGISTER_3,
                                  status_reg_val);
     status = flash.W25qInit();
-    // status_reg_val should be 0x04
+    // status_reg_val should have bit 2 set (if we're assuming 0th bit for first bit)
     status = flash.StatusRegRead(W25q::StatusRead::STATUS_REGISTER_3,
                                  status_reg_val);
 
     /* Verify BusyCheck, WriteEnable, StatusRegWrite, and StatusRegRead */
     status = flash.StatusRegWrite(W25q::StatusWrite::STATUS_REGISTER_1,
                                   (1 << 2), (1 << 2));
+    // status_reg_val should be 0x04
     status = flash.StatusRegRead(W25q::StatusRead::STATUS_REGISTER_1,
                                  status_reg_val);
     status = flash.StatusRegWrite(W25q::StatusWrite::STATUS_REGISTER_1,
                                   (1 << 2), (0 << 2));
+    // status_reg_val should be 0x00
     status = flash.StatusRegRead(W25q::StatusRead::STATUS_REGISTER_1,
                                  status_reg_val);
 
@@ -48,7 +50,7 @@ int main(void)
     std::array<uint8_t, 3> txbuf{0x02u, 0x04u, 0x06u};
     std::array<uint8_t, 3> rxbuf{};
     status = flash.PageProgram(1, 1, 1, 0, txbuf, rxbuf);
-    status = flash.Read(1, 1, 1, 0, rxbuf);
+    // After PageProgram, rxbuf should hold the same values as txbuf
 
     /* Verify BlockErase */
     status = flash.BlockErase(1);
@@ -59,23 +61,22 @@ int main(void)
     std::array<uint8_t, 1> txbuf2{0x08u};
     std::array<uint8_t, 1> rxbuf2{};
     status = flash.PageProgram(0, 1, 0, 0, txbuf2, rxbuf2);
-    // rxbuf2 should be 0x08
-    status = flash.Read(0, 1, 0, 0, rxbuf2);
+    // rxbuf2 should be 0x08 after PageProgram
     status = flash.SectorErase(0, 1);
-    // rxbuf2 should be 0xFF
     status = flash.Read(0, 1, 0, 0, rxbuf2);
+    // rxbuf2 should be 0xFF after SectorErase and Read
 
     /* Verify ChipErase */
     status = flash.PageProgram(0, 1, 0, 0, txbuf2, rxbuf2);
-    // rxbuf2 should be 0x08
-    status = flash.Read(0, 1, 0, 0, rxbuf2);
+    // rxbuf2 should be 0x08 after PageProgram
     status = flash.ChipErase();
-    // rxbuf2 should be 0xFF
     status = flash.Read(0, 1, 0, 0, rxbuf2);
+    // rxbuf2 should be 0xFF after ChipErase and Read
 
     /* Verify BlockLock and BlockUnlock */
     status = flash.BlockLock(1);
     status = flash.BlockUnlock(1);
+    // Both these functions should return true for status
 
     while (1)
     {
