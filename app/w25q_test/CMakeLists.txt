@@ -25,4 +25,3 @@ target_link_libraries_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
 )
 
 target_preprocess_for(${TARGET_DEVICE} ${EXECUTABLE} ${LINKER_SCRIPT} ${LDF} ${PREPROCESS_DEFS})
-
