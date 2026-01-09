@@ -2,10 +2,6 @@
 #include "gpio_cs.h"
 #include "spi.h"
 
-#ifndef NATIVE
-#include "stm32l476xx.h"
-#endif
-
 //do the cmake
 
 namespace LBR
