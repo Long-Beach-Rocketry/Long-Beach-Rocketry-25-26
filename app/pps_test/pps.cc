@@ -9,8 +9,8 @@ Pps::Pps() {
 
 void Pps::update() {
     // Update limit switches from GPIO
-    // limit_switch_min_ = readLmsMin();
-    // limit_switch_max_ = readLmsMax();
+    limit_switch_min_ = readLmsMin();
+    limit_switch_max_ = readLmsMax();
 
     switch (state_) {
         case PpsState::Start:
