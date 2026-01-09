@@ -14,7 +14,7 @@ struct Board
     Spi& spi1;
 };
 
-bool BSP_Init();
-Board& Get_Board();
+bool BspInit();
+Board& GetBoard();
 
 }  // namespace LBR
