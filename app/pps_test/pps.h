@@ -7,11 +7,15 @@
  */
 
 #pragma once
-#include "bsp/motor_if.h" // Use generic motor interface for portability
-// #include "bno055_imu.h" // Uncomment if IMU is used
+#include "bsp/motor_if.h" 
+#include "bno055_imu.h" 
 
 namespace LBR {
 
+/**
+ * @enum PpsState
+ * @brief States of the PPS state machine.
+ */
 enum class PpsState {
     Start,        // Initial state
     Idle,         // Waiting for command
@@ -30,16 +34,24 @@ public:
     PpsState getState() const;
 
 private:
-    // IMU data fields (quaternion, etc.)
-    // ...
-    // PWM control fields
-    // ...
-
-    // Limit switches: min = stowed/home position, max = fully deployed position
-    bool limit_switch_min_ = false; // True when mechanism is at home/stowed position
-    bool limit_switch_max_ = false; // True when mechanism is at deployed/limit position
-
     PpsState state_;
+
+    struct ImuData {
+    // Quaternion representing orientation (w, x, y, z)
+        float quat[4];
+    };
+    
+    // Reads the quaternion from the BNO055 IMU into the provided struct
+    void read_imu(ImuData* data);
+
+    // PWM control fields
+    // TODO: Define PWM control methods and members as needed
+
+    // Limit switch states
+    static bool readLmsMin(); // Stowed switch
+    static bool readLmsMax(); // Deployed switch
+    bool limit_switch_min_ = false;
+    bool limit_switch_max_ = false; 
 
     /**
      * @brief Check if deploy sequence should start.
@@ -73,5 +85,7 @@ private:
     bool sampleOk();
 };
 
+
 } // namespace LBR
-        
+
+
