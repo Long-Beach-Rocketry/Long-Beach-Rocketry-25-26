@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+import "nanopb.proto";
+
+message RocketStructProto {
+    string Name = 1 [(nanopb).max_length = 40];
+    int32 Year = 2;
+    string clubName = 3 [(nanopb).max_length = 40];
+    int32 memberCount = 4;
+}
+
+message Rockets {
+    repeated RocketStructProto rockets = 1;
+}
