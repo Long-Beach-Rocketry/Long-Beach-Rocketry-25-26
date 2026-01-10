@@ -75,8 +75,9 @@ bool HwPwm::init()
             _base_addr->CCMR1 &= ~TIM_CCMR1_CC1S_Msk;
 
             // Configure output mode
-            SetReg(_base_addr->CCMR1, _settings.output_mode, TIM_CCMR1_OC1M_Pos,
-                   TIM_CCMRx_OCxM_BitWidth);
+            SetReg(&_base_addr->CCMR1,
+                   static_cast<uint32_t>(_settings.output_mode),
+                   TIM_CCMR1_OC1M_Pos, TIM_CCMRx_OCxM_BitWidth);
 
             // Set preload bit to buffer updates to capture/compare register
             _base_addr->CCMR1 |= TIM_CCMR1_OC1PE;
@@ -86,22 +87,25 @@ bool HwPwm::init()
             break;
         case 2:
             _base_addr->CCMR1 &= ~TIM_CCMR1_CC2S_Msk;
-            SetReg(_base_addr->CCMR1, _settings.output_mode, TIM_CCMR1_OC2M_Pos,
-                   TIM_CCMRx_OCxM_BitWidth);
+            SetReg(&_base_addr->CCMR1,
+                   static_cast<uint32_t>(_settings.output_mode),
+                   TIM_CCMR1_OC2M_Pos, TIM_CCMRx_OCxM_BitWidth);
             _base_addr->CCMR1 |= TIM_CCMR1_OC2PE;
             _base_addr->CCER |= TIM_CCER_CC2E;
             break;
         case 3:
             _base_addr->CCMR2 &= ~TIM_CCMR2_CC3S_Msk;
-            SetReg(_base_addr->CCMR2, _settings.output_mode, TIM_CCMR2_OC3M_Pos,
-                   TIM_CCMRx_OCxM_BitWidth);
+            SetReg(&_base_addr->CCMR2,
+                   static_cast<uint32_t>(_settings.output_mode),
+                   TIM_CCMR2_OC3M_Pos, TIM_CCMRx_OCxM_BitWidth);
             _base_addr->CCMR2 |= TIM_CCMR2_OC3PE;
             _base_addr->CCER |= TIM_CCER_CC3E;
             break;
         case 4:
             _base_addr->CCMR2 &= ~TIM_CCMR2_CC4S_Msk;
-            SetReg(_base_addr->CCMR2, _settings.output_mode, TIM_CCMR2_OC4M_Pos,
-                   TIM_CCMRx_OCxM_BitWidth);
+            SetReg(&_base_addr->CCMR2,
+                   static_cast<uint32_t>(_settings.output_mode),
+                   TIM_CCMR2_OC4M_Pos, TIM_CCMRx_OCxM_BitWidth);
             _base_addr->CCMR2 |= TIM_CCMR2_OC4PE;
             _base_addr->CCER |= TIM_CCER_CC4E;
             break;
@@ -121,10 +125,10 @@ bool HwPwm::init()
     }
 
     // Configure PWM mode and direction
-    SetReg(_base_addr->CR1, _settings.mode, TIM_CR1_CMS_Pos,
-           TIM_CR1_CMS_BitWidth);
-    SetReg(_base_addr->CR1, _settings.dir, TIM_CR1_DIR_Pos,
-           TIM_CR1_DIR_BitWidth);
+    SetReg(&_base_addr->CR1, static_cast<uint32_t>(_settings.mode),
+           TIM_CR1_CMS_Pos, TIM_CR1_CMS_BitWidth);
+    SetReg(&_base_addr->CR1, static_cast<uint32_t>(_settings.dir),
+           TIM_CR1_DIR_Pos, TIM_CR1_DIR_BitWidth);
 
     // Initialize counter and update registers
     _base_addr->EGR |= TIM_EGR_UG;
