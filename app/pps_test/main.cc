@@ -17,8 +17,7 @@ int main() {
         LBR::Bno055Data imu_data;
         // TODO: Read IMU and fill imu_data, e.g.:
         // imu.read_all(imu_data);
-        pps.setQuat(imu_data); // Update PPS with latest orientation
-        pps.update();
+        pps.update(imu_data); 
         // Add scheduling delay (come with testing prototype)
     }
     return 0;

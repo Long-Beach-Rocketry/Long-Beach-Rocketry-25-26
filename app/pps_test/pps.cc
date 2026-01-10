@@ -10,14 +10,13 @@ PpsState Pps::getState() const {
     return state_;
 }
 
-void Pps::setQuat(const LBR::Bno055Data& imu_data) {
+void Pps::update(const LBR::Bno055Data& imu_data) {
+    // Update state_quat_ from IMU data
     state_quat_[0] = imu_data.quat.w;
     state_quat_[1] = imu_data.quat.x;
     state_quat_[2] = imu_data.quat.y;
     state_quat_[3] = imu_data.quat.z;
-}
 
-void Pps::update() {
     // Update limit switches from GPIO
     limit_switch_max = LBR::lms(); // Use the correct function for limit switch
 

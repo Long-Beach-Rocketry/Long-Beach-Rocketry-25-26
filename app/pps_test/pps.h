@@ -32,12 +32,7 @@ class Pps {
 public:
     PpsState getState() const;
     Pps();
-    void update();
-    /**
-     * @brief Update state_quat_ from IMU data
-     * @param imu_data Bno055Data containing latest IMU quaternion
-     */
-    void setQuat(const LBR::Bno055Data& imu_data);
+    void update(const LBR::Bno055Data& imu_data); // Only one update, takes IMU data
 
 private:
     PpsState state_ = PpsState::Idle;
