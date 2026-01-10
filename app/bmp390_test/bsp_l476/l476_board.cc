@@ -6,19 +6,19 @@
 
 namespace LBR
 {
-// SCL pin config (PB8)
+// SCL pin config (PB6)
 Stml4::StGpioSettings scl_settings{
     Stml4::GpioMode::ALT_FUNC, Stml4::GpioOtype::OPEN_DRAIN,
     Stml4::GpioOspeed::LOW, Stml4::GpioPupd::PULL_UP, 4};
 
-const Stml4::StGpioParams scl_params{scl_settings, 8, GPIOB};
+const Stml4::StGpioParams scl_params{scl_settings, 6, GPIOB};
 
-// SDA pin config (PB9)
+// SDA pin config (PB7)
 Stml4::StGpioSettings sda_settings{
     Stml4::GpioMode::ALT_FUNC, Stml4::GpioOtype::OPEN_DRAIN,
     Stml4::GpioOspeed::LOW, Stml4::GpioPupd::PULL_UP, 4};
 
-const Stml4::StGpioParams sda_params{sda_settings, 9, GPIOB};
+const Stml4::StGpioParams sda_params{sda_settings, 7, GPIOB};
 
 // I2C config
 const Stml4::StI2cParams i2c_params{I2C1, 0x10909CEC};

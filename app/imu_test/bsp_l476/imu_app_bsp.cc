@@ -12,7 +12,7 @@ bool bsp_init()
     RCC->AHB2ENR |= RCC_AHB2ENR_GPIOBEN;
     RCC->APB1ENR1 |= RCC_APB1ENR1_I2C1EN;
 
-    // Configure PB8 = I2C1_SCL, PB9 = I2C1_SDA (AF4, open-drain, pull-up)
+    // Configure PB6 = I2C1_SCL, PB7 = I2C1_SDA (AF4, open-drain, pull-up)
     Stml4::StGpioSettings gpio_settings{
         Stml4::GpioMode::ALT_FUNC, Stml4::GpioOtype::OPEN_DRAIN,
         Stml4::GpioOspeed::HIGH, Stml4::GpioPupd::PULL_UP,
@@ -20,8 +20,8 @@ bool bsp_init()
     };
 
     // Initialize GPIO pins for I2C
-    Stml4::StGpioParams scl{gpio_settings, 8, GPIOB};
-    Stml4::StGpioParams sda{gpio_settings, 9, GPIOB};
+    Stml4::StGpioParams scl{gpio_settings, 6, GPIOB};
+    Stml4::StGpioParams sda{gpio_settings, 7, GPIOB};
     Stml4::HwGpio scl_gpio(scl);
     Stml4::HwGpio sda_gpio(sda);
     scl_gpio.init();
@@ -68,7 +68,7 @@ Board& get_board()
     RCC->AHB2ENR |= RCC_AHB2ENR_GPIOBEN;
     RCC->APB1ENR1 |= RCC_APB1ENR1_I2C1EN;
 
-    // Configure PB8 = I2C1_SCL, PB9 = I2C1_SDA (AF4, open-drain, pull-up)
+    // Configure PB6 = I2C1_SCL, PB7 = I2C1_SDA (AF4, open-drain, pull-up)
     Stml4::StGpioSettings gpio_settings{
         Stml4::GpioMode::ALT_FUNC, Stml4::GpioOtype::OPEN_DRAIN,
         Stml4::GpioOspeed::HIGH, Stml4::GpioPupd::PULL_UP,
@@ -76,8 +76,8 @@ Board& get_board()
     };
 
     // Initialize GPIO pins for I2C
-    Stml4::StGpioParams scl{gpio_settings, 8, GPIOB};
-    Stml4::StGpioParams sda{gpio_settings, 9, GPIOB};
+    Stml4::StGpioParams scl{gpio_settings, 6, GPIOB};
+    Stml4::StGpioParams sda{gpio_settings, 7, GPIOB};
     Stml4::HwGpio scl_gpio(scl);
     Stml4::HwGpio sda_gpio(sda);
     scl_gpio.init();
