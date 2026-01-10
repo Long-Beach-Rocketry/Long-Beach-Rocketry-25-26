@@ -1,10 +1,10 @@
-
 add_library(pps
     pps.cc
-    bsp/motor_if.cc
+    bsp_pps/hw/pps_hw.cc
+    bsp_pps/motor_if.cc
 )
 
-target_include_directories(pps PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/bsp)
+target_include_directories(pps PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/bsp_pps/hw)
 
 target_link_libraries(pps PUBLIC bno055)
 

@@ -1,3 +1,4 @@
+#pragma once
 /**
  * @file pps.h
  * @brief PPS module interface
@@ -5,10 +6,9 @@
  * @author Bex Saw
  * @date 2026/01/05
  */
-
-#pragma once
-#include "bsp/motor_if.h" 
-#include "bno055_imu.h" 
+#include "bsp_pps/motor_if.h"
+#include "bno055_imu.h" // For Bno055Data
+#include "pps_hw.h" // For limit switch abstraction
 
 namespace LBR {
 
@@ -28,30 +28,32 @@ enum class PpsState {
 };
 
 class Pps {
+    float state_quat_[4] = {0};
 public:
+    PpsState getState() const;
     Pps();
     void update();
-    PpsState getState() const;
+    /**
+     * @brief Update state_quat_ from IMU data
+     * @param imu_data Bno055Data containing latest IMU quaternion
+     */
+    void setQuat(const LBR::Bno055Data& imu_data);
 
 private:
-    PpsState state_;
+    PpsState state_ = PpsState::Idle;
 
-    struct ImuData {
-    // Quaternion representing orientation (w, x, y, z)
-        float quat[4];
-    };
-    
-    // Reads the quaternion from the BNO055 IMU into the provided struct
-    void read_imu(ImuData* data);
+    bool limit_switch_max = false;
 
-    // PWM control fields
-    // TODO: Define PWM control methods and members as needed
+    /**
+     * @brief Read the current state of the limit switch (PA3).
+     * @return true if the switch is active, false otherwise.
+     */
+    static bool readLms();
 
-    // Limit switch states
-    static bool readLmsMin(); // Stowed switch
-    static bool readLmsMax(); // Deployed switch
-    bool limit_switch_min_ = false;
-    bool limit_switch_max_ = false; 
+    // Motor control helpers
+    void motorDeploy() { motorDeployDir(); }
+    void motorStopAll() { motorStop(); }
+    void motorTarget() { motorTargetDir(); }
 
     /**
      * @brief Check if deploy sequence should start.
@@ -74,7 +76,7 @@ private:
 
     /**
      * @brief Check if drilling operation is complete.
-     * @return true if drilling is done, false otherwise.
+     * @return true if servo motor drilling is done, false otherwise.
      */
     bool drillDone();
 
@@ -85,7 +87,4 @@ private:
     bool sampleOk();
 };
 
-
 } // namespace LBR
-
-

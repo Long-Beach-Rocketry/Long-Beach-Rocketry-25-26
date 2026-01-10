@@ -1,16 +1,25 @@
-
 #include "pps.h"
+#include "pps_hw.h"
+#include <cmath>
 
 namespace LBR {
 
-Pps::Pps() {
-    state_ = PpsState::Idle; // Only set initial state, do not init hardware here
+Pps::Pps() = default;
+
+PpsState Pps::getState() const {
+    return state_;
+}
+
+void Pps::setQuat(const LBR::Bno055Data& imu_data) {
+    state_quat_[0] = imu_data.quat.w;
+    state_quat_[1] = imu_data.quat.x;
+    state_quat_[2] = imu_data.quat.y;
+    state_quat_[3] = imu_data.quat.z;
 }
 
 void Pps::update() {
     // Update limit switches from GPIO
-    limit_switch_min_ = readLmsMin();
-    limit_switch_max_ = readLmsMax();
+    limit_switch_max = LBR::lms(); // Use the correct function for limit switch
 
     switch (state_) {
         case PpsState::Start:
@@ -22,46 +31,96 @@ void Pps::update() {
             if (shouldDeploy()) state_ = PpsState::Deploy;
             break;
         case PpsState::Deploy:
-            // Deploy: move mechanism to deployed position (limit_switch_max_)
-            // PWM: drive motor to extend
-            if (limit_switch_max_) state_ = PpsState::Rotate;
+            // Deploy: move mechanism to deployed position (limit_switch_max)
+            motorDeploy();
+            if (limit_switch_max) {
+                motorStopAll();
+                state_ = PpsState::Rotate;
+            }
             break;
         case PpsState::Rotate:
             // Rotate: move to dig position (could be a specific angle or position)
-            // PWM: rotate mechanism
-            // TODO: check if at dig position
-            // if (atDigPosition())
-            state_ = PpsState::FlipAuger;
+            motorTarget();
+            if (atDigPosition()) {
+                 motorStopAll();
+                 state_ = PpsState::FlipAuger;
+            }
             break;
         case PpsState::FlipAuger:
             // Flip auger to start drill
-            // PWM: actuate auger
-            // TODO: check if flip done
-            // if (flipDone())
-            state_ = PpsState::Drill;
+            if (flipDone()) {
+                state_ = PpsState::Drill;
+            }
             break;
         case PpsState::Drill:
             // Drill: perform drilling operation
-            // PWM: run drill motor
-            // TODO: check if drill done
-            // if (drillDone())
-            state_ = PpsState::SampleRead;
+            // servoMotorDrill();
+            if (drillDone()) {
+                state_ = PpsState::SampleRead;
+            }
             break;
         case PpsState::SampleRead:
             // SampleRead: read sample sensor
-            // TODO: check if sample OK
-            // if (sampleOk())
-            state_ = PpsState::Done;
+            // soilSampleRead();
+            if (sampleOk()) {
+                state_ = PpsState::Done;
+            }
             break;
         case PpsState::Done:
-            // Done: sequence complete
-            // Optionally reset or return to Idle state
             break;
     }
 }
 
-PpsState Pps::getState() const {
-    return state_;
+// Private pps state helper implementations
+
+bool Pps::readLms() {
+    return lms();
+}
+
+bool LBR::Pps::shouldDeploy() {
+    if (!LBR::lms()) return false;
+    for (int i = 0; i < 4; ++i) {
+        if (state_quat_[i] != 0.0f) return true;
+    }
+    return false;
+}
+
+bool LBR::Pps::atDigPosition() {
+    // Come with testing prototype
+    // Replace DIG_TARGET_QUAT with actual target quaternion values
+    constexpr float DIG_TARGET_QUAT[4] = {1.0f, 0.0f, 0.0f, 0.0f};
+    constexpr float QUAT_TOLERANCE = 0.05f; // Acceptable error margin
+    for (int i = 0; i < 4; i++) {
+        if (std::abs(state_quat_[i] - DIG_TARGET_QUAT[i]) > QUAT_TOLERANCE) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LBR::Pps::flipDone() {
+    // Check if the IMU quaternion indicates the auger is flipped to the target orientation
+    // Replace FLIP_TARGET_QUAT with actual target quaternion values for the flipped position
+    constexpr float FLIP_TARGET_QUAT[4] = {0.7071f, 0.7071f, 0.0f, 0.0f}; // Example: 90-degree rotation about X
+    constexpr float QUAT_TOLERANCE = 0.05f; // Acceptable error margin
+    for (int i = 0; i < 4; i++) {
+        if (std::abs(state_quat_[i] - FLIP_TARGET_QUAT[i]) > QUAT_TOLERANCE) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LBR::Pps::drillDone() {
+    // TODO: Implement logic
+    // Based on the servo motor status or drilling time
+    return false;
+}
+
+bool LBR::Pps::sampleOk() {
+    // TODO: Implement logic
+    // Based on the sample sensor reading
+    return false;
 }
 
 } // namespace LBR
