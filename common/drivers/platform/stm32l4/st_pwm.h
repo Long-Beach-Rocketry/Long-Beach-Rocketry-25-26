@@ -15,9 +15,10 @@ namespace Stml4
 
 /**
  * @note Timers 15, 16, 17 are only capable of edge-aligned mode
- * @note CENTER_ALIGNED_DOWN: flag when counting down
- *       CENTER_ALIGNED_UP: flag set when counting up
- *       CENTER_ALIGNED_BOTH: flag set when counting up and down
+ * @note EDGE_ALIGNED: counter counts up or down depending on DIR bit; flag set when CNT == CCRx
+ *       CENTER_ALIGNED_DOWN: counter counts up and down; flag set when counting down
+ *       CENTER_ALIGNED_UP: counter counts up and down; flag set when counting up
+ *       CENTER_ALIGNED_BOTH: counter counts up and down; flag set when counting up and down
  */
 enum class PwmMode : uint8_t
 {
@@ -44,7 +45,7 @@ enum class PwmOutputMode : uint8_t
 enum class PwmDir : uint8_t
 {
     UPCOUNTING = 0,
-    DOWNCOUNTING = TIM_CR1_DIR
+    DOWNCOUNTING
 };
 
 /**
