@@ -3,6 +3,11 @@
 #include "st_i2c.h"
 #include "stm32l4xx.h"
 
+// NOTE: Pin assignments must match PCB wiring!
+// I2C1_SCL: PB8
+// I2C1_SDA: PB9
+// IMU RESET: PA0
+
 namespace LBR
 {
 
