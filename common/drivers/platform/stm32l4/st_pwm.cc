@@ -13,13 +13,21 @@ static constexpr uint32_t pclk_freq = 4000000;
 static constexpr uint8_t TIM_CCMRx_OCxM_BitWidth = 3;
 static constexpr uint8_t TIM_CR1_CMS_BitWidth = 2;
 static constexpr uint8_t TIM_CR1_DIR_BitWidth = 1;
+static constexpr uint8_t TIM_CCRx_BitWidth = 16;
+
+/**
+ * Fixed auto-reload value (ARR)
+ * @note ARR + 1 = 100 timer ticks per PWM period, resulting in
+ *       a duty cycle resolution of 1% per step
+ */
+static constexpr uint8_t ARR_VAL = 99;
 
 HwPwm::HwPwm(const StPwmParams& params)
     : _base_addr{params.base_addr},
       _channel{params.channel},
       _settings{params.settings},
       _curr_freq{pclk_freq},
-      _curr_duty_cycle{100.0}
+      _curr_duty_cycle{0}
 {
 }
 
@@ -79,6 +87,9 @@ bool HwPwm::init()
                    static_cast<uint32_t>(_settings.output_mode),
                    TIM_CCMR1_OC1M_Pos, TIM_CCMRx_OCxM_BitWidth);
 
+            // Configure default duty cycle to be 0%
+            _base_addr->CCR1 = _curr_duty_cycle;
+
             // Set preload bit to buffer updates to capture/compare register
             _base_addr->CCMR1 |= TIM_CCMR1_OC1PE;
 
@@ -90,6 +101,7 @@ bool HwPwm::init()
             SetReg(&_base_addr->CCMR1,
                    static_cast<uint32_t>(_settings.output_mode),
                    TIM_CCMR1_OC2M_Pos, TIM_CCMRx_OCxM_BitWidth);
+            _base_addr->CCR2 = _curr_duty_cycle;
             _base_addr->CCMR1 |= TIM_CCMR1_OC2PE;
             _base_addr->CCER |= TIM_CCER_CC2E;
             break;
@@ -98,6 +110,7 @@ bool HwPwm::init()
             SetReg(&_base_addr->CCMR2,
                    static_cast<uint32_t>(_settings.output_mode),
                    TIM_CCMR2_OC3M_Pos, TIM_CCMRx_OCxM_BitWidth);
+            _base_addr->CCR3 = _curr_duty_cycle;
             _base_addr->CCMR2 |= TIM_CCMR2_OC3PE;
             _base_addr->CCER |= TIM_CCER_CC3E;
             break;
@@ -106,6 +119,7 @@ bool HwPwm::init()
             SetReg(&_base_addr->CCMR2,
                    static_cast<uint32_t>(_settings.output_mode),
                    TIM_CCMR2_OC4M_Pos, TIM_CCMRx_OCxM_BitWidth);
+            _base_addr->CCR4 = _curr_duty_cycle;
             _base_addr->CCMR2 |= TIM_CCMR2_OC4PE;
             _base_addr->CCER |= TIM_CCER_CC4E;
             break;
@@ -130,6 +144,9 @@ bool HwPwm::init()
     SetReg(&_base_addr->CR1, static_cast<uint32_t>(_settings.dir),
            TIM_CR1_DIR_Pos, TIM_CR1_DIR_BitWidth);
 
+    // Configure fixed ARR value
+    _base_addr->ARR = ARR_VAL;
+
     // Initialize counter and update registers
     _base_addr->EGR |= TIM_EGR_UG;
 
@@ -152,16 +169,30 @@ bool HwPwm::set_freq(uint32_t freq)
         return false;
     }
 
-    uint32_t reload_val = (pclk_freq / freq) - 1;
+    /**
+     * Solve for prescalar (PSC) value
+     * @note If in edge-aligned mode: freq = P_CLK / ((PSC + 1) (ARR + 1))
+     * @note If in center-aligned mode: freq = P_CLK / (2(PSC + 1)(ARR + 1))
+     */
+    uint32_t psc_val = pclk_freq / (freq * (ARR_VAL + 1));
+    if (_settings.mode != PwmMode::EDGE_ALIGNED)
+    {
+        psc_val /= 2;
+    }
 
-    _base_addr->ARR = reload_val;
+    // Make sure calculated value is valid
+    if (psc_val < 1 || psc_val > 65536)
+    {
+        return false;
+    }
+
+    _base_addr->PSC = psc_val - 1;
     _curr_freq = freq;
 
-    // Update auto-reload register according to new freq
-    return set_duty_cycle(_curr_duty_cycle);
+    return true;
 }
 
-bool HwPwm::set_duty_cycle(float duty_cycle)
+bool HwPwm::set_duty_cycle(uint8_t duty_cycle)
 {
     // Make sure counter was initialized
     if (!(_base_addr->CR1 & TIM_CR1_CEN_Msk))
@@ -169,13 +200,10 @@ bool HwPwm::set_duty_cycle(float duty_cycle)
         return false;
     }
 
-    if ((duty_cycle < 0.0) || (duty_cycle > 100.0))
+    if ((duty_cycle < 0) || (duty_cycle > 100))
     {
         return false;
     }
-
-    uint32_t compare_val =
-        static_cast<uint32_t>((duty_cycle / 100.0) * (_base_addr->ARR));
 
     switch (_channel)
     {

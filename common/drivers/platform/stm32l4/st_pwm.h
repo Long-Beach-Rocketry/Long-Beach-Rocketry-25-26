@@ -86,14 +86,14 @@ public:
     bool init();
 
     bool set_freq(uint32_t freq) override;
-    bool set_duty_cycle(float duty_cycle) override;
+    bool set_duty_cycle(uint8_t duty_cycle) override;
 
 private:
     TIM_TypeDef* _base_addr;
     uint8_t _channel;
     StPwmSettings _settings;
     uint32_t _curr_freq;
-    float _curr_duty_cycle;
+    uint8_t _curr_duty_cycle;
 };
 
 }  // namespace Stml4

@@ -30,7 +30,7 @@ public:
      * @param duty_cycle Desired duty cycle as a percentage
      * @return true if successful, false otherwise
      */
-    virtual bool set_duty_cycle(float duty_cycle) = 0;
+    virtual bool set_duty_cycle(uint8_t duty_cycle) = 0;
 
     ~Pwm() = default;
 };
