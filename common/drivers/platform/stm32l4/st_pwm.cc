@@ -205,19 +205,22 @@ bool HwPwm::set_duty_cycle(uint8_t duty_cycle)
         return false;
     }
 
+    uint8_t ccr_val =
+        static_cast<uint8_t>((duty_cycle / 100.0f) * (ARR_VAL + 1));
+
     switch (_channel)
     {
         case 1:
-
+            _base_addr->CCR1 = ccr_val;
             break;
         case 2:
-
+            _base_addr->CCR2 = ccr_val;
             break;
         case 3:
-
+            _base_addr->CCR3 = ccr_val;
             break;
         case 4:
-
+            _base_addr->CCR4 = ccr_val;
             break;
         default:
             return false;
