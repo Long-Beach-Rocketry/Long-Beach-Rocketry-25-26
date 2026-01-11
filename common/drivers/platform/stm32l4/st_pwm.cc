@@ -205,6 +205,7 @@ bool HwPwm::set_duty_cycle(uint8_t duty_cycle)
         return false;
     }
 
+    // Solve for capture/compare (CCR) value
     uint8_t ccr_val =
         static_cast<uint8_t>((duty_cycle / 100.0f) * (ARR_VAL + 1));
 
