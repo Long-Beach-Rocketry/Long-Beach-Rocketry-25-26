@@ -85,6 +85,13 @@ public:
      */
     bool init();
 
+    /**
+     * @note The available frequencies to generate are dependent on the
+     *       peripheral clock and the auto-reload value associated with the timer
+     * @note To find available frequencies, plug in PSC to the equations according to mode
+     *       Edge-aligned: fMAX = 40000 / (PSC + 1)
+     *       Center-aligned: fMAX = 20000 / (PSC + 1)
+     */
     bool set_freq(uint32_t freq) override;
     bool set_duty_cycle(uint8_t duty_cycle) override;
 

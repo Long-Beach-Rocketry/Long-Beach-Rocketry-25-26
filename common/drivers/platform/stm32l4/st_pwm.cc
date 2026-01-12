@@ -6,7 +6,11 @@ namespace LBR
 namespace Stml4
 {
 
-// Default clock frequency
+/**
+ * Peripheral clock frequency
+ * @warning If this changes, the equation associated with set_freq
+ *          in the header file must change
+ */
 static constexpr uint32_t pclk_freq = 4000000;
 
 // Bit lengths
@@ -19,8 +23,17 @@ static constexpr uint8_t TIM_CCRx_BitWidth = 16;
  * Fixed auto-reload value (ARR)
  * @note ARR + 1 = 100 timer ticks per PWM period, resulting in
  *       a duty cycle resolution of 1% per step
+ * @warning If this changes, the equation associated with set_freq
+ *          in the header file must change
  */
 static constexpr uint8_t ARR_VAL = 99;
+
+/**
+ * Maxmimum PWM frequencies according to ARR value
+ */
+static constexpr uint32_t MAX_FREQ_EDGE_ALIGNED = pclk_freq / (ARR_VAL + 1);
+static constexpr uint32_t MAX_FREQ_CENTER_ALIGNED =
+    pclk_freq / (2 * (ARR_VAL + 1));
 
 HwPwm::HwPwm(const StPwmParams& params)
     : _base_addr{params.base_addr},
@@ -165,6 +178,19 @@ bool HwPwm::set_freq(uint32_t freq)
     }
 
     if ((freq < 1) || (freq > pclk_freq))
+    {
+        return false;
+    }
+
+    // Check if given frequency is higher than the max possible according to the ARR value
+    if ((_settings.mode == PwmMode::EDGE_ALIGNED) &&
+        (freq > MAX_FREQ_EDGE_ALIGNED))
+    {
+        return false;
+    }
+
+    if ((_settings.mode != PwmMode::EDGE_ALIGNED) &&
+        (freq > MAX_FREQ_CENTER_ALIGNED))
     {
         return false;
     }
