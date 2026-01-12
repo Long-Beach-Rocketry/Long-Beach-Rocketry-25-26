@@ -1,3 +1,5 @@
+add_library(drv8245 INTERFACE)
+
 target_sources(drv8245 INTERFACE
     drv8245.cc
 )

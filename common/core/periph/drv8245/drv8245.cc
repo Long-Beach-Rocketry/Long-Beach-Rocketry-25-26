@@ -1,31 +1,44 @@
+
 #include "drv8245.h"
 
-void drv8245_init(void) {
-	// TODO: Initialize DRV8245 hardware (GPIO, PWM, etc.)
+namespace LBR {
+
+Drv8245::Drv8245(Pwm& pwm, Encoder& encoder)
+	: _pwm(pwm), _encoder(encoder) {}
+
+Drv8245::~Drv8245() {}
+
+bool Drv8245::init() {
+	// Initialize hardware (GPIO, PWM, encoder, etc.)
+	// Return true if successful
+	return true;
 }
 
-void drv8245_set_speed(int speed) {
-	// TODO: Set motor speed and direction using PWM and DIR pin
+void Drv8245::set_speed(int speed) {
+	// Set PWM duty and direction based on speed
+	// Example: _pwm.setDuty(abs(speed)); set_direction(speed >= 0);
 }
 
-void drv8245_stop(void) {
-	// TODO: Stop the motor (set PWM to 0)
+void Drv8245::enable(bool enable) {
+	// Enable or disable the motor driver (power control)
 }
 
-int drv8245_get_status(void) {
-	// TODO: Return driver status (0 = OK, nonzero = error)
+void Drv8245::setDirection(bool forward) {
+	// Set direction pin accordingly
+}
+
+void Drv8245::moveDegrees(int degrees, int speed) {
+	// Use encoder feedback to move specified degrees at given speed
+}
+
+int Drv8245::getTicks() const {
+	// Retrieve current tick count from encoder
+	
+}
+
+int Drv8245::getStatus() const {
+	// Return status code (0 for OK, nonzero for error)
 	return 0;
 }
 
-void drv8245_enable(bool enable) {
-	// TODO: Enable or disable motor driver (power control)
-}
-
-void drv8245_move_degrees(int degrees) {
-	// TODO: Move motor by specified degrees using encoder feedback
-}
-
-int drv8245_get_ticks(void) {
-	// TODO: Return encoder tick count
-	return 0;
-}
+} // namespace LBR
