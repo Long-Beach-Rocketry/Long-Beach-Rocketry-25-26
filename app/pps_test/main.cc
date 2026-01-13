@@ -10,15 +10,15 @@
 
 
 using LBR::Pps;
+LBR::Bno055Data imu;
 
 int main() {
     Pps pps;
     while (true) {
-        LBR::Bno055Data imu_data;
-        // TODO: Read IMU and fill imu_data, e.g.:
-        // imu.read_all(imu_data);
-        pps.update(imu_data); 
-        // Add scheduling delay (come with testing prototype)
+        // Simulate fetching IMU data
+        pps.fetchImuData(imu);
+        // Update PPS state machine
+        pps.update(); 
     }
     return 0;
 }

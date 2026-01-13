@@ -7,8 +7,8 @@
  * @date 2025/12/31
  */
  
-// #include "gpio.h" 
-// #include "drv_8255.h"  << motorsupport not yet implemented
+// #include "gpio.h" // Limit switch reading
+// #include "drv_8255.h" // PWM + ENCODER driver
 
 /**
  * @brief Stop all motor movement immediately.
@@ -22,11 +22,18 @@ void motorStop();
  * @note Used during the Deploy state to drive the mechanism until the deployed limit switch is reached.
  * TODO: Implement PWM logic for deployment.
  */
-void motorDeployDir();
+void motorDeploy();
 
 /**
  * @brief Move the motor to the target (dig) position.
  * @note Used during the Rotate state to position the mechanism for drilling.
  * TODO: Implement PWM logic for rotation.
  */
-void motorTargetDir();
+void motorTarget();
+
+/**
+ * @brief Move the motor in the retract direction (retract mechanism).
+ * @note Used during the Retract state to drive the mechanism until the retracted limit switch is reached.
+ * TODO: Implement PWM logic for retraction.
+ */
+void motorRetract();

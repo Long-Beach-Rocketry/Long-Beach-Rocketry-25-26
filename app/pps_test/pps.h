@@ -6,9 +6,9 @@
  * @author Bex Saw
  * @date 2026/01/05
  */
-#include "bsp_pps/motor_if.h"
-#include "bno055_imu.h" // For Bno055Data
-#include "pps_hw.h" // For limit switch abstraction
+#include "motor_support/motor_if.h"
+#include "bno055_imu.h" // For (quaternion)
+#include "stm32l476xx.h"
 
 namespace LBR {
 
@@ -20,10 +20,8 @@ enum class PpsState {
     Start,        // Initial state
     Idle,         // Waiting for command
     Deploy,       // Deploy to limit switch
-    Rotate,       // Rotate to dig position
-    FlipAuger,    // Flip auger to start drill
-    Drill,        // Drilling operation
-    SampleRead,   // Read sample sensor
+    Position,     // Move to position
+    Retract,      // Retract mechanism
     Done          // Sequence complete
 };
 
@@ -32,54 +30,39 @@ class Pps {
 public:
     PpsState getState() const;
     Pps();
-    void update(const LBR::Bno055Data& imu_data); // Only one update, takes IMU data
+    void fetchImuData(const LBR::Bno055Data& imu_data); // Update IMU data only
+    void update(); // State machine update, no IMU arg
 
 private:
     PpsState state_ = PpsState::Idle;
 
-    bool limit_switch_max = false;
+     bool limit_switch_max = false; // Deployed position
+     bool limit_switch_min = false; // Retracted position
 
     /**
      * @brief Read the current state of the limit switch (PA3).
      * @return true if the switch is active, false otherwise.
      */
-    static bool readLms();
+     static bool readLimitSwitchMax();
 
-    // Motor control helpers
-    void motorDeploy() { motorDeployDir(); }
-    void motorStopAll() { motorStop(); }
-    void motorTarget() { motorTargetDir(); }
-
+     /**
+      * @brief Read the current state of the min limit switch (e.g. PA4, retracted).
+      * @return true if the switch is active, false otherwise.
+      */
+     static bool readLimitSwitchMin();
     /**
      * @brief Check if deploy sequence should start.
      * @return true if deployment should begin, false otherwise.
      * @note Used to determine when to transition from Idle to Deploy state.
      */
-    bool shouldDeploy();
+    bool deploy();
 
     /**
-     * @brief Check if mechanism is at dig position.
-     * @return true if at dig position, false otherwise.
+     * @brief Check if mechanism is retracted. 
+     * @return true if retracted, false otherwise.
+     * @note Used to determine when to transition from Retract to Done state.
      */
-    bool atDigPosition();
-
-    /**
-     * @brief Check if auger flip is complete.
-     * @return true if flip is done, false otherwise.
-     */
-    bool flipDone();
-
-    /**
-     * @brief Check if drilling operation is complete.
-     * @return true if servo motor drilling is done, false otherwise.
-     */
-    bool drillDone();
-
-    /**
-     * @brief Check if sample sensor indicates OK.
-     * @return true if sample is OK, false otherwise.
-     */
-    bool sampleOk();
+    bool retracted();
 };
 
 } // namespace LBR
