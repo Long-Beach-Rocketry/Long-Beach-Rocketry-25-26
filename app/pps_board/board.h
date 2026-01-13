@@ -12,14 +12,13 @@
 //#include "adc.h"
 //#include "pwm.h"
 //#include encoder driver when written
-#include "gpio.h"
+
 
 namespace LBR
 {
 
 struct Board
 {
-    Gpio& gpio;
     Pwm& pwm;
     //Uart& uart;
     //Adc& adc;

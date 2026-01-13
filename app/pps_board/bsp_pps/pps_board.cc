@@ -36,7 +36,7 @@ const Stml4::StGpioParams rs_en_params{rs_en_settings, 5, GPIOA};
 Stml4::StGpioSettings mtr_pwm1_settings{
     Stml4::GpioMode::ALT_FUNC, Stml4::GpioOtype::PUSH_PULL,
     Stml4::GpioOspeed::HIGH, Stml4::GpioPupd::NO_PULL, 0};
-const Stml4::StGpioParams mtr_pwm1_params{mtr_pwm1_settings, 8, GPIOA};
+const Stml4::StGpioParams mtr_pwm1_params{mtr_pwm1_settings, 8, GPIOA}; 
 // MTR_DIR2 (PA9) pin config
 Stml4::StGpioSettings mtr_dir2_settings{
     Stml4::GpioMode::OUTPUT, Stml4::GpioOtype::PUSH_PULL,
@@ -45,7 +45,8 @@ const Stml4::StGpioParams mtr_dir2_params{mtr_dir2_settings, 9, GPIOA};
 
 // SWDIO (PA13) & SWCLK (PA14) pin config
 // (no need to configure these unless SWD is disabled)
-Stml4::StGpioSettings swdio_settings{
+
+/* Stml4::StGpioSettings swdio_settings{
     Stml4::GpioMode::ALT_FUNC, Stml4::GpioOtype::PUSH_PULL,
     Stml4::GpioOspeed::HIGH, Stml4::GpioPupd::NO_PULL, 0};
 const Stml4::StGpioParams swdio_params{swdio_settings, 13, GPIOA};
@@ -53,7 +54,7 @@ const Stml4::StGpioParams swdio_params{swdio_settings, 13, GPIOA};
 Stml4::StGpioSettings swclk_settings{
     Stml4::GpioMode::ALT_FUNC, Stml4::GpioOtype::PUSH_PULL,
     Stml4::GpioOspeed::HIGH, Stml4::GpioPupd::NO_PULL, 0};
-const Stml4::StGpioParams swclk_params{swclk_settings, 14, GPIOA};
+const Stml4::StGpioParams swclk_params{swclk_settings, 14, GPIOA}; */
 
 // DBG_USART_TX (PB6) & DBG_USART_RX (PB7) pin config
 Stml4::StGpioSettings dbg_tx_settings{
@@ -97,7 +98,7 @@ Stml4::StGpioSettings mtr_slp_settings{
 const Stml4::StGpioParams mtr_slp_params{mtr_slp_settings, 7, GPIOC};
 
 Stml4::StGpioSettings drv_z_settings{
-    Stml4::GpioMode::INPUT, Stml4::GpioOtype::PUSH_PULL,
+    Stml4::GpioMode::OUTPUT, Stml4::GpioOtype::PUSH_PULL,
     Stml4::GpioOspeed::LOW, Stml4::GpioPupd::NO_PULL, 0};
 const Stml4::StGpioParams drv_z_params{drv_z_settings, 8, GPIOC};
 
@@ -130,15 +131,38 @@ Stml4::StGpioSettings uart5_rx_settings{
     Stml4::GpioOspeed::HIGH, Stml4::GpioPupd::NO_PULL, 0};
 const Stml4::StGpioParams uart5_rx_params{uart5_rx_settings, 2, GPIOD};
 
+// GPIO objects BSP owns and manages
 
 Stml4::HwGpio gpio_lmt_swt(lmt_swt_params);
 Stml4::HwGpio gpio_rs_en(rs_en_params);
 Stml4::HwGpio gpio_mtr_dir2(mtr_dir2_params);
+Stml4::HwGpio gpio_cs_padc(cs_padc_params);
+
+Stml4::HwGpio gpio_dbg_red(dbg_red_params);
+Stml4::HwGpio gpio_dbg_blue(dbg_blue_params);
+Stml4::HwGpio gpio_dbg_green(dbg_green_params);
+
+Stml4::HwGpio gpio_enc_a_l(enc_a_l_params);
+Stml4::HwGpio gpio_enc_b_l(enc_b_l_params);
+
+Stml4::HwGpio gpio_drv_fault(drv_fault_params);
+Stml4::HwGpio gpio_mtr_slp(mtr_slp_params);
+Stml4::HwGpio gpio_drv_z(drv_z_params);
 
 Board board {.pps_board = {
     .gpio_lmt_swt = gpio_lmt_swt,
     .gpio_rs_en = gpio_rs_en,
-    .gpio_mtr_dir2 = gpio_mtr_dir2}
+    .gpio_mtr_dir2 = gpio_mtr_dir2
+    .gpio_cs_padc = gpio_cs_padc,
+    .gpio_dbg_red = gpio_dbg_red,
+    .gpio_dbg_blue = gpio_dbg_blue,
+    .gpio_dbg_green = gpio_dbg_green,
+    .gpio_enc_a_l = gpio_enc_a_l,
+    .gpio_enc_b_l = gpio_enc_b_l,
+    .gpio_drv_fault = gpio_drv_fault,
+    .gpio_mtr_slp = gpio_mtr_slp,
+    .gpio_drv_z = gpio_drv_z
+    }
 }
 
 bool bsp_init()
@@ -155,6 +179,18 @@ bool bsp_init()
     ret = ret && gpio_lmt_swt.init();
     ret = ret && gpio_rs_en.init();
     ret = ret && gpio_mtr_dir2.init();
+    ret = ret && gpio_cs_padc.init();
+
+    ret = ret && gpio_dbg_red.init();
+    ret = ret && gpio_dbg_blue.init();
+    ret = ret && gpio_dbg_green.init();
+
+    ret = ret && gpio_enc_a_l.init();
+    ret = ret && gpio_enc_b_l.init();
+
+    ret = ret && gpio_drv_fault.init();
+    ret = ret && gpio_mtr_slp.init();
+    ret = ret && gpio_drv_z.init();
 
     return ret;
 }
