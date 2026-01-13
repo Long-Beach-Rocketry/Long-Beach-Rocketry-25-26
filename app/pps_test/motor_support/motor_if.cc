@@ -1,7 +1,7 @@
 #include "motor_if.h"
 
-void motorStop() {
-    // TODO: Implement motor stop (stub)
+void motorEnable() {
+    // TODO: Implement motor enable start and stop logic (stub)
     // Called to halt all motor movement, e.g., after reaching a limit switch.
 }
 

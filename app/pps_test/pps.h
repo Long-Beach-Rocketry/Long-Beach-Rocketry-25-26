@@ -30,7 +30,7 @@ class Pps {
 public:
     PpsState getState() const;
     Pps();
-    void fetchImuData(const LBR::Bno055Data& imu_data); // Update IMU data only
+    void fetchImuData(const LBR::Bno055Data& imu_data); // Update IMU data quaternion
     void update(); // State machine update, no IMU arg
 
 private:
@@ -50,6 +50,7 @@ private:
       * @return true if the switch is active, false otherwise.
       */
      static bool readLimitSwitchMin();
+
     /**
      * @brief Check if deploy sequence should start.
      * @return true if deployment should begin, false otherwise.

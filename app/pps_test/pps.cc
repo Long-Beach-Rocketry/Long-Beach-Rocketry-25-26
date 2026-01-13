@@ -43,7 +43,7 @@ void Pps::update() {
             motorTarget();
             // Transition to Retract if retraction condition met 
             if (limit_switch_min && state_ != PpsState::Retract && state_ != PpsState::Done) {
-                motorStop();
+                motorEnable();
                 state_ = PpsState::Retract;
             }
             break;
@@ -51,7 +51,7 @@ void Pps::update() {
             // Retract mechanism
             motorRetract();
             if (limit_switch_min) {
-                motorStop();
+                motorEnable();
                 state_ = PpsState::Done;
             }
             break;

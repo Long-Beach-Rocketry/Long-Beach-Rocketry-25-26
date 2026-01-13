@@ -7,7 +7,7 @@
  * @date 2025/12/31
  */
  
-// #include "gpio.h" // Limit switch reading
+#include "gpio.h" // Limit switch reading
 // #include "drv_8255.h" // PWM + ENCODER driver
 
 /**
@@ -15,7 +15,7 @@
  * @note Used to halt the mechanism after reaching a limit switch or completing an action.
  * Example: Called after deployment or rotation is complete.
  */
-void motorStop();
+void motorEnable();
 
 /**
  * @brief Move the motor in the deploy direction (extend mechanism).
