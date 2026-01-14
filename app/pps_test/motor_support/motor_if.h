@@ -7,14 +7,14 @@
  * @date 2025/12/31
  */
 
-#include "pwm.h"   // Update with actual PWM header path
-#include "encoder.h" // generic encoder class
+#include "drv_8245.h" // Motor driver header
+//#include Encoder header
 
 namespace LBR {
 
 class Motor {
 public:
-	Motor(Pwm& pwm, Encoder& encoder);
+	Motor(Drv8245& drv, Encoder& encoder);
 	~Motor();
 
     /**
@@ -61,8 +61,8 @@ public:
 	int getStatus() const;
 
 private:
-	//Pwm& _pwm;
-	//Encoder& _encoder;
+	Drv8245& _drv;
+	Encoder& _encoder;
 
 	bool _initialized{false};
 	int _status{0}; // 0 = OK, nonzero = error code

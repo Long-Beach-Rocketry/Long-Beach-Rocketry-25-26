@@ -2,8 +2,8 @@
 
 namespace LBR {
 
-Motor::Motor(Pwm& pwm, Encoder& encoder)
-	: _pwm(pwm), _encoder(encoder) {}
+Motor::Motor(Drv8245& drv, Encoder& encoder)
+	: _drv(drv), _encoder(encoder) {}
 
 Motor::~Motor() {}
 
@@ -15,7 +15,7 @@ bool Motor::init() {
 
 void Motor::set_speed(int speed) {
 	// Set PWM duty and direction based on speed
-	// Example: _pwm.setDuty(abs(speed)); set_direction(speed >= 0);
+	// Example: _drv.setDuty(abs(speed)); set_direction(speed >= 0);
 }
 
 void Motor::motorEnable(bool enable) {
