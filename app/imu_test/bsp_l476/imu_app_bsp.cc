@@ -1,6 +1,7 @@
 #include "../board.h"
 #include "st_gpio.h"
 #include "st_i2c.h"
+#include "st_sys_clock.h"
 #include "stm32l4xx.h"
 
 namespace LBR

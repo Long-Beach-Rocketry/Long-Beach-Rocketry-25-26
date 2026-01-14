@@ -9,12 +9,17 @@
 
 #include "stm32l476xx.h"
 #include "stm32l4xx_hal.h"
-#include "sys_clock.h"
 
 namespace LBR::Stml4
 {
 
-class HwClock : public Clock
+/**
+ * @class Clock
+ * @brief Configures system clock as well as anything else in the clock
+ *  tree needed from cubeMX presets.
+ * @note Not designed change clock configs mid application.
+ */
+class HwClock
 {
 public:
     enum class configuration

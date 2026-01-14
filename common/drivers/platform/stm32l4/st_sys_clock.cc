@@ -7,21 +7,6 @@ extern "C"
     {
         HAL_IncTick();
     }
-
-    /**
-     * un-used currently bt may be used in the future
-     */
-    void Error_Handler(void)
-    {
-        /* USER CODE BEGIN Error_Handler_Debug */
-        /* User can add his own implementation to report the HAL error return state */
-        __disable_irq();
-        while (1)
-        {
-            GPIOA->ODR |= GPIO_ODR_OD0;
-        }
-        /* USER CODE END Error_Handler_Debug */
-    }
 };
 
 namespace LBR::Stml4
@@ -200,8 +185,11 @@ bool HwClock::init(configuration config)
         default:
             return false;
     }
+<<<<<<< HEAD
     // SystemClock_ConfigHSE();
     // HAL_DeInit();
+=======
+>>>>>>> e393a63 (Nick fix.)
     return true;
 }
 }  // namespace LBR::Stml4
