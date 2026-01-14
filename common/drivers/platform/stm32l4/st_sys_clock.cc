@@ -37,7 +37,7 @@ static constexpr uint32_t timingR_64Mhz{0x10B17D85};
  * @brief configures high speed external clock for sysclock
  * generated from cubeMX for 64 Mhz
  */
-bool SystemClock_ConfigHSE64(void)
+bool SystemClock_ConfigHSE64()
 {
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
@@ -83,7 +83,7 @@ bool SystemClock_ConfigHSE64(void)
 }
 
 /* Generated from cubeMX for 80 Mhz. */
-bool SystemClock_ConfigHSI80(void)
+bool SystemClock_ConfigHSI80()
 {
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
@@ -130,7 +130,7 @@ bool SystemClock_ConfigHSI80(void)
 }
 
 /* Generated from cubeMX for 64Mhz. */
-bool SystemClock_ConfigHSI64(void)
+bool SystemClock_ConfigHSI64()
 {
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
@@ -188,15 +188,15 @@ bool HwClock::init(configuration config)
         case configuration::HSI_64MHZ:
             i2c_const = timingR_64Mhz;
             hz = 64'000'000;
-            return SystemClock_ConfigHSI64;
+            return SystemClock_ConfigHSI64();
         case configuration::HSI_80MHZ:
             i2c_const = timingR_80Mhz;
             hz = 80'000'000;
-            return SystemClock_ConfigHSI80;
+            return SystemClock_ConfigHSI80();
         case configuration::HSE_64MHZ:
             i2c_const = timingR_64Mhz;
             hz = 64'000'000;
-            return SystemClock_ConfigHSE64;
+            return SystemClock_ConfigHSE64();
         default:
             return false;
     }

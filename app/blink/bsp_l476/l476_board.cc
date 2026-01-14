@@ -26,7 +26,7 @@ bool board_init()
 {
     bool return_val = true;
 
-    return_val &= clock.init();
+    return_val &= clock.init(Stml4::HwClock::configuration::DEFAULT_4MHZ);
 
     RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
 

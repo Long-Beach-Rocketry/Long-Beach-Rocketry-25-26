@@ -18,7 +18,7 @@ namespace LBR
 class Clock
 {
 public:
-    virtual uint32_t get_hz() = 0;
-    virtual uint16_t get_timingR() = 0;
+    virtual uint32_t get_hz() const = 0;
+    virtual uint32_t get_timingR() const = 0;
 };
 }  // namespace LBR
