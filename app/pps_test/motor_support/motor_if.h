@@ -6,34 +6,66 @@
  * @author Bex Saw
  * @date 2025/12/31
  */
- 
-#include "gpio.h" // Limit switch reading
-// #include "drv_8255.h" // PWM + ENCODER driver
 
-/**
- * @brief Stop all motor movement immediately.
- * @note Used to halt the mechanism after reaching a limit switch or completing an action.
- * Example: Called after deployment or rotation is complete.
- */
-void motorEnable();
+#include "pwm.h"   // Update with actual PWM header path
+#include "encoder.h" // generic encoder class
 
-/**
- * @brief Move the motor in the deploy direction (extend mechanism).
- * @note Used during the Deploy state to drive the mechanism until the deployed limit switch is reached.
- * TODO: Implement PWM logic for deployment.
- */
-void motorDeploy();
+namespace LBR {
 
-/**
- * @brief Move the motor to the target (dig) position.
- * @note Used during the Rotate state to position the mechanism for drilling.
- * TODO: Implement PWM logic for rotation.
- */
-void motorTarget();
+class Motor {
+public:
+	Motor(Pwm& pwm, Encoder& encoder);
+	~Motor();
 
-/**
- * @brief Move the motor in the retract direction (retract mechanism).
- * @note Used during the Retract state to drive the mechanism until the retracted limit switch is reached.
- * TODO: Implement PWM logic for retraction.
- */
-void motorRetract();
+    /**
+	* @brief Stop or enable the motor (PWM control)
+	* @param enable true to enable, false to stop
+	* @note PWM duty cycle to 0/1 and brakes/start the motor
+	*/
+	void motorEnable(bool enable);
+
+	/**
+	* @brief Set motor speed and direction
+	* @param speed Speed value from -100 to 100 (negative for reverse)
+	* @note PWM duty cycle at |speed|%, direction based on sign
+	*/
+	void motorSpeed(int speed);
+
+	/**
+	* @brief Set motor direction (PWM direction)
+	* @param forward true for forward, false for reverse
+	* @note Sets direction pin accordingly
+	*/
+	void motorDirection(bool forward);
+
+	/**
+	* @brief Move motor a specific number of degrees at given speed (encoder feedback)
+	* @param degrees Number of degrees to move (positive or negative)
+	* @param speed Speed value from 0 to 100
+	* @note Uses encoder feedback to move specified degrees
+	*/
+	void moveDegrees(int degrees, int speed);
+
+	/**
+	* @brief Get current encoder ticks
+	* @param ticks Reference to store current encoder ticks
+	* @note Retrieves the current tick count from the encoder
+	*/
+	void getTicks(int& ticks) const;
+
+	/**
+	* @brief Get driver status
+	* @param status Variable to store status code
+	* @return 0 for OK, nonzero for error
+	*/
+	int getStatus() const;
+
+private:
+	//Pwm& _pwm;
+	//Encoder& _encoder;
+
+	bool _initialized{false};
+	int _status{0}; // 0 = OK, nonzero = error code
+};
+
+} // namespace LBR

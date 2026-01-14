@@ -6,50 +6,43 @@
  * @author Bex Saw
  * @date 2026/01/05
  */
-#include "motor_support/motor_if.h"
-#include "bno055_imu.h" // For (quaternion)
-#include "stm32l476xx.h"
+#include "motor_if.h"
+#include "imu_math.h"
+#include "board.h"
+#include "pps_helpers.h"
+#include "motor_if.h" 
 
 namespace LBR {
 
-/**
- * @enum PpsState
- * @brief States of the PPS state machine.
- */
 enum class PpsState {
-    Start,        // Initial state
-    Idle,         // Waiting for command
-    Deploy,       // Deploy to limit switch
-    Position,     // Move to position
-    Retract,      // Retract mechanism
-    Done          // Sequence complete
+    Idle,         // Waiting for command, not moving
+    Deploying,    // Deploy to limit switch
+    Rotating,     // Move to target/drill position
+    Retract       // Retract mechanism
 };
 
 class Pps {
-    float state_quat_[4] = {0};
+    LBR::Quaternion state_quat_{};
+    LBR::Vec3 state_accel_{};
 public:
     PpsState getState() const;
-    Pps();
-    void fetchImuData(const LBR::Bno055Data& imu_data); // Update IMU data quaternion
+    Pps(Gpio& gpio, Motor& motor);
+    void fetchImuData(const LBR::Quaternion& data); // Fetch IMU data for quaternion
     void update(); // State machine update, no IMU arg
 
 private:
-    PpsState state_ = PpsState::Idle;
-
-     bool limit_switch_max = false; // Deployed position
-     bool limit_switch_min = false; // Retracted position
+    Gpio& gpio_;
+    Motor& motor_; 
+    
+    PpsState state_ = PpsState::Idle; // Initial state is Idle
 
     /**
-     * @brief Read the current state of the limit switch (PA3).
-     * @return true if the switch is active, false otherwise.
+     * @brief Read the current state of the limit switch.
+     * @return LimitSwitchState (Retracted or Extended)
+     * @note Limit switch state: 0 = Retracted, 1 = Extended
      */
-     static bool readLimitSwitchMax();
-
-     /**
-      * @brief Read the current state of the min limit switch (e.g. PA4, retracted).
-      * @return true if the switch is active, false otherwise.
-      */
-     static bool readLimitSwitchMin();
+    enum class LimitSwitchState { retracted = 0, extended = 1 };
+    LimitSwitchState readLimitSwitch();
 
     /**
      * @brief Check if deploy sequence should start.
@@ -64,6 +57,13 @@ private:
      * @note Used to determine when to transition from Retract to Done state.
      */
     bool retracted();
+
+   /**
+    * @brief Check if rotation to target/drill position is complete.
+    * @return true if rotation is complete, false otherwise.
+    * @note Should use encoder, IMU, or other feedback in real implementation. (brainstorming)
+    */
+    bool rotationComplete();
 };
 
 } // namespace LBR

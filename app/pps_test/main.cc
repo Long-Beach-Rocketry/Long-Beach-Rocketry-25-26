@@ -1,24 +1,18 @@
-/**
- * @file main.cc
- * @brief PPS module test application
- * @note This application tests the PPS module functionality.
- * @author Bex Saw
- * @date 2025/12/31
- */
-
 #include "pps.h"
-
+#include "board.h"
 
 using LBR::Pps;
-LBR::Bno055Data imu;
+
+Board board;
 
 int main() {
     Pps pps;
     while (true) {
         // Simulate fetching IMU data
-        pps.fetchImuData(imu);
+        pps.fetchImuData(board.imu);
+        pps.fetchAccelData(board.accel);
         // Update PPS state machine
-        pps.update(); 
+        pps.update();
     }
     return 0;
 }
