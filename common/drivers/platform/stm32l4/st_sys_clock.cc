@@ -185,11 +185,6 @@ bool HwClock::init(configuration config)
         default:
             return false;
     }
-<<<<<<< HEAD
-    // SystemClock_ConfigHSE();
-    // HAL_DeInit();
-=======
->>>>>>> e393a63 (Nick fix.)
     return true;
 }
 }  // namespace LBR::Stml4
