@@ -2,6 +2,7 @@
 #include "board.h"
 
 #include "st_gpio.h"
+#include "st_sys_clock.h"
 
 namespace LBR
 {
@@ -19,12 +20,17 @@ Stml4::HwGpio led{led_params};
 
 Board board{.led = led};
 
+Stml4::HwClock clock{};
+
 bool board_init()
 {
     bool return_val = true;
+
+    return_val &= clock.init();
+
     RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
 
-    return_val = return_val && led.init();
+    return_val &= led.init();
 
     return return_val;
 }
