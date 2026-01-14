@@ -118,7 +118,7 @@ enum class Apb4Prescaler : uint32_t
 struct ClockParams
 {
     Source clk_src;
-    uint32_t sysclk;             // Max 550 MHz
+    uint32_t sysclk;             // Max 550 MHz 550'000'000
     D1cprePrescaler d1cpre_psc;  // Max 550 MHz
     AhbPrescaler ahb_psc;        // Max 275 MHz
     Apb1Prescaler apb1_psc;      // Max 137.5 MHz
