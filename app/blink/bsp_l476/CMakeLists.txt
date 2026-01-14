@@ -1,6 +1,6 @@
 add_library(blink_bsp STATIC
     l476_board.cc
-    hal_timebase.c
+    # hal_timebase.c
 )
 
 target_include_directories(blink_bsp PUBLIC 
