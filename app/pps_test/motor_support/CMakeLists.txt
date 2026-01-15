@@ -1,5 +1,5 @@
 add_library(motor_support STATIC
-    hw/motor_control.cc
+    hw/motor_if.cc
 )
 
 target_include_directories(motor_support
