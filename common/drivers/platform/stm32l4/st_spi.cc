@@ -13,26 +13,11 @@ namespace LBR
 namespace Stml4
 {
 
-/**
- * @brief Construct a new HwSpi object
- *
- * @param instance_ The SPI peripheral being used
- * @param settings_ The SPI control register settings
- *
- */
 HwSpi::HwSpi(SPI_TypeDef* instance_, StSpiSettings& settings_)
-    : instance(instance_), settings(settings_)
+    : instance{instance_}, settings{settings_}
 {
 }
 
-/**
- * @brief Read data from a slave device.
- * 
- * @param rx_data 8 byte array to store read data.
- * @param buffer_len Size of array.
- * @return true 
- * @return false 
- */
 bool HwSpi::Read(std::span<uint8_t> rx_data)
 {
 
@@ -42,7 +27,7 @@ bool HwSpi::Read(std::span<uint8_t> rx_data)
         return false;
     }
 
-    for (size_t i = 0; i < rx_data.size(); i++)
+    for (auto& byte : rx_data)
     {
         // TODO: ADD a timeout
 
@@ -62,7 +47,7 @@ bool HwSpi::Read(std::span<uint8_t> rx_data)
         }
 
         // Read data from RX buffer
-        rx_data[i] = *(volatile uint8_t*)&instance->DR;
+        byte = *(volatile uint8_t*)&instance->DR;
     }
 
     // Wait until transmission is complete
@@ -73,14 +58,6 @@ bool HwSpi::Read(std::span<uint8_t> rx_data)
     return true;
 }
 
-/**
- * @brief Write data to a slave device.
- * 
- * @param tx_data 8 byte array of the data to be sent.
- * @param buffer_len Size of array
- * @return true 
- * @return false 
- */
 bool HwSpi::Write(std::span<uint8_t> tx_data)
 {
 
@@ -90,7 +67,7 @@ bool HwSpi::Write(std::span<uint8_t> tx_data)
         return false;
     }
 
-    for (size_t i = 0; i < tx_data.size(); i++)
+    for (const auto& byte : tx_data)
     {
         // Wait until TX Buffer is empty
         while (!(instance->SR & SPI_SR_TXE))
@@ -101,7 +78,7 @@ bool HwSpi::Write(std::span<uint8_t> tx_data)
          * Write to SPI Data Register (DR).
          * Automatically starts clock once data is written to the DR.
          */
-        *(volatile uint8_t*)&instance->DR = tx_data[i];
+        *(volatile uint8_t*)&instance->DR = byte;
 
         /*
          * Wait for RX buffer to be filled.
@@ -126,16 +103,7 @@ bool HwSpi::Write(std::span<uint8_t> tx_data)
     return true;
 }
 
-/**
- * @brief Read and Write data to a slave device.
- * 
- * @param tx_data 8 byte array of the data to be sent.
- * @param rx_data 8 byte array to store read data.
- * @param buffer_len Size of arrays
- * @return true 
- * @return false 
- */
-bool HwSpi::Transfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
+bool HwSpi::SeqTransfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
 {
     // Check if SPI is enabled
     if (!(instance->CR1 & SPI_CR1_SPE))
@@ -153,7 +121,7 @@ bool HwSpi::Transfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
      * First send all tx bytes and clear the RXNE flag for each transmitted
      * byte (we don't use these intermediate bytes for flash commands).
      */
-    for (size_t i = 0; i < tx_data.size(); i++)
+    for (const auto& byte : tx_data)
     {
         // Wait until TX Buffer is empty
         while (!(instance->SR & SPI_SR_TXE))
@@ -161,7 +129,7 @@ bool HwSpi::Transfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
         }
 
         // Write next tx byte to start clocking
-        *(volatile uint8_t*)&instance->DR = tx_data[i];
+        *(volatile uint8_t*)&instance->DR = byte;
 
         // Wait for RX buffer to be filled (data received for this transfer)
         while (!(instance->SR & SPI_SR_RXNE))
@@ -176,7 +144,7 @@ bool HwSpi::Transfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
      * Now generate clock pulses by sending dummy bytes to read the expected
      * response from the slave into rx_data[0..rx_len-1].
      */
-    for (size_t j = 0; j < rx_data.size(); j++)
+    for (auto& byte : rx_data)
     {
         // Wait until TX Buffer is empty before sending dummy byte
         while (!(instance->SR & SPI_SR_TXE))
@@ -192,7 +160,7 @@ bool HwSpi::Transfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
         }
 
         // Read data from RX buffer into rx_data
-        rx_data[j] = *(volatile uint8_t*)&instance->DR;
+        byte = *(volatile uint8_t*)&instance->DR;
     }
 
     // Wait until transmission is complete
@@ -203,10 +171,6 @@ bool HwSpi::Transfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
     return true;
 }
 
-/**
- * @brief Initializes SPI peripheral and its sck, mosi, miso, and nss pins
- *
- */
 bool HwSpi::Init()
 {
     // TODO: Runtime validation of enum values (will change to compile time checks in the future and maybe make a private function for these checks)

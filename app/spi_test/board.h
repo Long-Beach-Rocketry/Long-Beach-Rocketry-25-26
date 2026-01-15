@@ -1,7 +1,6 @@
 #pragma once
 #include "gpio_cs.h"
 #include "spi.h"
-#include "stm32l476xx.h"
 
 //do the cmake
 
@@ -14,7 +13,7 @@ struct Board
     Spi& spi1;
 };
 
-bool BSP_Init();
-Board& Get_Board();
+bool BspInit();
+Board& GetBoard();
 
 }  // namespace LBR
