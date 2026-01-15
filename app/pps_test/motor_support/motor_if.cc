@@ -8,12 +8,12 @@ Motor::Motor(Drv8245& drv, Encoder& encoder)
 Motor::~Motor() {}
 
 bool Motor::init() {
-	// Initialize hardware (GPIO, PWM, encoder, etc.)
-	// Return true if successful
+	// Initialize motor driver and encoder
+	_initialized = true;	
 	return true;
 }
 
-void Motor::set_speed(int speed) {
+void Motor::motorSpeed(int speed) {
 	// Set PWM duty and direction based on speed
 	// Example: _drv.setDuty(abs(speed)); set_direction(speed >= 0);
 }
