@@ -34,5 +34,6 @@ endif()
 
 add_subdirectory(common)
 add_subdirectory(mcu_support)
+add_subdirectory(external)
 
 
