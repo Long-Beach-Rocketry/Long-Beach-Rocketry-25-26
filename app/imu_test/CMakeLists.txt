@@ -9,7 +9,7 @@ set(PREPROCESS_DEFS
 # Only add BSP for this target device
 add_subdirectory_for(STM32L476 bsp_l476)
 
-if (TARGET bsp_sensors)
+if (TARGET bno055_bsp)
 
 	add_executable_for(${TARGET_DEVICE} ${EXECUTABLE} ${LDF}
 		main.cc
@@ -21,7 +21,7 @@ if (TARGET bsp_sensors)
 	)
 
 	target_link_libraries_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
-		bsp_sensors
+		bno055_bsp
 	)
 
 	target_preprocess_for(${TARGET_DEVICE} ${EXECUTABLE} ${LINKER_SCRIPT} ${LDF} ${PREPROCESS_DEFS})
