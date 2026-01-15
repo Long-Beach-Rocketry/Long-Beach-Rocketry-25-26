@@ -8,18 +8,13 @@ Drv8245::Drv8245(Gpio& dir, Pwm& pwm, Gpio& drv_z, Gpio& sleep, Gpio& fault)
 }
 
 void Drv8245::init() {
-    dir_.init();
-    drv_z_.init();
-    sleep_.init();
-    fault_.init();
-    pwm_.init();
     drv_z_.set(true); // Enable driver
     sleep_.set(true);  // Wake up driver
 }
 
 void Drv8245::setPwm(Direction dir, uint16_t pwm_value) {
     dir_.set(dir == Direction::Forward ? true : false);
-    pwm_.setDutyCycle(pwm_value); // will change based on yb-pwm interface
+    pwm_.set_duty_cycle(static_cast<uint8_t>(pwm_value / 10)); // Convert 0-1000 to 0-100%
 }
 
 void Drv8245::enableCoast() {
@@ -35,7 +30,7 @@ void Drv8245::setSleep(bool enable) {
 }
 
 bool Drv8245::checkFault() const {
-    return !fault_.get(); // Active low nFAULT
+    return !fault_.read(); // Active low nFAULT
 }
 
 } // namespace LBR

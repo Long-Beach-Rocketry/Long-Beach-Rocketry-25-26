@@ -8,19 +8,19 @@ namespace LBR {
 
 // GPIO configs 
 Stml4::StGpioSettings dir_settings{
-    Stml4::GpioMode::OUTPUT, Stml4::GpioOtype::PUSH_PULL,
+    Stml4::GpioMode::GPOUT, Stml4::GpioOtype::PUSH_PULL,
     Stml4::GpioOspeed::MEDIUM, Stml4::GpioPupd::NO_PULL, 0
 };
 const Stml4::StGpioParams dir_params{dir_settings, 9, GPIOA}; // PA9
 
 Stml4::StGpioSettings slp_settings{
-    Stml4::GpioMode::OUTPUT, Stml4::GpioOtype::PUSH_PULL,
+    Stml4::GpioMode::GPOUT, Stml4::GpioOtype::PUSH_PULL,
     Stml4::GpioOspeed::MEDIUM, Stml4::GpioPupd::NO_PULL, 0
 };
 const Stml4::StGpioParams slp_params{slp_settings, 7, GPIOC}; // PC7
 
 Stml4::StGpioSettings drv_z_settings{
-    Stml4::GpioMode::OUTPUT, Stml4::GpioOtype::PUSH_PULL,
+    Stml4::GpioMode::GPOUT, Stml4::GpioOtype::PUSH_PULL,
     Stml4::GpioOspeed::MEDIUM, Stml4::GpioPupd::NO_PULL, 0
 };
 const Stml4::StGpioParams drv_z_params{drv_z_settings, 8, GPIOC}; // PC8
@@ -55,9 +55,8 @@ Stml4::HwGpio fault_(fault_params);
 Stml4::HwGpio pwm_output(pwm_output_params);
 Stml4::HwPwm pwm(pwm_params);
 
-Board board{.pwm = pwm, .motor = motor};
-
 Drv8245 motor(dir_, pwm, drv_z_, slp_, fault_);
+Board board{motor};
 
 bool bsp_init()
 {
