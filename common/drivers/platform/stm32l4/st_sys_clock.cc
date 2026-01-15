@@ -7,8 +7,6 @@ extern "C"
     {
         HAL_IncTick();
     }
-<<<<<<< HEAD
-=======
 
     /**
      * un-used currently bt may be used in the future
@@ -24,7 +22,6 @@ extern "C"
         }
         /* USER CODE END Error_Handler_Debug */
     }
->>>>>>> e29ce8f (tm_sysclock (#72))
 };
 
 namespace LBR::Stml4
@@ -203,11 +200,8 @@ bool HwClock::init(configuration config)
         default:
             return false;
     }
-<<<<<<< HEAD
-=======
     // SystemClock_ConfigHSE();
     // HAL_DeInit();
->>>>>>> e29ce8f (tm_sysclock (#72))
     return true;
 }
 }  // namespace LBR::Stml4
