@@ -31,11 +31,11 @@ public:
      * @brief Construct a new Drv8245 object
      * @param dir Direction (PH/IN2) GPIO
      * @param pwm PWM (EN/IN1) PWM channel
-     * @param drvoff DRVOFF (coast/Hi-Z) GPIO
+     * @param drv_z DRVZ (coast/Hi-Z) GPIO
      * @param sleep nSLEEP (sleep/wake) GPIO
      * @param fault nFAULT (fault input) GPIO
      */
-    Drv8245(Gpio& dir, Pwm& pwm, Gpio& drvoff, Gpio& sleep, Gpio& fault);
+    Drv8245(Gpio& dir, Pwm& pwm, Gpio& drv_z, Gpio& sleep, Gpio& fault);
 
     /**
     * @brief Initialize the motor driver
@@ -74,7 +74,7 @@ public:
 private:
     Gpio& dir_;
     Pwm& pwm_;
-    Gpio& drvoff_;
+    Gpio& drv_z_;
     Gpio& sleep_;
     Gpio& fault_;
 }; 
