@@ -14,25 +14,24 @@ bool Motor::init() {
 }
 
 void Motor::motorSpeed(int speed) {
-	// Set PWM duty and direction based on speed
-	// Example: _drv.setDuty(abs(speed)); set_direction(speed >= 0);
+	// using _drv.methodName() to set speed and direction based on sign of speed
 }
 
 void Motor::motorEnable(bool enable) {
-	// Enable or disable the motor driver (power control)
+	// using _drv.methodName() to enable or disable motor
 }
 
 void Motor::motorDirection(bool forward) {
-	// Set direction pin accordingly
+	// using _drv.methodName() to set direction pin
 }
 
 void Motor::moveDegrees(int degrees, int speed) {
-	// Use encoder feedback to move specified degrees at given speed
+	// using _encoder.(something) to get current ticks and move motor accordingly
 }
 
 int Motor::getTicks() const {
-	// Retrieve current tick count from encoder
-	
+	// using _encoder.methodName() to get current ticks
+	return 0; 
 }
 
 int Motor::getStatus() const {

@@ -7,11 +7,15 @@
  * @date 2025/12/31
  */
 
+/* Small note for the motor interface. This will be generic for a DC motor! 
+This means that none of this should be specific to the PPS. The drilling app will probably use this as well. - TJ */
+
 #include "drv_8245.h" // Motor driver 
-//#include "encoder.h"  // Encoder interface
+//#include "encoder.h"  // Encoder interface (whatever yshi generic has made)
 
 namespace LBR {
 
+// I might make a template class to allow for different motor drivers type to be pass the constructor 
 class Motor {
 public:
 	Motor(Drv8245& drv, Encoder& encoder);

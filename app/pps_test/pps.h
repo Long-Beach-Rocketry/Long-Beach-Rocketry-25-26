@@ -9,8 +9,7 @@
 #include "motor_if.h"
 #include "imu_math.h"
 #include "board.h"
-#include "pps_helpers.h"
-#include "motor_if.h" 
+#include "pps_helpers.h" 
 
 namespace LBR {
 

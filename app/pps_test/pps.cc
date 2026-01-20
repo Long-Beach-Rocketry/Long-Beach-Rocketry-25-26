@@ -40,7 +40,7 @@ void Pps::update() {
             break;
         case PpsState::Rotating:
             // Rotating: move to target/drill position, then return to Idle
-            motorTarget();
+            motorTarget(); // Determine the target position 
             if (rotationComplete()) {
                 motorStop();
                 state_ = PpsState::Idle;
