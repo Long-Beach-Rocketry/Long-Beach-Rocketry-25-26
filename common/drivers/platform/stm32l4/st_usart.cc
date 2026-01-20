@@ -4,33 +4,39 @@ StUsart::StUsart(USART_TypeDef* base_addr, uint32_t sys_clck,
                  uint32_t baud_rate)
     : base_addr(base_addr), uartdiv(sys_clck / baud_rate) {};
 
-bool StUsart::receive_rx(uint8_t& data)
+bool StUsart::receive_rx(std::span<uint8_t> rxbuf)
 {
-
     //prevent overrun
     if (base_addr->ISR & USART_ISR_ORE)
     {
         base_addr->ICR |= USART_ICR_ORECF;
     }
 
-    while (!(base_addr->ISR & USART_ISR_RXNE))
-    {
+    for (auto& byte : rxbuf) {
+        while (!(base_addr->ISR & USART_ISR_RXNE))
+        {
+            // Add a timeout condition and return false if flag isn't cleared in time
+        }
+
+        byte = base_addr->RDR;
     }
-    data = base_addr->RDR;
 
     return true;
 }
 
-bool StUsart::send_tx(const uint8_t data)
+bool StUsart::send_tx(std::span<const uint8_t> txbuf)
 {
-    while (!(base_addr->ISR & USART_ISR_TXE))
-    {
+    for (const auto& byte : txbuf) {
+        while (!(base_addr->ISR & USART_ISR_TXE))
+        {
+        }
+        base_addr->TDR = byte;
     }
-    base_addr->TDR = data;
 
     while (!(base_addr->ISR & USART_ISR_TC))
     {
     }
+
     return true;
 }
 

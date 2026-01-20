@@ -23,26 +23,29 @@ public:
      * @param sys_clck The specific system clock frequency of hardware.
      * @param baud_rate The chosen baud rate to send and recieve data on a serial monitor.
      */
-    explicit StUsart(USART_TypeDef* base_addr, uint32_t sys_clck,
+    
+    StUsart(USART_TypeDef* base_addr, uint32_t sys_clck,
                      uint32_t baud_rate);
 
     /**
      * @brief Sends data to serial output.
      * 
-     * @param data A uint8_t pointer that contains message to be sent.
+     * @param txbuf An uint8_t std::array data to be sent
      * @param size Variable of size_t type which specifies the size of message.
      */
-    bool send_tx(const uint8_t data) override;
+    bool send_tx(std::span<const uint8_t> txbuf) override;
 
     /**
      * @brief Recieves data from serial input.
      * 
-     * @param data A uint8_t pointer that holds data to be recieved from serial input.
+     * @param rxbuf A uint8_t std::array that stores data being received
      */
-    bool receive_rx(uint8_t& data) override;
+    bool receive_rx(std::span<uint8_t> rxbuf) override;
+
     /**
      * @brief Initializes the USART and associated Rx and Tx pins.
      * 
+     * @return True successful initializaiton. False otherwise.
      */
     bool init();
 };
