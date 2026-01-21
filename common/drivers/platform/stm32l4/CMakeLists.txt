@@ -14,8 +14,8 @@ add_library(hal STATIC
 target_include_directories(hal PUBLIC
     .
     ${CMAKE_SOURCE_DIR}/common/core/utils
-    #bus #why this? i dont think needed
-)
+    ${CMAKE_SOURCE_DIR}/common/drivers/time
+    )
 
 target_link_libraries(hal PUBLIC
     st_l4_support
