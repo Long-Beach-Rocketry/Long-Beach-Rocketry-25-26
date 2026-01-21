@@ -1,6 +1,8 @@
 #include <span>
 #include "board.h"
 
+using namespace LBR;
+
 std::array<uint8_t, 17> txb{"i <3 embedded\r\n"};
 uint8_t rxb;
 

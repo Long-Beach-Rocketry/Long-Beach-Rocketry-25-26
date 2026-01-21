@@ -1,8 +1,14 @@
 #include "st_usart.h"
 
+namespace LBR
+{
+namespace Stml4
+{
 StUsart::StUsart(USART_TypeDef* base_addr, uint32_t sys_clck,
                  uint32_t baud_rate)
-    : base_addr(base_addr), uartdiv(sys_clck / baud_rate) {};
+    : base_addr(base_addr), uartdiv(sys_clck / baud_rate)
+{
+}
 
 bool StUsart::receive_rx(std::span<uint8_t> rxbuf)
 {
@@ -82,3 +88,5 @@ bool StUsart::init()
     StUsart::base_addr->CR1 |= USART_CR1_RXNEIE;
     return true;
 }
+}  // namespace Stml4
+}  // namespace LBR

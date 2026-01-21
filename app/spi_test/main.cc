@@ -6,8 +6,6 @@
 
 #include <array>
 #include "board.h"
-//#include "spi_app_bsp.cc"
-//#include "stm32l476xx.h"
 
 using namespace LBR;
 

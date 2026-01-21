@@ -7,6 +7,8 @@
 #include <cstdint>
 #include <span>
 
+namespace LBR
+{
 /**
   * @brief class that contains the functions needed to intialize and setup rx and tx functions.
   */
@@ -39,3 +41,4 @@ public:
      */
     virtual bool receive_rx_nb(uint8_t& byte) = 0;
 };
+}  // namespace LBR

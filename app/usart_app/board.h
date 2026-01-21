@@ -5,6 +5,8 @@
 
 extern uint8_t rxb;
 
+namespace LBR
+{
 struct Board
 {
     Usart& usart;
@@ -15,3 +17,4 @@ struct Board
 
 bool BSP_Init();
 Board& get_board();
+}  // namespace LBR

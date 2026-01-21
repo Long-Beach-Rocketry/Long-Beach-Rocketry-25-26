@@ -3,8 +3,9 @@
 #include "st_gpio.h"
 #include "st_usart.h"
 
-//extern uint32_t SystemCoreClock;
-
+using namespace LBR::Stml4;
+namespace LBR
+{
 LBR::Stml4::StGpioSettings rx_config = {
     LBR::Stml4::GpioMode::ALT_FUNC, LBR::Stml4::GpioOtype::PUSH_PULL,
     LBR::Stml4::GpioOspeed::LOW, LBR::Stml4::GpioPupd::NO_PULL, 0x7};
@@ -60,3 +61,4 @@ extern "C" void USART2_IRQHandler(void)
         board.usart.send_tx(tx_span);
     }
 }
+}  // namespace LBR

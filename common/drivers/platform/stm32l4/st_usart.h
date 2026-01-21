@@ -10,6 +10,10 @@
 #include "stm32l476xx.h"
 #include "usart.h"
 
+namespace LBR
+{
+namespace Stml4
+{
 class StUsart : public Usart
 {
 private:
@@ -56,3 +60,5 @@ public:
      */
     bool init();
 };
+}  // namespace Stml4
+}  // namespace LBR
