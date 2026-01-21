@@ -76,10 +76,17 @@ bool StUsart::init()
     {
         return false;
     }
+    // Clear USART enable bit
     StUsart::base_addr->CR1 &= ~USART_CR1_UE;
+
+    // Define USART word length: clear M1 and M0 for 8 data bits
+    StUsart::base_addr->CR1 &= ~USART_CR1_M;
 
     // Set baud rate register
     StUsart::base_addr->BRR = uartdiv;
+
+    // Set 1 stop bit
+    StUsart::base_addr->CR2 &= ~USART_CR2_STOP;
 
     // Enable RX, TX, and UART
     StUsart::base_addr->CR1 |= USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;
