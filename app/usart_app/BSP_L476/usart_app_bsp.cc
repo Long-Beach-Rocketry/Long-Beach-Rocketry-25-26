@@ -1,7 +1,9 @@
 #include <stdint.h>
 #include "board.h"
 #include "st_gpio.h"
+#include "st_sys_clock.h"
 #include "st_usart.h"
+
 
 using namespace LBR::Stml4;
 namespace LBR
@@ -18,33 +20,33 @@ LBR::Stml4::StGpioParams tx_params = {tx_config, (uint8_t)2, GPIOA};
 LBR::Stml4::HwGpio rx_gpio(rx_params);
 LBR::Stml4::HwGpio tx_gpio(tx_params);
 
+// Make clock
+Stml4::HwClock clock{};
+
 StUsart usart(USART2, 4000000, 9600);
 
 Board board{.usart = usart, .rx = rx_gpio, .tx = tx_gpio};
 
 bool BSP_Init()
 {
+    bool result = true;
+
+    result &= clock.init(Stml4::HwClock::configuration::DEFAULT_4MHZ);
+
     RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
     RCC->APB1ENR1 |= RCC_APB1ENR1_USART2EN | RCC_APB1ENR1_USART3EN;
     RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
 
-    if (!usart.init())
-    {
-        return false;
-    }
-    if (!rx_gpio.init())
-    {
-        return false;
-    }
-    if (!tx_gpio.init())
-    {
-        return false;
-    }
+    result &= usart.init();
+
+    result &= rx_gpio.init();
+
+    result &= tx_gpio.init();
 
     NVIC_SetPriority(USART2_IRQn, 0);
     NVIC_EnableIRQ(USART2_IRQn);
 
-    return true;
+    return result;
 }
 
 Board& get_board()
