@@ -25,6 +25,25 @@ bool StUsart::receive_rx(std::span<uint8_t> rxbuf)
     return true;
 }
 
+bool StUsart::receive_rx_nb(uint8_t& byte)
+{
+    // Check if data is available (non-blocking)
+    if (!(base_addr->ISR & USART_ISR_RXNE))
+    {
+        return false;
+    }
+
+    // Clear overrun error if present
+    if (base_addr->ISR & USART_ISR_ORE)
+    {
+        base_addr->ICR |= USART_ICR_ORECF;
+    }
+
+    // Read the byte
+    byte = base_addr->RDR;
+    return true;
+}
+
 bool StUsart::send_tx(std::span<const uint8_t> txbuf)
 {
     size_t count = 0;
@@ -53,13 +72,13 @@ bool StUsart::init()
     }
     StUsart::base_addr->CR1 &= ~USART_CR1_UE;
 
-    // Set baud rate
+    // Set baud rate register
     StUsart::base_addr->BRR = uartdiv;
 
     // Enable RX, TX, and UART
     StUsart::base_addr->CR1 |= USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;
 
     // Enable RXNE Interrupt
-    //StUsart::base_addr->CR1 |= USART_CR1_RXNEIE;
+    StUsart::base_addr->CR1 |= USART_CR1_RXNEIE;
     return true;
 }

@@ -30,4 +30,12 @@ public:
       * @return True on success. False, otherwise.
       */
     virtual bool receive_rx(std::span<uint8_t> rxbuf) = 0;
+
+    /**
+     * @brief Non-blocking receive for interrupt handler - reads 1 byte if available
+     * 
+     * @param byte Reference to store received byte
+     * @return True if byte was received, false if no data available
+     */
+    virtual bool receive_rx_nb(uint8_t& byte) = 0;
 };
