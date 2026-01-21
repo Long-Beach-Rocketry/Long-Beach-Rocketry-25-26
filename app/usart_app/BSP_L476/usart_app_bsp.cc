@@ -3,6 +3,8 @@
 #include "st_gpio.h"
 #include "st_usart.h"
 
+//extern uint32_t SystemCoreClock;
+
 LBR::Stml4::StGpioSettings rx_config = {
     LBR::Stml4::GpioMode::ALT_FUNC, LBR::Stml4::GpioOtype::PUSH_PULL,
     LBR::Stml4::GpioOspeed::LOW, LBR::Stml4::GpioPupd::NO_PULL, 0x7};
@@ -51,7 +53,6 @@ Board& get_board()
 
 extern "C" void USART2_IRQHandler(void)
 {
-
     if (board.usart.receive_rx(rxb))
     {
         board.usart.send_tx(rxb);

@@ -22,7 +22,6 @@ if (TARGET usart_app_bsp)
 
     target_link_libraries_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
         usart_app_bsp
-        driver
     )
 
     target_preprocess_for(${TARGET_DEVICE} ${EXECUTABLE} ${LINKER_SCRIPT} ${LDF} ${PREPROCESS_DEFS})

@@ -23,9 +23,8 @@ public:
      * @param sys_clck The specific system clock frequency of hardware.
      * @param baud_rate The chosen baud rate to send and recieve data on a serial monitor.
      */
-    
-    StUsart(USART_TypeDef* base_addr, uint32_t sys_clck,
-                     uint32_t baud_rate);
+
+    StUsart(USART_TypeDef* base_addr, uint32_t sys_clck, uint32_t baud_rate);
 
     /**
      * @brief Sends data to serial output.

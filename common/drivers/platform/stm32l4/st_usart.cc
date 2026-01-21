@@ -12,7 +12,8 @@ bool StUsart::receive_rx(std::span<uint8_t> rxbuf)
         base_addr->ICR |= USART_ICR_ORECF;
     }
 
-    for (auto& byte : rxbuf) {
+    for (auto& byte : rxbuf)
+    {
         while (!(base_addr->ISR & USART_ISR_RXNE))
         {
             // Add a timeout condition and return false if flag isn't cleared in time
@@ -26,18 +27,21 @@ bool StUsart::receive_rx(std::span<uint8_t> rxbuf)
 
 bool StUsart::send_tx(std::span<const uint8_t> txbuf)
 {
-    for (const auto& byte : txbuf) {
+    size_t count = 0;
+    for (const auto& byte : txbuf)
+    {
         while (!(base_addr->ISR & USART_ISR_TXE))
         {
         }
         base_addr->TDR = byte;
+        count++;
     }
 
     while (!(base_addr->ISR & USART_ISR_TC))
     {
     }
 
-    return true;
+    return (count == txbuf.size());
 }
 
 bool StUsart::init()
@@ -48,8 +52,14 @@ bool StUsart::init()
         return false;
     }
     StUsart::base_addr->CR1 &= ~USART_CR1_UE;
+
+    // Set baud rate
     StUsart::base_addr->BRR = uartdiv;
+
+    // Enable RX, TX, and UART
     StUsart::base_addr->CR1 |= USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;
-    StUsart::base_addr->CR1 |= USART_CR1_RXNEIE;
+
+    // Enable RXNE Interrupt
+    //StUsart::base_addr->CR1 |= USART_CR1_RXNEIE;
     return true;
 }

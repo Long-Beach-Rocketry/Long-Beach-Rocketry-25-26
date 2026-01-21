@@ -1,10 +1,12 @@
 #pragma once
+#include <array>
 #include "gpio.h"
 #include "usart.h"
 
-extern uint8_t rxb;
 
-extern uint8_t txb[];
+extern std::array<uint8_t, 7> rxb;
+
+//extern std::array<uint8_t, 7> txb;
 
 struct Board
 {
