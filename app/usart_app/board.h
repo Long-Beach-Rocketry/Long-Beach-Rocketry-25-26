@@ -3,10 +3,7 @@
 #include "gpio.h"
 #include "usart.h"
 
-
-extern std::array<uint8_t, 7> rxb;
-
-//extern std::array<uint8_t, 7> txb;
+extern uint8_t rxb;
 
 struct Board
 {

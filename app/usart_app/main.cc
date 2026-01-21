@@ -1,9 +1,8 @@
 #include <span>
 #include "board.h"
 
-std::array<uint8_t, 7> txb{'m', 'e', 's', 's', 'a', 'g', 'e'};
-
-std::array<uint8_t, 7> rxb;
+std::array<uint8_t, 17> txb{"i <3 embedded\r\n"};
+uint8_t rxb;
 
 int main(int argc, char** argv)
 {

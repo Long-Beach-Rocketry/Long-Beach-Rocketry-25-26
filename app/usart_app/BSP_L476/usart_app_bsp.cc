@@ -53,11 +53,10 @@ Board& get_board()
 
 extern "C" void USART2_IRQHandler(void)
 {
-    uint8_t byte;
-    if (board.usart.receive_rx_nb(byte))
+    if (board.usart.receive_rx_nb(rxb))
     {
         // Received 1 byte, echo it back
-        std::span<const uint8_t> tx_span(&byte, 1);
+        std::span<const uint8_t> tx_span(&rxb, 1);
         board.usart.send_tx(tx_span);
     }
 }
