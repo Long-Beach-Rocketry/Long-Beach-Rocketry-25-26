@@ -41,17 +41,10 @@ public:
     /**
      * @brief Recieves data from serial input.
      * 
-     * @param rxbuf A uint8_t std::array that stores data being received
-     */
-    bool receive_rx(std::span<uint8_t> rxbuf) override;
-
-    /**
-     * @brief Non-blocking receive for interrupt handler - reads 1 byte if available
-     * 
      * @param byte Reference to store received byte
      * @return True if byte was received, false if no data available
      */
-    bool receive_rx_nb(uint8_t& byte) override;
+    bool receive_rx(uint8_t& byte) override;
 
     /**
      * @brief Initializes the USART and associated Rx and Tx pins.
@@ -59,6 +52,13 @@ public:
      * @return True successful initializaiton. False otherwise.
      */
     bool init();
+
+    /**
+     * @brief Get the base_addr of the UART object
+     * 
+     * @return USART_TypeDef* 
+     */
+    USART_TypeDef* get_addr();
 };
 }  // namespace Stml4
 }  // namespace LBR

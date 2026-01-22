@@ -55,11 +55,15 @@ Board& get_board()
 
 extern "C" void USART2_IRQHandler(void)
 {
-    if (board.usart.receive_rx_nb(rxb))
+    // Check if data is available
+    if (usart.get_addr()->ISR & USART_ISR_RXNE)
     {
-        // Received 1 byte, echo it back
-        std::span<const uint8_t> tx_span(&rxb, 1);
-        board.usart.send_tx(tx_span);
+        if (board.usart.receive_rx(rxb))
+        {
+            // Received 1 byte, echo it back
+            std::span<const uint8_t> tx_span(&rxb, 1);
+            board.usart.send_tx(tx_span);
+        }
     }
 }
 }  // namespace LBR

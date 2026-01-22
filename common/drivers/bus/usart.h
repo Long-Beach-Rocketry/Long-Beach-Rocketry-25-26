@@ -25,20 +25,11 @@ public:
     virtual bool send_tx(std::span<const uint8_t> txbuf) = 0;
 
     /**
-      * @brief Recieves data from serial rx data line input.
-      * 
-      * @param rxbuf A uint8_t std::array to store data being received
-      * 
-      * @return True on success. False, otherwise.
-      */
-    virtual bool receive_rx(std::span<uint8_t> rxbuf) = 0;
-
-    /**
-     * @brief Non-blocking receive for interrupt handler - reads 1 byte if available
+     * @brief Recieves data from serial rx data line input.
      * 
      * @param byte Reference to store received byte
      * @return True if byte was received, false if no data available
      */
-    virtual bool receive_rx_nb(uint8_t& byte) = 0;
+    virtual bool receive_rx(uint8_t& byte) = 0;
 };
 }  // namespace LBR

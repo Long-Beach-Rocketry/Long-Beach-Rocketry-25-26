@@ -10,35 +10,8 @@ StUsart::StUsart(USART_TypeDef* base_addr, uint32_t sys_clck,
 {
 }
 
-bool StUsart::receive_rx(std::span<uint8_t> rxbuf)
+bool StUsart::receive_rx(uint8_t& byte)
 {
-    //prevent overrun
-    if (base_addr->ISR & USART_ISR_ORE)
-    {
-        base_addr->ICR |= USART_ICR_ORECF;
-    }
-
-    for (auto& byte : rxbuf)
-    {
-        while (!(base_addr->ISR & USART_ISR_RXNE))
-        {
-            // Add a timeout condition and return false if flag isn't cleared in time
-        }
-
-        byte = base_addr->RDR;
-    }
-
-    return true;
-}
-
-bool StUsart::receive_rx_nb(uint8_t& byte)
-{
-    // Check if data is available (non-blocking)
-    if (!(base_addr->ISR & USART_ISR_RXNE))
-    {
-        return false;
-    }
-
     // Clear overrun error if present
     if (base_addr->ISR & USART_ISR_ORE)
     {
@@ -94,6 +67,11 @@ bool StUsart::init()
     // Enable RXNE Interrupt
     StUsart::base_addr->CR1 |= USART_CR1_RXNEIE;
     return true;
+}
+
+USART_TypeDef* StUsart::get_addr()
+{
+    return this->base_addr;
 }
 }  // namespace Stml4
 }  // namespace LBR
