@@ -4,7 +4,6 @@
 #include "st_sys_clock.h"
 #include "st_usart.h"
 
-
 using namespace LBR::Stml4;
 namespace LBR
 {
