@@ -14,7 +14,7 @@ public:
 
     uint8_t data[BUF_SIZE];
 
-    ringbuffer buf;
+    RingBuffer buf;
     RingBufferTest() : buf(data, BUF_SIZE){};
 };
 
@@ -22,17 +22,17 @@ TEST_F(RingBufferTest, InsertAndPopTest)
 {
     for (size_t i = 0; i < BUF_SIZE; ++i)
     {
-        EXPECT_TRUE(buf.ringbuffer_push(i));
+        EXPECT_TRUE(buf.push(i));
     }
 
-    EXPECT_FALSE(buf.ringbuffer_push(0));
+    EXPECT_FALSE(buf.push(0));
 
     uint8_t data = 0;
     for (size_t i = 0; i < BUF_SIZE; ++i)
     {
-        EXPECT_TRUE(buf.ringbuffer_pop(&data));
+        EXPECT_TRUE(buf.pop(&data));
         EXPECT_EQ(i, data);
     }
 
-    EXPECT_FALSE(buf.ringbuffer_pop(&data));
+    EXPECT_FALSE(buf.pop(&data));
 }
