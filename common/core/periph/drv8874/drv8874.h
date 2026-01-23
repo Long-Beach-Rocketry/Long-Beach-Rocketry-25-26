@@ -5,21 +5,23 @@
 * @date 01/21/2026
 */
 
-#pragma once 
+#pragma once
+#include <cstdint>
 #include "gpio.h"
 #include "pwm.h"
-#include <cstdint>
 
-namespace LBR {
+namespace LBR
+{
 
-class Drv8874 {
+class Drv8874
+{
 public:
-
-    enum class Direction {
+    enum class Direction
+    {
         FORWARD,
         REVERSE
     };
-    
+
     /** 
     * @brief Constructor for DRV8874 motor driver
     * @param dir GPIO pin for direction control - PH/IN2
@@ -27,7 +29,7 @@ public:
     * @param sleep GPIO pin for sleep control - nSLEEP
     * @param fault GPIO pin for fault indication - NFAULT
     */
-    Drv8874(Gpio &dir, Pwm &pwm, Gpio &sleep, Gpio &fault);
+    Drv8874(Gpio& dir, Pwm& pwm, Gpio& sleep, Gpio& fault);
 
     /**
     * @brief Initialize the DRV8874 motor driver
@@ -75,9 +77,9 @@ public:
     bool checkFault() const;
 
 private:
-    Gpio &dir_;
-    Pwm &pwm_;
-    Gpio &sleep_;
-    Gpio &fault_;
+    Gpio& dir_;
+    Pwm& pwm_;
+    Gpio& sleep_;
+    Gpio& fault_;
 };
-} // namespace LBR
+}  // namespace LBR
