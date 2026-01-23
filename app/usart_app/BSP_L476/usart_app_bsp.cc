@@ -25,7 +25,7 @@ StUsart usart(USART2, 4000000, 9600);
 
 Board board{.usart = usart, .rx = rx_gpio, .tx = tx_gpio};
 
-bool BSP_Init()
+bool BspInit()
 {
     bool result = true;
 
@@ -47,7 +47,7 @@ bool BSP_Init()
     return result;
 }
 
-Board& get_board()
+Board& GetBoard()
 {
     return board;
 }
@@ -55,13 +55,13 @@ Board& get_board()
 extern "C" void USART2_IRQHandler(void)
 {
     // Check if data is available
-    if (usart.get_addr()->ISR & USART_ISR_RXNE)
+    if (usart.GetAddr()->ISR & USART_ISR_RXNE)
     {
-        if (board.usart.receive_rx(rxb))
+        if (board.usart.Receive(rxb))
         {
             // Received 1 byte, echo it back
             std::span<const uint8_t> tx_span(&rxb, 1);
-            board.usart.send_tx(tx_span);
+            board.usart.Send(tx_span);
         }
     }
 }

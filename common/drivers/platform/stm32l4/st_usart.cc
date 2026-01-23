@@ -10,7 +10,7 @@ StUsart::StUsart(USART_TypeDef* base_addr, uint32_t sys_clck,
 {
 }
 
-bool StUsart::receive_rx(uint8_t& byte)
+bool StUsart::Receive(uint8_t& byte)
 {
     // Clear overrun error if present
     if (base_addr->ISR & USART_ISR_ORE)
@@ -23,7 +23,7 @@ bool StUsart::receive_rx(uint8_t& byte)
     return true;
 }
 
-bool StUsart::send_tx(std::span<const uint8_t> txbuf)
+bool StUsart::Send(std::span<const uint8_t> txbuf)
 {
     size_t count = 0;
     for (const auto& byte : txbuf)
@@ -69,7 +69,7 @@ bool StUsart::init()
     return true;
 }
 
-USART_TypeDef* StUsart::get_addr()
+USART_TypeDef* StUsart::GetAddr()
 {
     return this->base_addr;
 }

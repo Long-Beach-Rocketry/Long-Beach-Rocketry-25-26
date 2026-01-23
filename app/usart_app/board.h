@@ -14,6 +14,6 @@ struct Board
     Gpio& tx;
 };
 
-bool BSP_Init();
-Board& get_board();
+bool BspInit();
+Board& GetBoard();
 }  // namespace LBR

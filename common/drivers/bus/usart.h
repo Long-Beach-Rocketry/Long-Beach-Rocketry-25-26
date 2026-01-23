@@ -22,7 +22,7 @@ public:
       * @return True on success. False, otherwise.
       * 
       */
-    virtual bool send_tx(std::span<const uint8_t> txbuf) = 0;
+    virtual bool Send(std::span<const uint8_t> txbuf) = 0;
 
     /**
      * @brief Recieves data from serial rx data line input.
@@ -30,6 +30,6 @@ public:
      * @param byte Reference to store received byte
      * @return True if byte was received, false if no data available
      */
-    virtual bool receive_rx(uint8_t& byte) = 0;
+    virtual bool Receive(uint8_t& byte) = 0;
 };
 }  // namespace LBR

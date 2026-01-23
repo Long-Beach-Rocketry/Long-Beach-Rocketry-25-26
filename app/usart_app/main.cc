@@ -7,13 +7,13 @@ uint8_t rxb;
 
 int main(int argc, char** argv)
 {
-    BSP_Init();
+    BspInit();
 
-    Board board = get_board();
+    Board board = GetBoard();
 
     while (1)
     {
-        board.usart.send_tx(txb);
+        board.usart.Send(txb);
 
         // Busy wait
         for (volatile uint32_t i = 0; i < 1000000; i++);

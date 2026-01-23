@@ -33,7 +33,7 @@ public:
      * @param txbuf An uint8_t std::array data to be sent
      * @param size Variable of size_t type which specifies the size of message.
      */
-    bool send_tx(std::span<const uint8_t> txbuf) override;
+    bool Send(std::span<const uint8_t> txbuf) override;
 
     /**
      * @brief Recieves data from serial input.
@@ -41,7 +41,7 @@ public:
      * @param byte Reference to store received byte
      * @return True if byte was received, false if no data available
      */
-    bool receive_rx(uint8_t& byte) override;
+    bool Receive(uint8_t& byte) override;
 
     /**
      * @brief Initializes the USART and associated Rx and Tx pins.
@@ -55,7 +55,7 @@ public:
      * 
      * @return USART_TypeDef* 
      */
-    USART_TypeDef* get_addr();
+    USART_TypeDef* GetAddr();
 };
 }  // namespace Stml4
 }  // namespace LBR
