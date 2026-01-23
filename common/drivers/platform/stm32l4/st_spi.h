@@ -82,8 +82,8 @@ enum class SpiRxThreshold : uint8_t
 enum class SpiStatus : uint8_t
 {
     OK = 0,
-    READ_ERR,
-    WRITE_ERR,
+    read_ERR,
+    write_ERR,
     TRANSFER_ERR,
     INIT_ERR
 };
@@ -113,40 +113,40 @@ public:
     explicit HwSpi(SPI_TypeDef* instance_, StSpiSettings& settings_);
 
     /**
-    * @brief Read data from a slave device.
+    * @brief read data from a slave device.
     * 
     * @param rx_data 8 byte array to store read data.
     * @param buffer_len Size of array.
-    * @return true SPI Read success, false Read failed
+    * @return true SPI read success, false read failed
     */
-    bool Read(std::span<uint8_t> rx_data) override;
+    bool read(std::span<uint8_t> rx_data) override;
 
     /**
-    * @brief Write data to a slave device.
+    * @brief write data to a slave device.
     * 
     * @param tx_data 8 byte array of the data to be sent.
     * @param buffer_len Size of array
-    * @return true SPI Write success, false Write failed
+    * @return true SPI write success, false write failed
     */
-    bool Write(std::span<uint8_t> tx_data) override;
+    bool write(std::span<uint8_t> tx_data) override;
 
     /**
-    * @brief Sequential Write and Read data to a slave device.
+    * @brief Sequential write and read data to a slave device.
     * 
     * @param tx_data 8 byte array of the data to be sent.
     * @param rx_data 8 byte array to store read data.
     * @param buffer_len Size of arrays
     * @return true SPI Sequential transfer success, false Sequential transfer failed
     */
-    bool SeqTransfer(std::span<uint8_t> tx_data,
-                     std::span<uint8_t> rx_data) override;
+    bool seq_transfer(std::span<uint8_t> tx_data,
+                      std::span<uint8_t> rx_data) override;
 
     /**
     * @brief Initializes SPI peripheral and its sck, mosi, miso, and nss pins
     *
     * @return true Initialization success, false Initialization failed
     */
-    bool Init();
+    bool init();
 
 private:
     // Member variables

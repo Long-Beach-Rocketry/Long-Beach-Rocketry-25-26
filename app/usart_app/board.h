@@ -1,19 +1,19 @@
 #pragma once
-#include "gpio_cs.h"
-#include "spi.h"
+#include "gpio.h"
+#include "usart.h"
 
-//do the cmake
+extern uint8_t rxb;
 
 namespace LBR
 {
-
 struct Board
 {
-    GpioChipSelect& cs;
-    Spi& spi1;
+    Usart& usart;
+
+    Gpio& rx;
+    Gpio& tx;
 };
 
 bool bsp_init();
 Board& get_board();
-
 }  // namespace LBR
