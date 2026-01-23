@@ -10,7 +10,7 @@ extern "C"
 class RingBufferTest : public testing::Test
 {
 public:
-    static constexpr std::size_t BUF_SIZE = 5;
+    static constexpr size_t BUF_SIZE = 5;
 
     uint8_t data[BUF_SIZE];
 
