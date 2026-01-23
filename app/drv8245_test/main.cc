@@ -13,24 +13,20 @@ int main(int argc, char* argv[])
 
     while (1)
     {
-        // Drive forward at 50% duty cycle
-        hw.motor.setPwm(Drv8245::Direction::Forward, 500);
-        for (volatile size_t i = 0; i < 1000000; i++); // Delay
+        // Set motor speed
+        hw.motor.setSpeed(0.5f);  // Set speed to 50%
+        // Set Direction 
+        hw.motor.setDirection(Drv8245::Direction::Forward);
+        for (volatile int i = 0; i < 1000000; ++i);  // Delay
 
-        // Drive reverse at 75% duty cycle
-        hw.motor.setPwm(Drv8245::Direction::Reverse, 750);
-        for (volatile size_t i = 0; i < 1000000; i++); // Delay
+        hw.motor.setDirection(Drv8245::Direction::Reverse);
+        for (volatile int i = 0; i < 1000000; ++i);  // Delay
 
-        // Enable coast (Hi-Z)
-        hw.motor.enableCoast();
-        for (volatile size_t i = 0; i < 1000000; i++); // Delay
+        hw.motor.setSpeed(0.0f);  // Stop motor
+        for (volatile int i = 0; i < 1000000; ++i);  // Delay
+
+        hw.motor.checkFault();  // Check for faults
         
-        // Check for faults
-        if (hw.motor.checkFault()) {
-            return -1;
-        } else {
-            return 0;
-        }
     }
 
     return 0;

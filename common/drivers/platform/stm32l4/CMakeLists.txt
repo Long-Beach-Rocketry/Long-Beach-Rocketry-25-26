@@ -4,11 +4,7 @@ add_library(hal STATIC
     st_i2c.cc
     st_sys_clock.cc
     st_pwm.cc
-<<<<<<< HEAD
-    st_sys_clock.cc
     st_usart.cc
-=======
->>>>>>> 8766895 (need review)
 )
 
 target_include_directories(hal PUBLIC
