@@ -12,10 +12,10 @@ using namespace LBR;
 int main(void)
 {
     // Enable clocks and initialize SPI pins
-    BspInit();
+    bsp_init();
 
     // Get struct of our ready to use Chip Select Pin and SPI object
-    Board spi_board = GetBoard();
+    Board spi_board = get_board();
 
     // Send command byte 0x90 to read Manufacturer ID for the w25q
     std::array<uint8_t, 4> tx_buffer = {0x90, 0x00, 0x00, 0x00};
@@ -26,11 +26,11 @@ int main(void)
     while (1)
     {
         // Drive CS Pin low to allow write
-        spi_board.cs.ChipSelectEnable();
+        spi_board.cs.cs_enable();
         // Loop write to PA7
-        spi_board.spi1.SeqTransfer(tx_buffer, rx_buffer);
+        spi_board.spi1.seq_transfer(tx_buffer, rx_buffer);
         // Drive CS Pin high to end write
-        spi_board.cs.ChipSelectDisable();
+        spi_board.cs.cs_disable();
     }
 
     return 0;

@@ -28,12 +28,12 @@ public:
     StUsart(USART_TypeDef* base_addr, uint32_t sys_clck, uint32_t baud_rate);
 
     /**
-     * @brief Sends data to serial output.
+     * @brief sends data to serial output.
      * 
      * @param txbuf An uint8_t std::array data to be sent
      * @param size Variable of size_t type which specifies the size of message.
      */
-    bool Send(std::span<const uint8_t> txbuf) override;
+    bool send(std::span<const uint8_t> txbuf) override;
 
     /**
      * @brief Recieves data from serial input.
@@ -41,7 +41,7 @@ public:
      * @param byte Reference to store received byte
      * @return True if byte was received, false if no data available
      */
-    bool Receive(uint8_t& byte) override;
+    bool receive(uint8_t& byte) override;
 
     /**
      * @brief Initializes the USART and associated Rx and Tx pins.
@@ -55,7 +55,7 @@ public:
      * 
      * @return USART_TypeDef* 
      */
-    USART_TypeDef* GetAddr();
+    USART_TypeDef* get_addr();
 };
 }  // namespace Stml4
 }  // namespace LBR

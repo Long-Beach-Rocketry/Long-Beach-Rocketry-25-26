@@ -18,7 +18,7 @@ HwSpi::HwSpi(SPI_TypeDef* instance_, StSpiSettings& settings_)
 {
 }
 
-bool HwSpi::Read(std::span<uint8_t> rx_data)
+bool HwSpi::read(std::span<uint8_t> rx_data)
 {
 
     // Check if SPI is already in communication
@@ -46,7 +46,7 @@ bool HwSpi::Read(std::span<uint8_t> rx_data)
         {
         }
 
-        // Read data from RX buffer
+        // read data from RX buffer
         byte = *(volatile uint8_t*)&instance->DR;
     }
 
@@ -58,7 +58,7 @@ bool HwSpi::Read(std::span<uint8_t> rx_data)
     return true;
 }
 
-bool HwSpi::Write(std::span<uint8_t> tx_data)
+bool HwSpi::write(std::span<uint8_t> tx_data)
 {
 
     // Check if SPI is already in communication
@@ -75,7 +75,7 @@ bool HwSpi::Write(std::span<uint8_t> tx_data)
         }
 
         /*
-         * Write to SPI Data Register (DR).
+         * write to SPI Data Register (DR).
          * Automatically starts clock once data is written to the DR.
          */
         *(volatile uint8_t*)&instance->DR = byte;
@@ -103,7 +103,7 @@ bool HwSpi::Write(std::span<uint8_t> tx_data)
     return true;
 }
 
-bool HwSpi::SeqTransfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
+bool HwSpi::seq_transfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
 {
     // Check if SPI is enabled
     if (!(instance->CR1 & SPI_CR1_SPE))
@@ -128,7 +128,7 @@ bool HwSpi::SeqTransfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
         {
         }
 
-        // Write next tx byte to start clocking
+        // write next tx byte to start clocking
         *(volatile uint8_t*)&instance->DR = byte;
 
         // Wait for RX buffer to be filled (data received for this transfer)
@@ -136,7 +136,7 @@ bool HwSpi::SeqTransfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
         {
         }
 
-        // Read and discard intermediate RX byte to clear RXNE
+        // read and discard intermediate RX byte to clear RXNE
         (void)(*(volatile uint8_t*)&instance->DR);
     }
 
@@ -159,7 +159,7 @@ bool HwSpi::SeqTransfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
         {
         }
 
-        // Read data from RX buffer into rx_data
+        // read data from RX buffer into rx_data
         byte = *(volatile uint8_t*)&instance->DR;
     }
 
@@ -171,7 +171,7 @@ bool HwSpi::SeqTransfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
     return true;
 }
 
-bool HwSpi::Init()
+bool HwSpi::init()
 {
     // TODO: Runtime validation of enum values (will change to compile time checks in the future and maybe make a private function for these checks)
     if (static_cast<uint8_t>(settings.baudrate) > 7)

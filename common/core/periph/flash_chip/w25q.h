@@ -51,7 +51,7 @@ public:
     * 
     * @return true W25Q Initialization was successful, false Initialization failed
     */
-    bool W25qInit();
+    bool init();
 
     /**
     * @brief Volatile write to modify Status Reg values (used for block or sector protect)
@@ -61,7 +61,8 @@ public:
     * @param val The actual bit value we want to write into the Status Reg, Ex. value 101 on 4:2 -> 00010100 -> (0x05 << 2)
     * @return true Correct value was written to the Status Reg, false Operation failed
     */
-    bool StatusRegWrite(StatusWrite status_reg_num, uint8_t mask, uint8_t val);
+    bool status_reg_write(StatusWrite status_reg_num, uint8_t mask,
+                          uint8_t val);
 
     /**
     * @brief Read specified status register
@@ -70,14 +71,14 @@ public:
     * @param rxbuf 
     * @return true Read operation on Status Reg success, false Read operation failed
     */
-    bool StatusRegRead(StatusRead status_reg_num, std::span<uint8_t> rxbuf);
+    bool status_reg_read(StatusRead status_reg_num, std::span<uint8_t> rxbuf);
 
     /**
     * @brief All on-going operations will be halted, the device will return to the default power-on state, and lose all current volatile settings 
     * 
     * @return true Device was successfully reset, false Device reset failed
     */
-    bool Reset();
+    bool reset();
 
     /**
     * @brief Reads data from a sector, page, or word
@@ -89,7 +90,7 @@ public:
     * @param rxbuf 
     * @return true Read from desired memory location successful, false Read failed
     */
-    bool Read(uint8_t block, uint8_t sector, uint8_t page, uint8_t offset,
+    bool read(uint8_t block, uint8_t sector, uint8_t page, uint8_t offset,
               std::span<uint8_t> rxbuf);
 
     /**
@@ -103,9 +104,9 @@ public:
     * @param rxbuf Buffer to verify correct data was written into flash chip
     * @return true Data successfully written to desired memory location, false Write to flash chip failed
     */
-    bool PageProgram(uint8_t block, uint8_t sector, uint8_t page,
-                     uint8_t offset, std::span<uint8_t> txbuf,
-                     std::span<uint8_t> rxbuf);
+    bool page_program(uint8_t block, uint8_t sector, uint8_t page,
+                      uint8_t offset, std::span<uint8_t> txbuf,
+                      std::span<uint8_t> rxbuf);
 
     /**
     * @brief Erase a 64KB block
@@ -113,7 +114,7 @@ public:
     * @param block 
     * @return true Desired 64KB block successfully erased, false Block erase failed
     */
-    bool BlockErase(uint8_t block);
+    bool block_erase(uint8_t block);
 
     /**
     * @brief Erase a sector
@@ -121,14 +122,14 @@ public:
     * @param sector 
     * @return true Desired Sector successfully erased, false Sector was not erased
     */
-    bool SectorErase(uint8_t block, uint8_t sector);
+    bool sector_erase(uint8_t block, uint8_t sector);
 
     /**
     * @brief Erase entire chip
     * 
     * @return true Chip successfully wiped, false Chip erase failed
     */
-    bool ChipErase();
+    bool chip_erase();
 
     /**
     * @brief Make a block read only to prevent an accidental erase
@@ -136,7 +137,7 @@ public:
     * @param block 
     * @return true Block successfully locked, false Block already locked
     */
-    bool BlockLock(uint8_t block);
+    bool block_lock(uint8_t block);
 
     /**
     * @brief Make a block writeable from read only mode
@@ -144,7 +145,7 @@ public:
     * @param block 
     * @return true Block was successfully unlocked, false Block already unlocked
     */
-    bool BlockUnlock(uint8_t block);
+    bool block_unlock(uint8_t block);
 
     // Bit Mask for a helper function
     static constexpr uint8_t kBlockBitMask = (1u << 0);
@@ -155,21 +156,21 @@ private:
     * 
     * @return true W25Q is currently in a write or erase cycle, false W25Q is ready to accept commands
     */
-    bool BusyCheck();
+    bool busy_check();
 
     /**
     * @brief Non-volatile write enable
     * 
     * @return true WEL bit was set, false WEL bit is cleared
     */
-    bool WriteEnable();
+    bool write_enable();
 
     /**
      * @brief Volatile write enable for writing to Status Registers
      * 
      * @return true Volatile Write Enable command was sent successfully, false otherwise
      */
-    bool VolatileWriteEnable();
+    bool volatile_write_enable();
 
     /**
     * @brief Check if an individual block is locked or not
@@ -178,7 +179,7 @@ private:
     * @param wps_val A byte that will hold the contents of whether the Block is locked or not
     * @return true Block is currently locked, false Block is not locked
     */
-    bool BlockLockStatusRead(uint32_t block_addr, uint8_t& block_lock_byte);
+    bool block_lock_status_read(uint32_t block_addr, uint8_t& block_lock_byte);
 
     // Member Variables
     Spi& spi;
@@ -190,8 +191,8 @@ private:
         static constexpr uint8_t kGlobalBlockUnlock = 0x98u;
         static constexpr uint8_t kWriteEnable = 0x06u;
         static constexpr uint8_t kVolatileWriteEnable = 0x50u;
-        static constexpr uint8_t kEnableReset = 0x66u;
-        static constexpr uint8_t kResetDevice = 0x99u;
+        static constexpr uint8_t kEnablereset = 0x66u;
+        static constexpr uint8_t kresetDevice = 0x99u;
         static constexpr uint8_t kReadData = 0x03u;
         static constexpr uint8_t kPageProgram = 0x02u;
         static constexpr uint8_t kBlockErase64Kb = 0xD8u;
