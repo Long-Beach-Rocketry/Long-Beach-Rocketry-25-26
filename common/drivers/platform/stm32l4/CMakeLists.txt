@@ -4,6 +4,7 @@ add_library(hal STATIC
     st_i2c.cc
     st_sys_clock.cc
     st_usart.cc
+    st_pwm.cc
 )
 
 target_include_directories(hal PUBLIC
