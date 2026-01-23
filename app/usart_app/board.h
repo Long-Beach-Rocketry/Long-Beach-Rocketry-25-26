@@ -11,8 +11,8 @@ struct Board
 {
     Usart& usart;
 
-    LBR::Gpio& rx;
-    LBR::Gpio& tx;
+    Gpio& rx;
+    Gpio& tx;
 };
 
 bool BSP_Init();
