@@ -31,24 +31,23 @@ public:
      * @example fixed8_8(10, 45) would = 10.45
      */
     fixed_point(upperT upper, lowerT lower)
+        : raw((upper << fraction_bits) |= lower)
     {
-        raw{upper << fraction_bits};
-        raw |= lower;
+        // raw{upper << fraction_bits};
+        // raw |= lower;
     }
 
     /**
      * @brief Constructs fixed point intager wholenumber
      * @example fixed8_8(10) would = 10.0
      */
-    fixed_point(upperT upper)
+    fixed_point(upperT upper) : raw(upper << fraction_bits)
     {
-        raw{upper << fraction_bits};
     }
 
     /* Default constructor. */
-    fixed_point()
+    fixed_point() : raw(0)
     {
-        raw{0};
     }
 
     rawT get_raw()
