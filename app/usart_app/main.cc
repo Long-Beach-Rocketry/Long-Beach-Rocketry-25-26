@@ -1,4 +1,3 @@
-#include <span>
 #include "board.h"
 
 using namespace LBR;

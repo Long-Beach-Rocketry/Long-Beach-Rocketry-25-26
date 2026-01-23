@@ -1,4 +1,3 @@
-#include <stdint.h>
 #include "board.h"
 #include "st_gpio.h"
 #include "st_sys_clock.h"

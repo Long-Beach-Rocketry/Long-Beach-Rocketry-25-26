@@ -4,9 +4,6 @@
 
 #pragma once
 
-#include <cstddef>
-#include <span>
-#include <string>
 #include "stm32l476xx.h"
 #include "usart.h"
 
