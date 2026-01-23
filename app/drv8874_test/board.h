@@ -10,15 +10,15 @@
 #include "gpio.h"
 #include "pwm.h"
 
-namespace LBR 
+namespace LBR
 {
 
-struct Board 
+struct Board
 {
-    Drv8874 &motor;
+    Drv8874& motor;
 };
 
 bool bsp_init(void);
-Board &get_board(void);
+Board& get_board(void);
 
-} // namespace LBR
+}  // namespace LBR
