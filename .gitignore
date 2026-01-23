@@ -1,6 +1,8 @@
 **/Build
 **/build
 *.ninja
+*.ninja_log
+*.ninja_deps
 cmake_install.cmake
 CMakeCache.txt
 **/CMakeFiles
@@ -11,5 +13,8 @@ CMakeCache.txt
 **/venv
 .venv*
 .clangd
+clangd
 .cache
 compile_commands.json
+CTestTestfile.cmake
+*.a
