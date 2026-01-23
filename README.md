@@ -19,10 +19,8 @@ Also, install Ninja ```sudo apt-get install ninja-build```
 On Windows, try [here](https://github.com/ninja-build/ninja/releases). Same with adding to path.
 Make sure it worked: ```ninja --version```
 
-<!--
 Lastly, pull in external dependencies:
 ```git submodule update --init --recursive```
--->
 
 ## Building
 To build:
