@@ -13,12 +13,12 @@ bool Motor::init() {
 	return true;
 }
 
-void Motor::motorSpeed(int speed) {
-	// using _drv.methodName() to set speed and direction based on sign of speed
-}
-
 void Motor::motorEnable(bool enable) {
 	// using _drv.methodName() to enable or disable motor
+}
+
+void Motor::motorSpeed(int speed) {
+	// using _drv.methodName() to set speed and direction based on sign of speed
 }
 
 void Motor::motorDirection(bool forward) {

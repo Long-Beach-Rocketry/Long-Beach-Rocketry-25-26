@@ -1,16 +1,14 @@
 #pragma once
 /**
- * @file motor_if.h
- * @brief Abstract motor interface for PPS
+ * @file dc_motor.h
+ * @brief Abstract motor interface for DC motors + encoder feedback
  * @note Motor interface functions to control motor actions.
  * @author Bex Saw
  * @date 2025/12/31
  */
 
-/* Small note for the motor interface. This will be generic for a DC motor! 
-This means that none of this should be specific to the PPS. The drilling app will probably use this as well. - TJ */
-
-#include "drv_8245.h" // Motor driver 
+#include "drv_8245.h" // PPS motor driver 
+#include "drv_8874.h" // Auger motor driver
 //#include "encoder.h"  // Encoder interface (whatever yshi generic has made)
 
 namespace LBR {
@@ -18,8 +16,14 @@ namespace LBR {
 // I might make a template class to allow for different motor drivers type to be pass the constructor 
 class Motor {
 public:
-	Motor(Drv8245& drv, Encoder& encoder);
+	Motor(Drv8245& drv, Drv8874& drv2, Encoder& encoder);
 	~Motor();
+
+	/**
+	 * @brief Initialize motor driver and encoder
+	 * @return true if successful, false otherwise
+	 */
+	bool init();
 
     /**
 	* @brief Stop or enable the motor (PWM control)
@@ -66,6 +70,7 @@ public:
 
 private:
 	Drv8245& _drv;
+	Drv8874& _drv2; 
 	Encoder& _encoder;
 
 	bool _initialized{false};
