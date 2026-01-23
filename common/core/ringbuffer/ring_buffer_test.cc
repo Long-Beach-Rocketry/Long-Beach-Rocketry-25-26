@@ -1,11 +1,9 @@
 
 #include <gtest/gtest.h>
-
-extern "C"
-{
 #include <cstdint>
 #include "ringbuffer.h"
-}
+
+using namespace LBR;
 
 class RingBufferTest : public testing::Test
 {
@@ -15,7 +13,7 @@ public:
     uint8_t data[BUF_SIZE];
 
     RingBuffer buf;
-    RingBufferTest() : buf(data, BUF_SIZE){};
+    RingBufferTest() : buf(data, BUF_SIZE) {};
 };
 
 TEST_F(RingBufferTest, InsertAndPopTest)
