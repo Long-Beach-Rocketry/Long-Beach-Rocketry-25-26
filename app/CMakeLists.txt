@@ -4,12 +4,6 @@ add_subdirectory(i2c_test)
 add_subdirectory(bmp390_test)
 add_subdirectory(imu_test)
 add_subdirectory(w25q_test)
-<<<<<<< HEAD
 add_subdirectory(usart_app)
 add_subdirectory(pwm_test)
 add_subdirectory(drv8874_test)
-add_subdirectory(drv8874_test)
-=======
-add_subdirectory(pwm_test)
-add_subdirectory(drv8874_test)
->>>>>>> 01ac8fd (rebase origin)
