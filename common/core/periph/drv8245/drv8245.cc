@@ -12,9 +12,19 @@ void Drv8245::init() {
     sleep_.set(true);  // Wake up driver
 }
 
-void Drv8245::setPwm(Direction dir, uint16_t pwm_value) {
-    dir_.set(dir == Direction::Forward ? true : false);
-    pwm_.set_duty_cycle(static_cast<uint8_t>(pwm_value / 10)); // Convert 0-1000 to 0-100%
+void Drv8245::setSpeed(uint16_t pwm_value) {
+    if (pwm_value > 100) {
+        pwm_value = 100; // Cap at 100%
+    }
+    pwm_.set_duty_cycle(pwm_value);
+}
+
+void Drv8245::setDirection(Direction dir) {
+    if (dir == Direction::Forward) {
+        dir_.set(true);
+    } else {
+        dir_.set(false);
+    }
 }
 
 void Drv8245::enableCoast() {

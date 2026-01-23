@@ -44,21 +44,28 @@ public:
     void init();
 
     /**
-    * @brief Set motor PWM and direction
-    * @param dir Direction enum (Forward/Reverse)
-    * @param pwm_value PWM duty cycle (0-1000 for 0%-100%)
+    * @brief Set motor speed (0-100%)
+    * @param pwm_value Speed value from 0 (stop) to 100 (full speed)
+    * @note This function sets the motor speed by adjusting the PWM duty cycle.
     */
-    void setPwm(Direction dir, uint16_t pwm_value);
+    void setSpeed(uint16_t pwm_value);
+
+    /**
+    * @brief set motor direction
+    * @param dir Direction enum (Forward/Reverse)
+    * @note This function sets the deploy_board motor direction by controlling the DIR pin.
+    */
+    void setDirection(Direction dir);
 
     /**
     * @brief Enable coast (Hi-Z) mode
-    * @note This function disables the motor outputs, putting them in a high-impedance state.
+    * @note This function disables the deploy_board motor outputs, putting them in a high-impedance state.
     */
     void enableCoast();
     
     /**
     * @brief Enable/Disable sleep mode
-    * @note set motor into a low-power sleep state when enabled, and wakes it when disabled.
+    * @note set deploy_board motor into a low-power sleep state when enabled, and wakes it when disabled.
     */
     void setSleep(bool enable);
 
@@ -67,10 +74,7 @@ public:
     * @return true if a fault is detected, false otherwise
     */
     bool checkFault() const;
-
-    // bool currentSense(float& current) const; 
-    // Optional: Implement if current sensing is needed (ADC raw)
-
+    
 private:
     Gpio& dir_;
     Pwm& pwm_;
