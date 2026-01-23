@@ -13,16 +13,18 @@
  * All hardware mapping is handled by the BSP; this class only uses abstracted Gpio and Pwm objects.
  */
 #pragma once
+#include <cstdint>
 #include "gpio.h"
 #include "pwm.h"
-#include <cstdint>
 
-namespace LBR {
+namespace LBR
+{
 
-class Drv8245 {
+class Drv8245
+{
 public:
-
-    enum class Direction : uint8_t {
+    enum class Direction : uint8_t
+    {
         Forward = 1,
         Reverse = 0
     };
@@ -62,7 +64,7 @@ public:
     * @note This function disables the deploy_board motor outputs, putting them in a high-impedance state.
     */
     void enableCoast();
-    
+
     /**
     * @brief Enable/Disable sleep mode
     * @note set deploy_board motor into a low-power sleep state when enabled, and wakes it when disabled.
@@ -74,13 +76,12 @@ public:
     * @return true if a fault is detected, false otherwise
     */
     bool checkFault() const;
-    
+
 private:
     Gpio& dir_;
     Pwm& pwm_;
     Gpio& drv_z_;
     Gpio& sleep_;
     Gpio& fault_;
-}; 
-} // namespace LBR
-  
+};
+}  // namespace LBR
