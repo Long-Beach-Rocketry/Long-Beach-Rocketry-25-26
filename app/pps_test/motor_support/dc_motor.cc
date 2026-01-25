@@ -1,28 +1,37 @@
-#include "motor_if.h"
+#include "dc_motor.h"
+#include <cstdlib>
+#include <algorithm>
 
 namespace LBR {
 
-Motor::Motor(Drv8245& drv, Encoder& encoder)
-	: _drv(drv), _encoder(encoder) {}
+Motor::Motor(Drv8245& drv)
+	: _drv(drv) {}
 
 Motor::~Motor() {}
 
 bool Motor::init() {
-	// Initialize motor driver and encoder
-	_initialized = true;	
+	// Initialize driver
+	_drv.init();
+	_initialized = true;
 	return true;
 }
 
 void Motor::motorEnable(bool enable) {
-	// using _drv.methodName() to enable or disable motor
+	if (enable) {
+		_drv.setSleep(false);  // Wake up driver (enable)
+	} else {
+		_drv.enableCoast();    // Set driver to Hi-Z (disable)
+	}
 }
 
 void Motor::motorSpeed(int speed) {
-	// using _drv.methodName() to set speed and direction based on sign of speed
+	// Clamp speed to -100 to 100
+	speed = std::clamp(std::abs(speed), 0, 100);
+	_drv.setSpeed(static_cast<uint16_t>(speed));
 }
 
 void Motor::motorDirection(bool forward) {
-	// using _drv.methodName() to set direction pin
+    _drv.setDirection(forward ? Drv8245::Direction::Forward : Drv8245::Direction::Reverse);
 }
 
 void Motor::moveDegrees(int degrees, int speed) {
@@ -30,12 +39,21 @@ void Motor::moveDegrees(int degrees, int speed) {
 }
 
 int Motor::getTicks() const {
-	// using _encoder.methodName() to get current ticks
-	return 0; 
+	// No encoder implemented yet
+	return 0;
 }
 
 int Motor::getStatus() const {
 	// Return status code (0 for OK, nonzero for error)
+	if( !_initialized) {
+		return -1; // Not initialized
+	}
+	if (_drv.checkFault()) {
+		return -2; // Driver fault
+	}
+	/* if == (_encoder.getStatus() != 0) {
+		return -3; // Encoder error
+	} */ 
 	return 0;
 }
 

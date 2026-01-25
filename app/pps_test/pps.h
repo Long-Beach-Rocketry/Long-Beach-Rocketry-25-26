@@ -2,11 +2,11 @@
 /**
  * @file pps.h
  * @brief PPS module interface
- * @note This module manages the PPS state machine for deployment, rotation, drilling, and sample read.
+ * @note This module manages the PPS state machine for deployment, rotation, and retraction.
  * @author Bex Saw
  * @date 2026/01/05
  */
-#include "motor_if.h"
+#include "motor_support/dc_motor.h"
 #include "imu_math.h"
 #include "board.h"
 #include "pps_helpers.h" 
@@ -27,6 +27,7 @@ public:
     PpsState getState() const;
     Pps(Gpio& gpio, Motor& motor);
     void fetchImuData(const LBR::Quaternion& data); // Fetch IMU data for quaternion
+    void fetchAccelData(const LBR::Vec3& data); // Fetch IMU data for acceleration
     void update(); // State machine update, no IMU arg
 
 private:

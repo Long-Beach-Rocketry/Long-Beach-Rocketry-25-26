@@ -1,8 +1,7 @@
 #include "pps.h"
 
-namespace LBR {
 
-Pps::Pps() = default;
+namespace LBR {
 
 PpsState Pps::getState() const {
     return state_;
@@ -33,7 +32,7 @@ void Pps::update() {
             // Deploying: move to deployed position, then rotate, then return to Idle
             motorDeploy();
             if (readLimitSwitch() == LimitSwitchState::extended) {
-                motorStop();
+                motor_.motorEnable(false);
                 // After deploying, rotate
                 state_ = PpsState::Rotating;
             }
@@ -42,7 +41,7 @@ void Pps::update() {
             // Rotating: move to target/drill position, then return to Idle
             motorTarget(); // Determine the target position 
             if (rotationComplete()) {
-                motorStop();
+                motor_.motorEnable(false);
                 state_ = PpsState::Idle;
             }
             break;
@@ -50,16 +49,19 @@ void Pps::update() {
             // Retract: move to retracted position, then return to Idle
             motorRetract();
             if (readLimitSwitch() == LimitSwitchState::retracted) {
-                motorStop();
+                motor_.motorEnable(false);
                 state_ = PpsState::Idle;
             }
             break;
     }
 }
 
-bool Pps::readLimitSwitch() {
+
+
+Pps::LimitSwitchState Pps::readLimitSwitch() {
     // Read limit switch state from GPIO
-    if (gpio_.readPin(LIMIT_SWITCH_PIN)) {
+    // If high, extended; if low, retracted
+    if (gpio_.read()) {
         return LimitSwitchState::extended;
     } else {
         return LimitSwitchState::retracted;
@@ -69,9 +71,10 @@ bool Pps::readLimitSwitch() {
 
 bool Pps::deploy() {
     if (!(readLimitSwitch() == LimitSwitchState::extended)) return false;
-    for (int i = 0; i < 4; ++i) {
-        if (state_quat_[i] != 0.0f) return true;
-    }
+    if (state_quat_.w != 0.0f) return true;
+    if (state_quat_.x != 0.0f) return true;
+    if (state_quat_.y != 0.0f) return true;
+    if (state_quat_.z != 0.0f) return true;
     return false;
 }
 
