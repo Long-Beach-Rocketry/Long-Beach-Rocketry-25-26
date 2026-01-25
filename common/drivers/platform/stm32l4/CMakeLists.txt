@@ -3,14 +3,15 @@ add_library(hal STATIC
     st_spi.cc
     st_i2c.cc
     st_sys_clock.cc
+    st_pwm.cc
     st_usart.cc
 )
 
 target_include_directories(hal PUBLIC
     .
     ${CMAKE_SOURCE_DIR}/common/core/utils
-    #bus #why this? i dont think needed
-)
+    ${CMAKE_SOURCE_DIR}/common/drivers/time
+    )
 
 target_link_libraries(hal PUBLIC
     st_l4_support
