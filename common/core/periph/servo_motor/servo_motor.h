@@ -28,6 +28,12 @@ class ServoMotor
 {
 public:
     /**
+     * @brief BMP390 Contructor
+     * @param params Struct containing I2C interface and device address.
+     */
+    explicit ServoMotor(const ServoMotorParams& params_);
+
+    /**
      * @brief Servo motor hardware initializer
      * @return true if successful, false otherwise
      */
@@ -40,10 +46,10 @@ public:
     bool set_angle(uint16_t angle);
 
 private:
-    Pwm& _pwm;
-    uint16_t _min_pulse_width;
-    uint16_t _max_pulse_width;
-    uint16_t _max_angle;
+    Pwm& pwm;
+    uint16_t min_pulse_width;
+    uint16_t max_pulse_width;
+    uint16_t max_angle;
 
     uint8_t calculate_duty_cycle(uint16_t angle);
 };
