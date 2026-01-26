@@ -73,9 +73,9 @@ class HwPwm : public Pwm
 public:
     /**
      * @brief Hw Contructor
-     * @param params struct of timer and channel
+     * @param params_ struct of timer and channel
      */
-    explicit HwPwm(const StPwmParams& params);
+    explicit HwPwm(const StPwmParams& params_);
 
     /**
      * @brief Initializes PWM peripheral
@@ -96,11 +96,11 @@ public:
     bool set_duty_cycle(uint8_t duty_cycle) override;
 
 private:
-    TIM_TypeDef* _base_addr;
-    uint8_t _channel;
-    StPwmSettings _settings;
-    uint32_t _curr_freq;
-    uint8_t _curr_duty_cycle;
+    TIM_TypeDef* base_addr;
+    uint8_t channel;
+    StPwmSettings settings;
+    uint32_t curr_freq;
+    uint8_t curr_duty_cycle;
 };
 
 }  // namespace Stml4

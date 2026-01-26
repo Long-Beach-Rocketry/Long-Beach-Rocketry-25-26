@@ -35,24 +35,24 @@ static constexpr uint32_t MAX_FREQ_EDGE_ALIGNED = pclk_freq / (ARR_VAL + 1);
 static constexpr uint32_t MAX_FREQ_CENTER_ALIGNED =
     pclk_freq / (2 * (ARR_VAL + 1));
 
-HwPwm::HwPwm(const StPwmParams& params)
-    : _base_addr{params.base_addr},
-      _channel{params.channel},
-      _settings{params.settings},
-      _curr_freq{pclk_freq},
-      _curr_duty_cycle{0}
+HwPwm::HwPwm(const StPwmParams& params_)
+    : base_addr{params_.base_addr},
+      channel{params_.channel},
+      settings{params_.settings},
+      curr_freq{pclk_freq},
+      curr_duty_cycle{0}
 {
 }
 
 bool HwPwm::init()
 {
-    if (_base_addr == nullptr)
+    if (base_addr == nullptr)
     {
         return false;
     }
 
     // Timers 6/7 are not capable of PWM
-    if ((_base_addr == TIM6) || (_base_addr == TIM7))
+    if ((base_addr == TIM6) || (base_addr == TIM7))
     {
         return false;
     }
@@ -63,15 +63,15 @@ bool HwPwm::init()
      *       Timer 15 has 2 channels
      *       Timers 1, 2, 3, 4, 5, 6, 8 have 4 channels
      */
-    if ((_channel < 1) || (_channel > 4))
+    if ((channel < 1) || (channel > 4))
     {
         return false;
     }
-    else if ((_base_addr == TIM16 || _base_addr == TIM17) && (_channel > 1))
+    else if ((base_addr == TIM16 || base_addr == TIM17) && (channel > 1))
     {
         return false;
     }
-    else if ((_base_addr == TIM15) && (_channel > 2))
+    else if ((base_addr == TIM15) && (channel > 2))
     {
         return false;
     }
@@ -81,60 +81,60 @@ bool HwPwm::init()
      * @note Timers 15, 16, 17 are only capable of edge-aligned mode
      * @note Timers 15, 16, 17 are not capable of downcounting
      */
-    if ((_base_addr == TIM15 || _base_addr == TIM16 || _base_addr == TIM17) &&
-        ((_settings.mode != PwmMode::EDGE_ALIGNED) ||
-         _settings.dir != PwmDir::UPCOUNTING))
+    if ((base_addr == TIM15 || base_addr == TIM16 || base_addr == TIM17) &&
+        ((settings.mode != PwmMode::EDGE_ALIGNED) ||
+         settings.dir != PwmDir::UPCOUNTING))
     {
         return false;
     }
 
     // Configure timer according to channel and settings
-    switch (_channel)
+    switch (channel)
     {
         case 1:
             // Configure channel as an output
-            _base_addr->CCMR1 &= ~TIM_CCMR1_CC1S_Msk;
+            base_addr->CCMR1 &= ~TIM_CCMR1_CC1S_Msk;
 
             // Configure output mode
-            SetReg(&_base_addr->CCMR1,
-                   static_cast<uint32_t>(_settings.output_mode),
+            SetReg(&base_addr->CCMR1,
+                   static_cast<uint32_t>(settings.output_mode),
                    TIM_CCMR1_OC1M_Pos, TIM_CCMRx_OCxM_BitWidth);
 
             // Configure default duty cycle to be 0%
-            _base_addr->CCR1 = _curr_duty_cycle;
+            base_addr->CCR1 = curr_duty_cycle;
 
             // Set preload bit to buffer updates to capture/compare register
-            _base_addr->CCMR1 |= TIM_CCMR1_OC1PE;
+            base_addr->CCMR1 |= TIM_CCMR1_OC1PE;
 
             // Enable capture/compare output
-            _base_addr->CCER |= TIM_CCER_CC1E;
+            base_addr->CCER |= TIM_CCER_CC1E;
             break;
         case 2:
-            _base_addr->CCMR1 &= ~TIM_CCMR1_CC2S_Msk;
-            SetReg(&_base_addr->CCMR1,
-                   static_cast<uint32_t>(_settings.output_mode),
+            base_addr->CCMR1 &= ~TIM_CCMR1_CC2S_Msk;
+            SetReg(&base_addr->CCMR1,
+                   static_cast<uint32_t>(settings.output_mode),
                    TIM_CCMR1_OC2M_Pos, TIM_CCMRx_OCxM_BitWidth);
-            _base_addr->CCR2 = _curr_duty_cycle;
-            _base_addr->CCMR1 |= TIM_CCMR1_OC2PE;
-            _base_addr->CCER |= TIM_CCER_CC2E;
+            base_addr->CCR2 = curr_duty_cycle;
+            base_addr->CCMR1 |= TIM_CCMR1_OC2PE;
+            base_addr->CCER |= TIM_CCER_CC2E;
             break;
         case 3:
-            _base_addr->CCMR2 &= ~TIM_CCMR2_CC3S_Msk;
-            SetReg(&_base_addr->CCMR2,
-                   static_cast<uint32_t>(_settings.output_mode),
+            base_addr->CCMR2 &= ~TIM_CCMR2_CC3S_Msk;
+            SetReg(&base_addr->CCMR2,
+                   static_cast<uint32_t>(settings.output_mode),
                    TIM_CCMR2_OC3M_Pos, TIM_CCMRx_OCxM_BitWidth);
-            _base_addr->CCR3 = _curr_duty_cycle;
-            _base_addr->CCMR2 |= TIM_CCMR2_OC3PE;
-            _base_addr->CCER |= TIM_CCER_CC3E;
+            base_addr->CCR3 = curr_duty_cycle;
+            base_addr->CCMR2 |= TIM_CCMR2_OC3PE;
+            base_addr->CCER |= TIM_CCER_CC3E;
             break;
         case 4:
-            _base_addr->CCMR2 &= ~TIM_CCMR2_CC4S_Msk;
-            SetReg(&_base_addr->CCMR2,
-                   static_cast<uint32_t>(_settings.output_mode),
+            base_addr->CCMR2 &= ~TIM_CCMR2_CC4S_Msk;
+            SetReg(&base_addr->CCMR2,
+                   static_cast<uint32_t>(settings.output_mode),
                    TIM_CCMR2_OC4M_Pos, TIM_CCMRx_OCxM_BitWidth);
-            _base_addr->CCR4 = _curr_duty_cycle;
-            _base_addr->CCMR2 |= TIM_CCMR2_OC4PE;
-            _base_addr->CCER |= TIM_CCER_CC4E;
+            base_addr->CCR4 = curr_duty_cycle;
+            base_addr->CCMR2 |= TIM_CCMR2_OC4PE;
+            base_addr->CCER |= TIM_CCER_CC4E;
             break;
         default:
             return false;
@@ -145,26 +145,26 @@ bool HwPwm::init()
      * @note Timer outputs are gated by the MOE bit since they contain
      *       functionality to handle break faults
      */
-    if (_base_addr == TIM1 || _base_addr == TIM8 || _base_addr == TIM15 ||
-        _base_addr == TIM16 || _base_addr == TIM17)
+    if (base_addr == TIM1 || base_addr == TIM8 || base_addr == TIM15 ||
+        base_addr == TIM16 || base_addr == TIM17)
     {
-        _base_addr->BDTR |= TIM_BDTR_MOE;
+        base_addr->BDTR |= TIM_BDTR_MOE;
     }
 
     // Configure PWM mode and direction
-    SetReg(&_base_addr->CR1, static_cast<uint32_t>(_settings.mode),
+    SetReg(&base_addr->CR1, static_cast<uint32_t>(settings.mode),
            TIM_CR1_CMS_Pos, TIM_CR1_CMS_BitWidth);
-    SetReg(&_base_addr->CR1, static_cast<uint32_t>(_settings.dir),
+    SetReg(&base_addr->CR1, static_cast<uint32_t>(settings.dir),
            TIM_CR1_DIR_Pos, TIM_CR1_DIR_BitWidth);
 
     // Configure fixed ARR value
-    _base_addr->ARR = ARR_VAL;
+    base_addr->ARR = ARR_VAL;
 
     // Initialize counter and update registers
-    _base_addr->EGR |= TIM_EGR_UG;
+    base_addr->EGR |= TIM_EGR_UG;
 
     // Enable auto-reload preload register and enable counter
-    _base_addr->CR1 |= (TIM_CR1_ARPE | TIM_CR1_CEN);
+    base_addr->CR1 |= (TIM_CR1_ARPE | TIM_CR1_CEN);
 
     return true;
 }
@@ -172,7 +172,7 @@ bool HwPwm::init()
 bool HwPwm::set_freq(uint32_t freq)
 {
     // Make sure counter was initialized
-    if (!(_base_addr->CR1 & TIM_CR1_CEN_Msk))
+    if (!(base_addr->CR1 & TIM_CR1_CEN_Msk))
     {
         return false;
     }
@@ -183,13 +183,13 @@ bool HwPwm::set_freq(uint32_t freq)
     }
 
     // Check if given frequency is higher than the max possible according to the ARR value
-    if ((_settings.mode == PwmMode::EDGE_ALIGNED) &&
+    if ((settings.mode == PwmMode::EDGE_ALIGNED) &&
         (freq > MAX_FREQ_EDGE_ALIGNED))
     {
         return false;
     }
 
-    if ((_settings.mode != PwmMode::EDGE_ALIGNED) &&
+    if ((settings.mode != PwmMode::EDGE_ALIGNED) &&
         (freq > MAX_FREQ_CENTER_ALIGNED))
     {
         return false;
@@ -201,7 +201,7 @@ bool HwPwm::set_freq(uint32_t freq)
      * @note If in center-aligned mode: freq = P_CLK / (2(PSC + 1)(ARR + 1))
      */
     uint32_t psc_val = pclk_freq / (freq * (ARR_VAL + 1));
-    if (_settings.mode != PwmMode::EDGE_ALIGNED)
+    if (settings.mode != PwmMode::EDGE_ALIGNED)
     {
         psc_val /= 2;
     }
@@ -212,8 +212,8 @@ bool HwPwm::set_freq(uint32_t freq)
         return false;
     }
 
-    _base_addr->PSC = psc_val - 1;
-    _curr_freq = freq;
+    base_addr->PSC = psc_val - 1;
+    curr_freq = freq;
 
     return true;
 }
@@ -221,7 +221,7 @@ bool HwPwm::set_freq(uint32_t freq)
 bool HwPwm::set_duty_cycle(uint8_t duty_cycle)
 {
     // Make sure counter was initialized
-    if (!(_base_addr->CR1 & TIM_CR1_CEN_Msk))
+    if (!(base_addr->CR1 & TIM_CR1_CEN_Msk))
     {
         return false;
     }
@@ -235,25 +235,25 @@ bool HwPwm::set_duty_cycle(uint8_t duty_cycle)
     uint8_t ccr_val =
         static_cast<uint8_t>((duty_cycle / 100.0f) * (ARR_VAL + 1));
 
-    switch (_channel)
+    switch (channel)
     {
         case 1:
-            _base_addr->CCR1 = ccr_val;
+            base_addr->CCR1 = ccr_val;
             break;
         case 2:
-            _base_addr->CCR2 = ccr_val;
+            base_addr->CCR2 = ccr_val;
             break;
         case 3:
-            _base_addr->CCR3 = ccr_val;
+            base_addr->CCR3 = ccr_val;
             break;
         case 4:
-            _base_addr->CCR4 = ccr_val;
+            base_addr->CCR4 = ccr_val;
             break;
         default:
             return false;
     }
 
-    _curr_duty_cycle = duty_cycle;
+    curr_duty_cycle = duty_cycle;
 
     return true;
 }
