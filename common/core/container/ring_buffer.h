@@ -31,21 +31,21 @@ public:
      * @param WritePolicy If ring buffer full, choose to overwrite oldest unread data or deny an overwrite on unread data. Default no overwrite.
      * @return True Data was successfully added to the buffer. False otherwise.
      */
-    bool push(uint8_t data, WritePolicy policy = WritePolicy::NO_OVERWRITE);
+    bool push(uint8_t tx, WritePolicy policy = WritePolicy::NO_OVERWRITE);
 
     /**
      * @brief Read data and advance read indice
      * 
      * @return uint8_t& The data that was just removed from the ring buffer
      */
-    uint8_t& pop();
+    bool pop(uint8_t& rx);
 
     /**
      * @brief Read data without advancing read indice
      * 
      * @return uint8_t& The data that the read index is currently on
      */
-    uint8_t& peak();
+    bool peak(uint8_t& rx);
 
     /**
      * @brief Clear the contents of the ring buffer
@@ -83,7 +83,7 @@ public:
     size_t capacity() const;
 
 private:
-    size_t buf_size = 0;
+    size_t count = 0;
     size_t read = 0;
     size_t write = 0;
 };
