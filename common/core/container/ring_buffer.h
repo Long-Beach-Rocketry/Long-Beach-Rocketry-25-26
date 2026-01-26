@@ -18,28 +18,30 @@ class RingBuffer : private std::array<uint8_t, N>
 public:
     RingBuffer() = default;
 
-    enum class WritePolicy : uint8_t {
-        OVERWRITE = 0,
-        NO_OVERWRITE
+    enum class WritePolicy : uint8_t
+    {
+        NO_OVERWRITE = 0,
+        OVERWRITE
     };
 
     /**
-     * @brief Push a byte of data onto the ring buffer
+     * @brief Write a byte of data and advance write indice
      * 
      * @param data Byte of data
+     * @param WritePolicy If ring buffer full, choose to overwrite oldest unread data or deny an overwrite on unread data. Default no overwrite.
      * @return True Data was successfully added to the buffer. False otherwise.
      */
-    bool push(uint8_t &data, WritePolicy);
+    bool push(uint8_t data, WritePolicy policy = WritePolicy::NO_OVERWRITE);
 
     /**
-     * @brief Read data and take out the element in the ring buffer
+     * @brief Read data and advance read indice
      * 
      * @return uint8_t& The data that was just removed from the ring buffer
      */
     uint8_t& pop();
 
     /**
-     * @brief Read data without taking out the element in the ring buffer
+     * @brief Read data without advancing read indice
      * 
      * @return uint8_t& The data that the read index is currently on
      */

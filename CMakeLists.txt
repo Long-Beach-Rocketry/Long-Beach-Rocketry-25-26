@@ -13,6 +13,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_CXX_STANDARD 20)
 
+if(NOT "${TARGET_DEVICE}" STREQUAL "NATIVE")
+    set(LBR_IS_MCU_BUILD TRUE)
+else()
+    set(LBR_IS_MCU_BUILD FALSE)
+endif()
+
 enable_testing()
 
 include(cmake/build-util.cmake)
@@ -33,4 +39,5 @@ else()
 endif()
 
 add_subdirectory(common)
+add_subdirectory(external)
 add_subdirectory(mcu_support)
