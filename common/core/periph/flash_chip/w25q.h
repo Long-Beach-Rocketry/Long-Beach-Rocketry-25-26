@@ -215,7 +215,5 @@ private:
     static constexpr uint32_t kSectorSizeBytes = 4096u;
     static constexpr uint32_t kPageSizeBytes = 256u;
     static constexpr uint32_t kOffsetSizeBit = 1u;
-
-    //
 };
 }  // namespace LBR
