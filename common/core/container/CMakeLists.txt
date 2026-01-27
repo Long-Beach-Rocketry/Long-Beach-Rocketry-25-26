@@ -1,8 +1,6 @@
-add_library(container STATIC
-    ring_buffer.cc
-)
+add_library(container INTERFACE)
 
-target_include_directories(container PUBLIC
+target_include_directories(container INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}
 )
 
