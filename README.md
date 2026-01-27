@@ -35,6 +35,11 @@ for a clean build, do
 
 builds are by default done in Debug mode, but Release mode can be selected with the -r parameter: ```./make.ps1 -t stm32f746 -r```
 
+## Running tests
+Build for native with:
+```make.sh -t native``` or the ```.ps1``` if on windows. 
+After navigate to the build directory with ```pushd build/native''' followed by ```ctest``` to run tests! You can now to back with ```pupd```.
+
 ## Debugging
 To debug, make sure you have openocd installed ```sudo apt-get install openocd```
 On Windows, try [here](https://openocd.org/pages/getting-openocd.html). Also may have to add to path.
