@@ -19,6 +19,12 @@ else()
     set(LBR_IS_MCU_BUILD FALSE)
 endif()
 
+# Disable pthread for GoogleTest on MCU builds
+if(LBR_IS_MCU_BUILD)
+    set(gtest_disable_pthreads ON CACHE BOOL "" FORCE)
+    add_compile_definitions(GTEST_HAS_PTHREAD=0)
+endif()
+
 enable_testing()
 set(BUILD_TESTING ON)
 

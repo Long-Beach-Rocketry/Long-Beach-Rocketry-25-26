@@ -1,7 +1,13 @@
 # Fetch Google Test
 include(FetchContent)
 
-find_package(Threads REQUIRED)
+# Disable pthread for embedded/STM32 environments
+if(LBR_IS_MCU_BUILD)
+    set(gtest_disable_pthreads ON CACHE BOOL "" FORCE)
+    set(GTEST_HAS_PTHREAD 0 CACHE BOOL "" FORCE)
+else()
+    find_package(Threads REQUIRED)
+endif()
 
 FetchContent_Declare(
   googletest
@@ -11,9 +17,6 @@ FetchContent_Declare(
 
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-# Disable pthread for embedded/STM32 environments
-set(GTEST_HAS_PTHREAD 0 CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(googletest)
 
