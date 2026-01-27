@@ -147,6 +147,26 @@ public:
         return N;
     }
 
+    /**
+     * @brief Get the current read index (for testing)
+     * 
+     * @return size_t 
+     */
+    size_t get_read() const
+    {
+        return read;
+    }
+
+    /**
+     * @brief Get the current write index (for testing)
+     * 
+     * @return size_t 
+     */
+    size_t get_write() const
+    {
+        return write;
+    }
+
 private:
     size_t count = 0;
     size_t read = 0;

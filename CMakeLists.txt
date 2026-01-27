@@ -20,6 +20,7 @@ else()
 endif()
 
 enable_testing()
+set(BUILD_TESTING ON)
 
 include(cmake/build-util.cmake)
 
