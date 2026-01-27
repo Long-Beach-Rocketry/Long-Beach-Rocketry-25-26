@@ -38,7 +38,7 @@ builds are by default done in Debug mode, but Release mode can be selected with 
 ## Running tests
 Build for native with:
 ```make.sh -t native``` or the ```.ps1``` if on windows. 
-After navigate to the build directory with ```pushd build/native''' followed by ```ctest``` to run tests! You can now to back with ```pupd```.
+After navigate to the build directory with ```pushd build/native``` followed by ```ctest``` to run tests! You can now to back with ```pushd```.
 
 ## Debugging
 To debug, make sure you have openocd installed ```sudo apt-get install openocd```
