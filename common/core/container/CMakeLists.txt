@@ -13,6 +13,7 @@ if(BUILD_TESTING AND NOT LBR_IS_MCU_BUILD)
         PRIVATE
             container
             GTest::gtest_main
+            pthread
     )
 
     add_test(NAME ring_buffer_test COMMAND ring_buffer_test)
