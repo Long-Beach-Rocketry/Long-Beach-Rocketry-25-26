@@ -23,6 +23,10 @@ endif()
 if(LBR_IS_MCU_BUILD)
     set(gtest_disable_pthreads ON CACHE BOOL "" FORCE)
     add_compile_definitions(GTEST_HAS_PTHREAD=0)
+    # Disable building GoogleTest for MCU Targets
+    set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+    set(BUILD_GTEST OFF CACHE BOOL "" FORCE)
+    set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 endif()
 
 enable_testing()
