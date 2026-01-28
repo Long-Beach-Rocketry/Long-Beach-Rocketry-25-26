@@ -28,8 +28,8 @@ class ServoMotor
 {
 public:
     /**
-     * @brief BMP390 Contructor
-     * @param params Struct containing I2C interface and device address.
+     * @brief Servo Motor Contructor
+     * @param params Struct containing PWM interface, pulse width info, and max angle of the servo.
      */
     explicit ServoMotor(const ServoMotorParams& params_);
 
