@@ -3,6 +3,7 @@
 #include "st_gpio.h"
 #include "st_i2c.h"
 #include "st_sys_clock.h"
+#include "delay.h"
 
 namespace LBR {
 

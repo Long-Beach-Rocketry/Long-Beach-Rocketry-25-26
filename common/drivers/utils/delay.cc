@@ -1,38 +1,25 @@
 #include "delay.h"
+#include <cstdint>
 
-#ifdef STM32L476xx
-#include "stm32l476xx.h"
-#endif
-
-namespace LBR::Utils
-// NOTE: This delay implementation is temporary.
-// It is hardware-specific and may become inaccurate if the clock speed changes.
-{
-
-void DelayMs(uint32_t ms)
-{
-#ifdef STM32L476xx
-    // Embedded target: busy-wait loop
-    for (uint32_t i = 0; i < ms * 4000; i++)
-    {
-        __NOP();
-    }
-#else
-    // Native/host target: stub or use std sleep if needed
-    (void)ms;
-#endif
+namespace {
+volatile uint32_t g_ms_ticks = 0;
 }
 
-void DelayUs(uint32_t us)
-{
-#ifdef STM32L476xx
-    for (uint32_t i = 0; i < us * 4; i++)
-    {
-        __NOP();
-    }
-#else
-    (void)us;
-#endif
+extern "C" void SysTick_Handler(void) {
+    g_ms_ticks++;
 }
 
-}  // namespace LBR::Utils
+namespace LBR::Utils {
+
+void DelayMs(uint32_t ms) {
+    uint32_t start = g_ms_ticks;
+    while ((g_ms_ticks - start) < ms) {
+        __NOP();
+    }
+}
+
+uint32_t GetMsTicks() {
+    return g_ms_ticks;
+}
+
+} // namespace LBR::Utils
