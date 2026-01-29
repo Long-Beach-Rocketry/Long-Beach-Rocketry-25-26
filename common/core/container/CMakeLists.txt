@@ -4,7 +4,7 @@ target_include_directories(container INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}
 )
 
-if(BUILD_TESTING AND NOT LBR_IS_MCU_BUILD)
+if("${TARGET_DEVICE}" MATCHES "NATIVE")
     add_executable(ring_buffer_test
         ring_buffer_test.cc
     )

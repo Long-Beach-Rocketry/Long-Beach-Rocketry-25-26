@@ -1,25 +1,26 @@
-# Fetch Google Test
-include(FetchContent)
-
 # Disable pthread for embedded/STM32 environments
-if(LBR_IS_MCU_BUILD)
+if(NOT "${TARGET_DEVICE}" STREQUAL "NATIVE")
     set(gtest_disable_pthreads ON CACHE BOOL "" FORCE)
     set(GTEST_HAS_PTHREAD 0 CACHE BOOL "" FORCE)
 else()
     find_package(Threads REQUIRED)
 endif()
 
-if(NOT LBR_IS_MCU_BUILD)
-  FetchContent_Declare(
-    googletest
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG        v1.17.0
-  )
-
+if("${TARGET_DEVICE}" MATCHES "NATIVE")
   # For Windows: Prevent overriding the parent project's compiler/linker settings
   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
-  FetchContent_MakeAvailable(googletest)
+  # C++ standard
+  set(CMAKE_CXX_STANDARD 20)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+  set(CMAKE_CXX_EXTENSIONS OFF)
+
+  # C standard
+  set(CMAKE_C_STANDARD 23)
+  set(CMAKE_C_STANDARD_REQUIRED ON)
+  set(CMAKE_C_EXTENSIONS OFF)
+
+  add_subdirectory(googletest)
 endif()
 
 #add_subdirectory(nanopb)

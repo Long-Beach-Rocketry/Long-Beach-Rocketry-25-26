@@ -13,14 +13,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_CXX_STANDARD 20)
 
-if(NOT "${TARGET_DEVICE}" STREQUAL "NATIVE")
-    set(LBR_IS_MCU_BUILD TRUE)
-else()
-    set(LBR_IS_MCU_BUILD FALSE)
-endif()
-
 # Disable pthread for GoogleTest on MCU builds
-if(LBR_IS_MCU_BUILD)
+if(NOT "${TARGET_DEVICE}" STREQUAL "NATIVE")
     set(gtest_disable_pthreads ON CACHE BOOL "" FORCE)
     add_compile_definitions(GTEST_HAS_PTHREAD=0)
     # Disable building GoogleTest for MCU Targets
@@ -30,7 +24,6 @@ if(LBR_IS_MCU_BUILD)
 endif()
 
 enable_testing()
-set(BUILD_TESTING ON)
 
 include(cmake/build-util.cmake)
 

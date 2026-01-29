@@ -6,7 +6,7 @@ class RingBufferTest : public testing::Test
 protected:
     RingBufferTest() = default;
     uint8_t rx;
-    LBR::RingBuffer<4> rb;
+    LBR::RingBuffer<uint8_t, 4> rb;
 };
 
 /**
@@ -19,9 +19,8 @@ TEST_F(RingBufferTest, EmptyRingBuffer)
     EXPECT_FALSE(rb.full());
     EXPECT_EQ(rb.size(), 0);
     EXPECT_EQ(rb.capacity(), 4);
-    EXPECT_FALSE(rb.reset());
+    EXPECT_TRUE(rb.reset());
     EXPECT_FALSE(rb.pop(rx));
-    EXPECT_FALSE(rb.peek(rx));
 
     rb.push(6);
     EXPECT_EQ(rb.get_write(), 1);
@@ -47,15 +46,11 @@ TEST_F(RingBufferTest, HalfFilledRingBuffer)
         << "Elements 6 and/or 7 were not properly added to the buffer.";
     ASSERT_EQ(rb.get_write(), 2) << "Write pointer not at expected indice.";
 
-    rb.peek(rx);
-    EXPECT_EQ(rx, 6) << "Incorrect value was read.";
     rb.pop(rx);
     EXPECT_EQ(rx, 6) << "Incorrect value was read.";
     EXPECT_EQ(rb.get_read(), 1) << "Read pointer not incremented properly";
     EXPECT_EQ(rb.size(), 1) << "Count was not decremented properly.";
 
-    rb.peek(rx);
-    EXPECT_EQ(rx, 7) << "Incorrect value was read.";
     rb.pop(rx);
     EXPECT_EQ(rx, 7) << "Incorrect value was read.";
     EXPECT_EQ(rb.get_read(), 2) << "Read pointer not incremented properly";
@@ -114,7 +109,7 @@ TEST_F(RingBufferTest, NoOverwriteFullRingBuffer)
     ASSERT_FALSE(rb.push(10)) << "Unexpected data overwrite at indice 0.";
 
     // Read the data to confirm
-    rb.peek(rx);
+    rb.pop(rx);
     EXPECT_EQ(rx, 6) << "Expected value 6 not read.";
 }
 
@@ -134,7 +129,7 @@ TEST_F(RingBufferTest, OverwriteFullRingBuffer)
         << "Read and write pointers do not match.";
 
     // Do a overwrite push on a full buffer
-    ASSERT_TRUE(rb.push(10, LBR::RingBuffer<4>::WritePolicy::OVERWRITE))
+    ASSERT_TRUE(rb.push(10, LBR::RingBuffer<uint8_t, 4>::WritePolicy::OVERWRITE))
         << "Data was not overwritten.";
     EXPECT_EQ(rb.get_read(), 1);
     EXPECT_EQ(rb.get_write(), 1);

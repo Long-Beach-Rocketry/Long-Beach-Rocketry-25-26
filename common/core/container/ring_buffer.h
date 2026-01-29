@@ -12,8 +12,8 @@
 
 namespace LBR
 {
-template <size_t N>
-class RingBuffer : private std::array<uint8_t, N>
+template <typename T, size_t N>
+class RingBuffer : private std::array<T, N>
 {
 public:
     RingBuffer() = default;
@@ -31,7 +31,7 @@ public:
      * @param WritePolicy If ring buffer full, choose to overwrite oldest unread data or deny an overwrite on unread data. Default no overwrite.
      * @return True Data was successfully added to the buffer. False otherwise.
      */
-    bool push(uint8_t tx, WritePolicy policy = WritePolicy::NO_OVERWRITE)
+    bool push(T tx, WritePolicy policy = WritePolicy::NO_OVERWRITE)
     {
         // Check if the ring buffer is full
         if (this->full())
@@ -43,15 +43,15 @@ public:
             }
 
             // If we want to overwrite, increment the read pointer
-            read = (read + 1) % N;
+            read_index = (read_index + 1) % N;
         }
         else
         {
             count++;
         }
 
-        (*this)[write] = tx;
-        write = (write + 1) % N;
+        (*this)[write_index] = tx;
+        write_index = (write_index + 1) % N;
 
         return true;
     }
@@ -59,35 +59,20 @@ public:
     /**
      * @brief Read data and advance read indice
      * 
-     * @return uint8_t& The data that was just removed from the ring buffer
+     * @return True Data was successfully read and removed from the buffer. False otherwise.
      */
-    bool pop(uint8_t& rx)
+    bool pop(T& rx)
     {
         if (this->empty())
         {
             return false;
         }
 
-        rx = (*this)[read];
-        read = (read + 1) % N;
+        rx = (*this)[read_index];
+        read_index = (read_index + 1) % N;
         count--;
 
         return true;
-    }
-
-    /**
-     * @brief Read data without advancing read indice
-     * 
-     * @return uint8_t& The data that the read index is currently on
-     */
-    bool peek(uint8_t& rx)
-    {
-        if (!this->empty())
-        {
-            rx = (*this)[read];
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -97,14 +82,10 @@ public:
      */
     bool reset()
     {
-        if (!this->empty())
-        {
-            read = 0;
-            write = 0;
-            count = 0;
-            return true;
-        }
-        return false;
+        read_index = 0;
+        write_index = 0;
+        count = 0;
+        return true;
     }
 
     /**
@@ -154,7 +135,7 @@ public:
      */
     size_t get_read() const
     {
-        return read;
+        return read_index;
     }
 
     /**
@@ -164,12 +145,12 @@ public:
      */
     size_t get_write() const
     {
-        return write;
+        return write_index;
     }
 
 private:
     size_t count = 0;
-    size_t read = 0;
-    size_t write = 0;
+    size_t read_index = 0;
+    size_t write_index = 0;
 };
 }  // namespace LBR
