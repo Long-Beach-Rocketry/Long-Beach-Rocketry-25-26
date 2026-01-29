@@ -10,7 +10,7 @@
 
 #include <cstddef>
 #include <cstdint>
-// sys_clock.h included for delay
+#include "delay.h"
 #include "i2c.h"
 #include "imu_math.h"
 
