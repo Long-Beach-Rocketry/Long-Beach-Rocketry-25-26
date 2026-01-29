@@ -129,7 +129,8 @@ TEST_F(RingBufferTest, OverwriteFullRingBuffer)
         << "Read and write pointers do not match.";
 
     // Do a overwrite push on a full buffer
-    ASSERT_TRUE(rb.push(10, LBR::RingBuffer<uint8_t, 4>::WritePolicy::OVERWRITE))
+    ASSERT_TRUE(
+        rb.push(10, LBR::RingBuffer<uint8_t, 4>::WritePolicy::OVERWRITE))
         << "Data was not overwritten.";
     EXPECT_EQ(rb.get_read(), 1);
     EXPECT_EQ(rb.get_write(), 1);
