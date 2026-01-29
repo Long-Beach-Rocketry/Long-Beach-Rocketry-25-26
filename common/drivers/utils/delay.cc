@@ -1,25 +1,50 @@
 #include "delay.h"
 #include <cstdint>
 
-namespace {
+namespace
+{
 volatile uint32_t g_ms_ticks = 0;
 }
 
-extern "C" void SysTick_Handler(void) {
+// SysTick_Handler is defined in st_sys_clock.cc
+// Provide a way for it to increment g_ms_ticks
+extern "C" void IncDelayTicks(void)
+{
     g_ms_ticks++;
 }
 
-namespace LBR::Utils {
+namespace LBR::Utils
+{
 
-void DelayMs(uint32_t ms) {
-    uint32_t start = g_ms_ticks;
-    while ((g_ms_ticks - start) < ms) {
-        __NOP();
+void DelayMs(uint32_t ms)
+{
+    uint32_t start;
+    // Atomically read start time
+    __asm__ volatile("cpsid i" : : : "memory");  // Disable interrupts
+    start = g_ms_ticks;
+    __asm__ volatile("cpsie i" : : : "memory");  // Enable interrupts
+
+    while (1)
+    {
+        uint32_t now;
+        // Atomically read current time
+        __asm__ volatile("cpsid i" : : : "memory");
+        now = g_ms_ticks;
+        __asm__ volatile("cpsie i" : : : "memory");
+
+        if ((now - start) >= ms)
+            break;
+        __asm__ volatile("nop");
     }
 }
 
-uint32_t GetMsTicks() {
-    return g_ms_ticks;
+uint32_t GetMsTicks()
+{
+    uint32_t ticks;
+    __asm__ volatile("cpsid i" : : : "memory");
+    ticks = g_ms_ticks;
+    __asm__ volatile("cpsie i" : : : "memory");
+    return ticks;
 }
 
-} // namespace LBR::Utils
+}  // namespace LBR::Utils
