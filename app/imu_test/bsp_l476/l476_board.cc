@@ -1,11 +1,12 @@
 #include <stdint.h>
 #include "board.h"
+#include "delay.h"
 #include "st_gpio.h"
 #include "st_i2c.h"
 #include "st_sys_clock.h"
-#include "delay.h"
 
-namespace LBR {
+namespace LBR
+{
 
 // SCL pin config (PB8)
 Stml4::StGpioSettings scl_settings{
@@ -29,8 +30,8 @@ Stml4::HwGpio sda(sda_params);
 
 // Add PA0 as reset pin for BNO055
 Stml4::StGpioSettings rst_settings{
-    Stml4::GpioMode::GPOUT, Stml4::GpioOtype::PUSH_PULL,
-    Stml4::GpioOspeed::LOW, Stml4::GpioPupd::NO_PULL, 0};
+    Stml4::GpioMode::GPOUT, Stml4::GpioOtype::PUSH_PULL, Stml4::GpioOspeed::LOW,
+    Stml4::GpioPupd::NO_PULL, 0};
 const Stml4::StGpioParams rst_params{rst_settings, 0, GPIOA};
 Stml4::HwGpio rst(rst_params);
 
@@ -67,7 +68,5 @@ Board& get_board()
 {
     return board;
 }
-    
-}  // namespace LBR
- 
 
+}  // namespace LBR

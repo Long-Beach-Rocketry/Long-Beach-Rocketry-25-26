@@ -10,7 +10,7 @@ volatile uint32_t g_ms_ticks = 0;
 // Provide a way for it to increment g_ms_ticks
 extern "C" void IncDelayTicks(void)
 {
-    g_ms_ticks++;
+    g_ms_ticks = g_ms_ticks + 1;
 }
 
 namespace LBR::Utils

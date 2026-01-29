@@ -1,7 +1,8 @@
 #pragma once
 #include <cstdint>
 
-namespace LBR::Utils {
+namespace LBR::Utils
+{
 
 /**
  * @brief Delays execution for a specified number of milliseconds (uses SysTick timebase).
@@ -14,4 +15,4 @@ void DelayMs(uint32_t ms);
  */
 uint32_t GetMsTicks();
 
-} // namespace LBR::Utils
+}  // namespace LBR::Utils

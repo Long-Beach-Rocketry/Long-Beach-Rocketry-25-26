@@ -8,9 +8,10 @@
 #pragma once
 #include "bno055_imu.h"
 
-namespace LBR {
+namespace LBR
+{
 
-struct Board 
+struct Board
 {
     Bno055& imu;
 };
