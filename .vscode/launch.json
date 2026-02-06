@@ -122,7 +122,7 @@
         "enabled": true
       }
     },
-        {
+    {
             "cwd": "${workspaceFolder}",
             "executable": "${workspaceRoot}/build/stm32l476/app/pwm_test/pwm_test",
             "name": "DEBUG PWM L4",
@@ -150,9 +150,7 @@
                 "monitor reset"
             ],
             "showDevDebugOutput": true,
-        },
-    ]
-}
+    },
     {
       "cwd": "${workspaceFolder}",
       "executable": "${workspaceRoot}/build/stm32l476/app/bmp390_test/bmp390_test",
