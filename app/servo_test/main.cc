@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
 
         hw.servo_motor.set_angle(angle);
 
-        for (volatile size_t i = 0; i < 2000000; i++);
+        for (volatile size_t i = 0; i < 200000; i++);
     }
 
     return 0;
