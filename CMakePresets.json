@@ -38,6 +38,18 @@
                 "TARGET_DEVICE": "STM32L476",
                 "MCU_NAME": "STM32L476xx"
             }
+        },
+        {
+            "name": "stm32f745",
+            "inherits": "build",
+            "binaryDir": "${sourceDir}/build/stm32f745",
+            "toolchainFile": "cmake/gcc-m7f.cmake",
+            "cacheVariables": {
+                "LINKER_SCRIPT": "${sourceDir}/mcu_support/stm32/f7xx/f745/STM32F745VGTX_FLASH.ld",
+                "STARTUP_FILE": "${sourceDir}/mcu_support/stm32/f7xx/f745/startup_stm32f745vgtx.s",
+                "TARGET_DEVICE": "STM32F745",
+                "MCU_NAME": "STM32F745xx"
+            }
         }
     ]
 }
