@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
 
     while (1)
     {
-        angle += 10;
+        angle += 30;
         if (angle > 180)
         {
             angle = 0;
