@@ -8,7 +8,7 @@ volatile uint32_t g_ms_ticks = 0;
 // ARM-specific interrupt disable/enable macros
 #ifdef __arm__
 #define DISABLE_IRQ() __asm__ volatile("cpsid i" : : : "memory")
-#define ENABLE_IRQ()  __asm__ volatile("cpsie i" : : : "memory")
+#define ENABLE_IRQ() __asm__ volatile("cpsie i" : : : "memory")
 #else
 // For non-ARM (native builds), these are no-ops
 #define DISABLE_IRQ()
