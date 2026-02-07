@@ -122,7 +122,7 @@
         "enabled": true
       }
     },
-        {
+    {
             "cwd": "${workspaceFolder}",
             "executable": "${workspaceRoot}/build/stm32l476/app/pwm_test/pwm_test",
             "name": "DEBUG PWM L4",
@@ -150,9 +150,7 @@
                 "monitor reset"
             ],
             "showDevDebugOutput": true,
-        },
-    ]
-}
+    },
     {
       "cwd": "${workspaceFolder}",
       "executable": "${workspaceRoot}/build/stm32l476/app/bmp390_test/bmp390_test",
@@ -219,6 +217,30 @@
       "debuggerArgs": ["-d", "${workspaceRoot}"],
       "preRestartCommands": [
         "add-symbol-file build/stm32l476/app/usart_app/uasrt_app",
+        "load",
+        "enable breakpoint",
+        "monitor reset"
+      ],
+      "showDevDebugOutput": true
+    },
+    {
+      "cwd": "${workspaceFolder}",
+      "executable": "${workspaceRoot}/build/stm32l476/app/servo_test/servo_test",
+      "name": "DEBUG SERVO L4",
+      "request": "launch",
+      "type": "cortex-debug",
+      "servertype": "openocd",
+      "device": "STM32L4",
+      "svdFile": "${workspaceRoot}/mcu_support/l4xx/STM32L4x2.svd",
+      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "runToMain": true,
+      "configFiles": [
+        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+        "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
+      ],
+      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "preRestartCommands": [
+        "add-symbol-file build/stm32l476/app/servo_test/servo_test",
         "load",
         "enable breakpoint",
         "monitor reset"
