@@ -2,9 +2,12 @@
 
 extern "C"
 {
+    extern void IncDelayTicks(void);
+
     /* Needs to be defined or else we will never timout. */
     void SysTick_Handler()
     {
+        IncDelayTicks();
         HAL_IncTick();
     }
 };

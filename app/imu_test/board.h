@@ -1,15 +1,12 @@
 /**
  * @file board.h
- * @brief IMU test board interface
+ * @brief Board definition for IMU Test Application
  * @author Bex Saw
- * @date 10/21/2025
+ * @date 2025-10-21
  */
 
 #pragma once
 #include "bno055_imu.h"
-#include "delay.h"
-#include "gpio.h"
-#include "i2c.h"
 
 namespace LBR
 {
