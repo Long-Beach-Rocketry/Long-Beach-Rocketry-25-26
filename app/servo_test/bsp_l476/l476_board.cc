@@ -3,8 +3,8 @@
 #include "st_gpio.h"
 #include "st_pwm.h"
 
-static constexpr uint16_t MIN_PULSE_WIDTH = 1000;
-static constexpr uint16_t MAX_PULSE_WIDTH = 2000;
+static constexpr uint16_t MIN_PULSE_WIDTH = 500;
+static constexpr uint16_t MAX_PULSE_WIDTH = 2500;
 static constexpr uint16_t MAX_ANGLE = 180;
 
 namespace LBR
