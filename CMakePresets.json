@@ -28,6 +28,16 @@
                 "MCU_FAMILY": "STM32L4"
             }
         },
+         {
+            "name": "stm32h7",
+            "hidden": true,
+            "inherits": "build",
+            "toolchainFile": "cmake/gcc-m7f.cmake",
+            "cacheVariables": {
+                "FREERTOS_PORT": "GCC_ARM_CM7F",
+                "MCU_FAMILY": "STM32H7"
+            }
+        },
         {
             "name": "stm32l476",
             "inherits": "stm32l4",
@@ -37,6 +47,18 @@
                 "STARTUP_FILE": "${sourceDir}/mcu_support/stm32/l4xx/l476/startup_stm32l476xx.s",
                 "TARGET_DEVICE": "STM32L476",
                 "MCU_NAME": "STM32L476xx"
+            }
+        },
+        {
+            "name": "stm32h723",
+            "inherits": "stm32h7",
+            "binaryDir": "${sourceDir}/build/stm32h723",
+            "toolchainFile": "cmake/gcc-m7f.cmake",
+            "cacheVariables": {
+                "LINKER_SCRIPT": "${sourceDir}/mcu_support/stm32/h7xx/h723/STM32H723VGTX_FLASH.ld",
+                "STARTUP_FILE": "${sourceDir}/mcu_support/stm32/h7xx/h723/startup_stm32h723xx.s",
+                "TARGET_DEVICE": "STM32H723",
+                "MCU_NAME": "STM32H723xx"
             }
         }
     ]
