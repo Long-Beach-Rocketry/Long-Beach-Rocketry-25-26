@@ -8,8 +8,4 @@
 
 PB_BIND(RocketStructProto, RocketStructProto, AUTO)
 
-
 PB_BIND(Rockets, Rockets, AUTO)
-
-
-
