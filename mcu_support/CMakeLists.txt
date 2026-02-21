@@ -10,4 +10,6 @@ elseif(MCU_NAME MATCHES "^(STM32H5)[0-9]+")
     add_subdirectory(stm32/h5xx)
 elseif(MCU_NAME MATCHES "^(STM32L4)[0-9]+")
     add_subdirectory(stm32/l4xx) #only supporting l4 for now
-endif()       
+elseif(MCU_NAME MATCHES "^(STM32H7)[0-9]+")
+    add_subdirectory(stm32/h7xx)   
+endif()

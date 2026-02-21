@@ -13,3 +13,4 @@ CMakeCache.txt
 .clangd
 .cache
 compile_commands.json
+clangd
