@@ -10,52 +10,63 @@
 #endif
 
 /* Struct definitions */
-typedef struct _RocketStructProto {
+typedef struct _RocketStructProto
+{
     char Name[41];
     int32_t Year;
     char clubName[41];
     int32_t memberCount;
 } RocketStructProto;
 
-typedef struct _Rockets {
+typedef struct _Rockets
+{
     pb_callback_t rockets;
 } Rockets;
 
-
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /* Initializer values for message structs */
-#define RocketStructProto_init_default           {"", 0, "", 0}
-#define Rockets_init_default                     {{{NULL}, NULL}}
-#define RocketStructProto_init_zero              {"", 0, "", 0}
-#define Rockets_init_zero                        {{{NULL}, NULL}}
+#define RocketStructProto_init_default {"", 0, "", 0}
+#define Rockets_init_default \
+    {                        \
+        {                    \
+            {NULL}, NULL     \
+        }                    \
+    }
+#define RocketStructProto_init_zero {"", 0, "", 0}
+#define Rockets_init_zero \
+    {                     \
+        {                 \
+            {NULL}, NULL  \
+        }                 \
+    }
 
 /* Field tags (for use in manual encoding/decoding) */
-#define RocketStructProto_Name_tag               1
-#define RocketStructProto_Year_tag               2
-#define RocketStructProto_clubName_tag           3
-#define RocketStructProto_memberCount_tag        4
-#define Rockets_rockets_tag                      1
+#define RocketStructProto_Name_tag 1
+#define RocketStructProto_Year_tag 2
+#define RocketStructProto_clubName_tag 3
+#define RocketStructProto_memberCount_tag 4
+#define Rockets_rockets_tag 1
 
 /* Struct field encoding specification for nanopb */
-#define RocketStructProto_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, STRING,   Name,              1) \
-X(a, STATIC,   SINGULAR, INT32,    Year,              2) \
-X(a, STATIC,   SINGULAR, STRING,   clubName,          3) \
-X(a, STATIC,   SINGULAR, INT32,    memberCount,       4)
+#define RocketStructProto_FIELDLIST(X, a)       \
+    X(a, STATIC, SINGULAR, STRING, Name, 1)     \
+    X(a, STATIC, SINGULAR, INT32, Year, 2)      \
+    X(a, STATIC, SINGULAR, STRING, clubName, 3) \
+    X(a, STATIC, SINGULAR, INT32, memberCount, 4)
 #define RocketStructProto_CALLBACK NULL
 #define RocketStructProto_DEFAULT NULL
 
-#define Rockets_FIELDLIST(X, a) \
-X(a, CALLBACK, REPEATED, MESSAGE,  rockets,           1)
+#define Rockets_FIELDLIST(X, a) X(a, CALLBACK, REPEATED, MESSAGE, rockets, 1)
 #define Rockets_CALLBACK pb_default_field_callback
 #define Rockets_DEFAULT NULL
 #define Rockets_rockets_MSGTYPE RocketStructProto
 
-extern const pb_msgdesc_t RocketStructProto_msg;
-extern const pb_msgdesc_t Rockets_msg;
+    extern const pb_msgdesc_t RocketStructProto_msg;
+    extern const pb_msgdesc_t Rockets_msg;
 
 /* Defines for backwards compatibility with code written before nanopb-0.4.0 */
 #define RocketStructProto_fields &RocketStructProto_msg
@@ -63,8 +74,8 @@ extern const pb_msgdesc_t Rockets_msg;
 
 /* Maximum encoded size of messages (where known) */
 /* Rockets_size depends on runtime parameters */
-#define PROTOBUFF_PB_H_MAX_SIZE                  RocketStructProto_size
-#define RocketStructProto_size                   106
+#define PROTOBUFF_PB_H_MAX_SIZE RocketStructProto_size
+#define RocketStructProto_size 106
 
 #ifdef __cplusplus
 } /* extern "C" */
