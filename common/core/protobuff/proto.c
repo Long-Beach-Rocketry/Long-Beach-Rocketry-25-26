@@ -1,9 +1,7 @@
-#include "protobuff.pb.h"
+#include <stdio.h>
 #include "pb_decode.h"
 #include "pb_encode.h"
-#include <stdio.h>
-
-
+#include "protobuff.pb.h"
 
 int main()
 {
@@ -24,5 +22,4 @@ int main()
     {
         printf("%s", buffer);
     }
-
 }
