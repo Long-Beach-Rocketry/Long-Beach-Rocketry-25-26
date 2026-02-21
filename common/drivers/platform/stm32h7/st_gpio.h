@@ -14,7 +14,7 @@
 
 namespace LBR
 {
-namespace Stml4
+namespace Stmh7
 {
 
 enum class GpioMode : uint8_t
@@ -81,14 +81,14 @@ public:
      * @brief Initializes gpio settings.
      * @return true if success.
      */
-    bool init(void);
+    bool init();
 
-    bool toggle(void) override;
+    bool toggle() override;
     bool set(const bool active) override;
-    bool read(void) override;
+    bool read() override;
 
 private:
-    StGpioSettings settings_;
+    StGpioSettings settings;
     const uint8_t pin_num;
     GPIO_TypeDef* const base_addr;
 };
