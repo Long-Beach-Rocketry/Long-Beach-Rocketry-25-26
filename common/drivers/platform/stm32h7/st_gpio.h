@@ -92,5 +92,5 @@ private:
     const uint8_t pin_num;
     GPIO_TypeDef* const base_addr;
 };
-}  // namespace Stml4
+}  // namespace Stmh7
 }  // namespace LBR
