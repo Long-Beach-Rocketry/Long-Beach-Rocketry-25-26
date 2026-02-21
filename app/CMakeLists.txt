@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 add_subdirectory(spi_test)
 add_subdirectory(blink)
 add_subdirectory(i2c_test)
@@ -6,3 +7,9 @@ add_subdirectory(imu_test)
 add_subdirectory(w25q_test)
 add_subdirectory(usart_app)
 add_subdirectory(pwm_test)
+=======
+add_subdirectory(spi_test)
+add_subdirectory(blink)
+add_subdirectory(i2c_test)
+add_subdirectory(imu_test)
+>>>>>>> 319d772 (ekf)

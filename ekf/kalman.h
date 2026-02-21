@@ -6,8 +6,11 @@
 #include <fstream>
 #include <Eigen/Dense>
 
+#pragma once //prevents header files from being included multiple times
+namespace LBR{
+
 //discrete 
-class KF{
+class KalmanFilter{
     public:
     /*
     creating matrices to represent variables:
@@ -23,7 +26,7 @@ class KF{
     */
     
 
-    KF(
+    KalmanFilter(
         //function parameters (1D filter)
             double dt,
             const Eigen::DiagonalMatrix<double, 13>& Q_, //uncertainty of estimate (x)
@@ -64,6 +67,7 @@ class KF{
         Eigen::Matrix<double, 13,13> F;
         Eigen::Matrix<double,13, 13> P;
         Eigen::Matrix<double 13,5>K;
+}
 };
 //values
 

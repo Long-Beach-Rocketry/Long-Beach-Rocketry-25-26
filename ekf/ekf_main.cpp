@@ -1,13 +1,14 @@
 #include <iostream>
 #include <Eigen/Dense>
-#include "kalman.hpp"
+#include "kalman.h"
 #include <vector>
-#include "board.h"
+//#include "board.h"
 using namespace std;
  int main(){
-  bsp_init() ;
+  //bsp_init() ;
+  //Board hw = get_board(); //for both imu and baro when struct is made
 
-   LBR::Board& hw = LBR::get_board();
+   //LBR::Board& hw = LBR::get_board();
 
   cout<<"main "<<endl;
   double dt = 0.01;
@@ -56,51 +57,32 @@ using namespace std;
     /*7.*/
     
 
-   KF kfilter(0.01, Q,R,H,F,P); //calling on the KF class and naming the object kfilter
-   Bno055Data out; //getting sensor values from imu
-   Bmp390 data; // different board structs
-   kfilter.init(0,x0,P0);
-   while(true){ //loops for a while to allow all values of the sensor to be entered
-   
-   double gx,gy,gz; //gyro bias
-   hw.imu.read_all(out);
-   gx = out.gyro.x;
-   gy = out.gyro.y;
-   gz = out.gyro.z;
+   LBR::KalmanFilter kfilter(0.01, Q,R,H,F,P0); //calling on the KF class and naming the object kfilter
 
-   double qx,qy,qz,qw; //quaternion
-   qw = out.quat.w;
-   qx = out.quat.x;
-   qy = out.quat.y;
-   qz = out.quat.z;
-
-   double baro_meas = hw.Bmp390.get_pressure();
-    //parameters: 0.01, Q,R,H,F,P for kfilter
-   //reading values from quat sensor (page 51/105)
-   Eigen::Vector3d gyro;
-   gyro<< gx,gy,gz;
-
-   Eigen::Vector3d quats;
-   quats<<qx,qy,qz,qw;
-       /*8. reading baro measurements*/
-    z(0) = baro_meas;
-    z(1) = qx;
-    z(2) = qy;
-    z(3) = qz;
-    z(4) = qw; //bex put it as w,x,y,z 
-   
-
+//initialize:
+    kfilter.init(0, x0, P0);
   
+//fake gyro values
+for(int t = 0.0; t<10.0; t++){
+    Eigen::Vector3d gyro;
+    gyro<<0.0,0.0,0.0;
+
+    z<<10.0,
+       0.0,
+       0.0,
+       0.0,
+       1.0 ;
+
 
     kfilter.predict(gyro);
-    kfilter.update(z);
-    cout<<"Filter Step: "<<kfilter.get_xhat()(0,0)<<endl;
+   kfilter.update(z);
+    cout<<"Filter Step: "<<kfilter.get_xhat()(2)<<endl;
+}
    
-   
-   cout<<"Filtered: "<<kfilter.get_xhat()(0,0)<<endl; //(90,0) because it's a matrix
+   cout<<"Filtered: "<<kfilter.get_xhat()(2)<<endl; //(90,0) because it's a matrix
    
    }
-  }
+  
  //g++ main.cpp kalman.cpp -I /mnt/c/Users/pho20/Documents/EigenLib -o kalman.exe
  //./kalman.exe
 
@@ -178,5 +160,6 @@ PRESSURE -> Altitude:
 8. obtaining values for z (5x1)
 - measurement: pz,qx,qy,qz,qw
 - using measurements from the sensors (baro_alt, imuquat.x(), imuquat.y(), imuquat.z(), imuquat.w()) --> taken in from update()
+
 
 */

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #pragma once
 #include <cstdint>
 
@@ -27,3 +28,11 @@ uint16_t combine_uint16(uint8_t msb, uint8_t lsb);
  * @return 16-bit signed integer
  */
 int16_t combine_int16(uint8_t msb, uint8_t lsb);
+=======
+#pragma once
+#include <cstdint>
+
+// Declaration for SetReg implemented in reg_helpers.cc
+void SetReg(volatile uint32_t* reg, uint32_t enum_val, uint32_t bit_num,
+            uint32_t bit_length);
+>>>>>>> 319d772 (ekf)

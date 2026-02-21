@@ -5,16 +5,16 @@
 
  #include <iostream>
  #include <Eigen/Dense>
- #include "kalman.hpp"
+ #include "kalman.h"
  
  using namespace std;
- KF::KF(
+ LBR::KalmanFilter::KalmanFilter(
     double dt_,
             const Eigen::DiagonalMatrix<double, 13>& Q_, //uncertainty of estimate (x)
             const Eigen::DiagonalMatrix<double, 5>& R_, //how much you trust sensor (std^2) <-- inverse 
             const Eigen::Matrix<double, 5,13>& H_,
             const Eigen::Matrix<double, 13,13>& F_,
-            const Eigen::DiagonalMatrix<double, 13>& P_
+            const Eigen::Matrix<double,13, 13>& P_
  )
  {
     dt = dt_;
@@ -40,7 +40,7 @@
 
  }
 
- void KF::init(double t1, const Eigen::Matrix<double, 13,1>& x0, const Eigen::Matrix<double, 13,13>& P0){
+ void LBR::KalmanFilter::init(double t1, const Eigen::Matrix<double, 13,1>& x0, const Eigen::Matrix<double, 13,13>& P0){
     x_hat = x0;
     x_hat_new = x0;
     t0 = t1;
@@ -50,7 +50,7 @@
  }
 
  
- void KF::predict(const Eigen::Vector3d& gyromeas){
+ void LBR::KalmanFilter::predict(const Eigen::Vector3d& gyromeas){
    if (!initialized) return;
    //when accessing matrix elements, use [][]
    Eigen::Vector3d omega = gyromeas - x_hat.segment<3>(10); //subtract gyro bias to prevent drift over time and prevent error
@@ -65,7 +65,7 @@
          wz,  wy, -wx,  0 ;
    Eigen::Vector4d q;
    /*2.*/
-   q = x_hat.segment(6,4); 
+   q = x_hat.segment<4>(6); 
    q += (0.5)*w*q*dt;
    
    
@@ -78,7 +78,7 @@
     P_new = F*P*F.transpose()+Q; //functions can access private variables from the same class
     //cout<<"Predict "<<" "<<x_hat_new<<" " <<P_new<<endl;
  }
- void KF::update(const Eigen::Matrix<double,5,1>& z){
+ void LBR::KalmanFilter::update(const Eigen::Matrix<double,5,1>& z){
    if (!initialized) return;
     //kalman gain 
     //for (int i = 0; i<n; i++){

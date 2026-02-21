@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #pragma once
 #include "gpio.h"
 //do the cmake
@@ -17,4 +18,21 @@ struct Board
 bool board_init(void);
 Board& get_board(void);
 
+=======
+#pragma once
+#include "gpio.h"
+//do the cmake
+
+namespace LBR
+{
+
+struct Board
+{
+    Gpio& led;
+};
+
+bool board_init(void);
+Board& get_board(void);
+
+>>>>>>> afd223e (ekf)
 }  // namespace LBR
