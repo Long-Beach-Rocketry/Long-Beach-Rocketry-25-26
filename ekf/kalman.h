@@ -25,7 +25,12 @@ class KalmanFilter{
     z (The actual measurement vector from sensors at a specific time step)
     */
     
-
+KalmanFilter::KalmanFilter(int m, int n, double t0, double t, Eigen::Matrix<double,13,13> I, Eigen::Matrix<double,13,1> x_hat, x_hat_new, Eigen::Matrix<double, 13,13> P_new, bool initialized,  Eigen::DiagonalMatrix<double,13> Q, 
+        Eigen::DiagonalMatrix<double, 5> R; //how much you trust sensor (std^2) <-- inverse 
+        Eigen::Matrix<double, 5,13> H;
+        Eigen::Matrix<double, 13,13> F;
+        Eigen::Matrix<double,13, 13> P;
+        Eigen::Matrix<double 13,5>K;
     KalmanFilter(
         //function parameters (1D filter)
             double dt,
