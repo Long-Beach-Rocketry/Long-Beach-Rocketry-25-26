@@ -12,7 +12,8 @@ add_subdirectory_for(STM32H723 BSP_H723)
 if (TARGET usart_bsp OR TARGET usart_app_bsp)
 
     add_executable_for(${TARGET_DEVICE} ${EXECUTABLE} ${LDF}
-        main.cc
+        #main.cc remove this when not testing
+        main_pb_test.cc 
         ${STARTUP_FILE}
     )
 
@@ -36,5 +37,9 @@ if (TARGET usart_bsp OR TARGET usart_app_bsp)
     endif()
 
     target_preprocess_for(${TARGET_DEVICE} ${EXECUTABLE} ${LINKER_SCRIPT} ${LDF} ${PREPROCESS_DEFS})
+
+    if (TARGET ${EXECUTABLE})
+        target_link_libraries(${EXECUTABLE} PRIVATE cmd_msg pb_helper)
+    endif()
 
 endif()
