@@ -1,5 +1,5 @@
 add_library(protobuff STATIC
-    proto.c
+    proto.cc
     protobuff.pb.c
 )
 
@@ -9,9 +9,7 @@ target_include_directories(protobuff PUBLIC
 )
 
 
-add_executable(protobufftest proto.c)
-
-
+add_executable(protobufftest proto.cc)
 
 target_link_libraries(protobufftest PRIVATE 
     protobuff
