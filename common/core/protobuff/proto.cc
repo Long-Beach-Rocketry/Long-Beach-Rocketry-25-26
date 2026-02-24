@@ -1,65 +1,46 @@
-/**
- * @note This is a test file for the protobuff library. 
- * It encodes and decodes a simple RocketStructProto
- * -message and prints the result.
-*/
+// This is a test file for the protobuff library.
 
-#include <cstdio>
-#include <cstring>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 #include "pb_cmd.h"
 #include "protobuff.pb.h"
 
-using namespace std;
-
-namespace LBR
-{
+using namespace LBR;
 int main()
 {
     // Buffer to hold the encoded data
     uint8_t buffer[128];
+    // Create PbCmd instances for encoding and decoding
+    PbCmd tx_cmd, rx_cmd;
 
-    // Initialize the RocketStructProto message
-    RocketStructProto rocket = RocketStructProto_init_zero;
+    // Create and fill the PbCmd message
+    strcpy(tx_cmd.msg.Name, "Bex Saw");
+    tx_cmd.msg.Year = 2026;
+    strcpy(tx_cmd.msg.clubName, "Long Beach Rocketry");
+    tx_cmd.msg.memberCount = 1;
 
-    // Fill the RocketStructProto message with data
-    strcpy(rocket.Name, "ROCKET");
-    rocket.Year = 2026;
-    strcpy(rocket.clubName, "LBR");
-    rocket.memberCount = 1;
-
-    // Create PbCmd wrapper (as CmdMessage pointer for interface demonstration)
-    CmdMessage* cmd =
-        new PbCmd(sizeof(buffer), RocketStructProto_fields, &rocket);
-
-    // Encode the message using CmdMessage interface
-    if (!cmd->get_buf(buffer, sizeof(buffer)))
+    // Encode the message into the buffer
+    int len = tx_cmd.encode(buffer, sizeof(buffer));
+    if (len <= 0)
     {
-        printf("Encoding failed\n");
-        delete cmd;
         return 1;
     }
 
-    // Zero out the struct to simulate receiving and decoding
-    memset(&rocket, 0, sizeof(rocket));
-    // Set the struct pointer again for decoding
-    static_cast<PbCmd*>(cmd)->set_message_struct(&rocket);
-
-    // Decode the message using CmdMessage interface
-    if (cmd->parse(buffer, cmd->get_size()))
+    // Decode the message from the buffer
+    if (rx_cmd.decode(buffer, len))
     {
         printf("Decoded message:\n");
-        printf("Name: %s\n", rocket.Name);
-        printf("Year: %d\n", rocket.Year);
-        printf("Club Name: %s\n", rocket.clubName);
-        printf("Member Count: %d\n", rocket.memberCount);
+        printf("Name: %s\n", rx_cmd.msg.Name);
+        printf("Year: %ld\n", (long)rx_cmd.msg.Year);
+        printf("Club Name: %s\n", rx_cmd.msg.clubName);
+        printf("Member Count: %ld\n", (long)rx_cmd.msg.memberCount);
     }
     else
     {
         printf("Decoding failed\n");
-        delete cmd;
         return 1;
     }
 
-    delete cmd;
+    return 0;
 }
-}  // namespace LBR
