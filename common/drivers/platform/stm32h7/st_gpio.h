@@ -1,6 +1,6 @@
 /**
  * @file st_gpio.h
- * @brief Gpio driver specfiics for the stmh7.
+ * @brief Gpio driver specifics for the stmh7.
  * @author Kent Hong
  */
 
