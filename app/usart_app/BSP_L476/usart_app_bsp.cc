@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "board.h"
 #include "st_gpio.h"
 #include "st_sys_clock.h"
@@ -22,6 +23,9 @@ LBR::Stml4::HwGpio tx_gpio(tx_params);
 Stml4::HwClock clock{};
 
 StUsart usart(USART2, 4000000, 9600);
+
+// Protobuff rxb buffer
+uint8_t rxb = 0;
 
 Board board{.usart = usart, .rx = rx_gpio, .tx = tx_gpio};
 

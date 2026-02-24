@@ -9,7 +9,6 @@ namespace LBR
 struct Board
 {
     Usart& usart;
-
     Gpio& rx;
     Gpio& tx;
 };
