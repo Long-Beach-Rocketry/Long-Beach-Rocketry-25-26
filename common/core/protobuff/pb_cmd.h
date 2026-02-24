@@ -1,48 +1,41 @@
+/**
+* @file pb_cmd.h
+* @author Bex Saw
+* @brief Protobuf command message wrapper for encoding/decoding RocketStructProto messages.
+* @version 0.1
+*/
 
 #pragma once
-#include <pb_decode.h>
-#include <pb_encode.h>
-#include <cstddef>
-#include <cstdint>
+#include <stddef.h>
+#include <stdint.h>
 #include "cmd_msg.h"
+#include "pb_decode.h"
+#include "pb_encode.h"
+#include "protobuff.pb.h"
 
 namespace LBR
 {
 
-/**
-* @note PdCmd inherits the CmdMessage interface and provides methods 
-* for encoding and decoding protobuf messages. It uses the nanopb library 
-* for serialization and deserialization.
-*/
-
 class PbCmd : public CmdMessage
 {
 public:
-    // Constructor
-    explicit PbCmd(size_t buffer_size, const pb_msgdesc_t* message_desc,
-                   void* message_struct);
+    // The actual protobuf message
+    RocketStructProto msg;
 
-    // Destructor for cleanup if necessary
+    /**
+    * @brief Encode the message into a buffer. Returns the number of bytes written, or -1 on failure.
+    * @param buffer The buffer to write the encoded message into.
+    * @param maxlen The maximum length of the buffer.
+    */
     ~PbCmd() = default;
 
-    // Serialization interface
-    bool get_buf(uint8_t* buffer, size_t size)
-        override;  // Encode the message into the provided buffer
-    size_t get_size()
-        const override;  // Return the size of the serialized message
-    bool parse(uint8_t* buffer, size_t size) override;
+    int encode(uint8_t* buffer, size_t maxlen) const override;
 
-    // Accessors
-    size_t buffer_size() const;  // Getter for the buffer size
-    const pb_msgdesc_t* message_desc()
-        const;                     // Getter for the message descriptor
-    void* message_struct() const;  // Getter for the message struct pointer
-    void set_message_struct(
-        void* message_struct);  // Setter for the message struct pointer
-
-private:
-    size_t buffer_size_;
-    const pb_msgdesc_t* message_desc_;
-    void* message_struct_;
+    /**
+    * @brief Decode the message from a buffer. Returns true on success, false on failure.
+    * @param buffer The buffer containing the encoded message.
+    * @param len The length of the buffer.
+    */
+    bool decode(const uint8_t* buffer, size_t len) override;
 };
 }  // namespace LBR
