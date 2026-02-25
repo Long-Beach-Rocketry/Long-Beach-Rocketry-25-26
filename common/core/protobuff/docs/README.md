@@ -1,10 +1,55 @@
+## Building and Generating Code with nanopb
+
+### Prerequisites
+
+- Install Python (recommended: use a virtual environment)
+- Install Protocol Buffers compiler (`protoc`)
+- Install the required protobuf Python package:
+  
+	```sh
+	pip install --upgrade protobuf
+	# or for a specific version:
+	pip install protobuf==4.21.12
+	```
+
+- Check your `protoc` version:
+  
+	```sh
+	protoc --version
+	```
+
+### Generating C Code from .proto
+
+Use the following command to generate nanopb C files from your .proto file:
+
+```sh
+protoc --plugin=protoc-gen-nanopb="external/nanopb/generator/protoc-gen-nanopb.bat" \
+	--proto_path=common/core/protobuff \
+	--proto_path=external/nanopb/generator/proto \
+	--nanopb_out=common/core/protobuff \
+	protobuff.proto
+```
+
+Replace `protobuff.proto` with your .proto file as needed. (well we anemd it this way no need to change)
+
+---
 # Protobuf Integration Guide
 
 ## Overview
 This document explains how to use the modular protobuf (nanopb) integration in this project, both for simple encode/decode and for communication over USART. The architecture is designed for flexibility and portability between embedded and host environments.
 
----
+#### Protocol Buffers messages are defined in a .proto file, which follows a standard format that is compatible with all Protocol Buffers libraries. To use it with nanopb, you need to generate .pb.c and .pb.h files from it
 
+*python generator/nanopb_generator.py myprotocol.proto  # For source checkout
+generator-bin/nanopb_generator myprotocol.proto        # For binary package*
+
+---
+## 0. What you need 
+
+` set CC=gcc
+set CFLAGS=-O2
+set PROTOC=C:\path\to\protoc.exe
+set PYTHON=python`
 ## 1. Core Abstractions
 
 ### `CmdMessage` (Generic Interface)
@@ -75,3 +120,4 @@ This modular approach allows you to:
 - Easily swap or extend message protocols by implementing new `CmdMessage` subclasses.
 - Cleanly separate protocol logic from transport (USART, etc.) and application logic.
 will write about how to use protobuff
+ 
