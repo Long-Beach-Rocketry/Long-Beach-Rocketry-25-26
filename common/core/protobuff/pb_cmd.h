@@ -22,13 +22,13 @@ public:
     // The actual protobuf message
     RocketStructProto msg;
 
+    virtual ~PbCmd();
+
     /**
     * @brief Encode the message into a buffer. Returns the number of bytes written, or -1 on failure.
     * @param buffer The buffer to write the encoded message into.
     * @param maxlen The maximum length of the buffer.
     */
-    ~PbCmd() = default;
-
     int encode(uint8_t* buffer, size_t maxlen) const override;
 
     /**

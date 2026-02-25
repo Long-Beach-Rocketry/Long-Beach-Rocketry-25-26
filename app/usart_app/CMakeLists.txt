@@ -6,7 +6,6 @@ set(PREPROCESS_DEFS
     -DDEF_FLASH_SIZE=1024K
 )
 
-
 add_subdirectory(pb_helper)
 add_subdirectory_for(STM32L476 BSP_L476)
 
@@ -31,8 +30,17 @@ if (TARGET usart_app_bsp)
 
     target_preprocess_for(${TARGET_DEVICE} ${EXECUTABLE} ${LINKER_SCRIPT} ${LDF} ${PREPROCESS_DEFS})
 
+    # This is for protobuff specific linking, which is currently only nanopb.
     if (TARGET ${EXECUTABLE})
-        target_link_libraries(${EXECUTABLE} PRIVATE cmd_msg pb_helper)
+        target_link_libraries(${EXECUTABLE} PRIVATE cmd_msg pb_helper protobuff)
+        target_sources(${EXECUTABLE} PRIVATE
+            ${CMAKE_SOURCE_DIR}/external/nanopb/pb_common.c
+            ${CMAKE_SOURCE_DIR}/external/nanopb/pb_encode.c
+            ${CMAKE_SOURCE_DIR}/external/nanopb/pb_decode.c
+        )
+        target_include_directories(${EXECUTABLE} PRIVATE
+            ${CMAKE_SOURCE_DIR}/external/nanopb
+        )
     endif()
 
 endif()
