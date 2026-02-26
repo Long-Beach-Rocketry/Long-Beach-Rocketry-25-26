@@ -55,5 +55,27 @@ bool HwGpio::init()
     return true;
 }
 
+bool HwGpio::toggle()
+{
+    uint8_t pin_mask = (1u << pin_num);
+    bool pin_state = static_cast<bool>(base_addr->ODR & pin_mask);
+    return set(!pin_state);
+}
+
+bool HwGpio::set(const bool active)
+{
+    if (active)
+        base_addr->BSRR |= (1u << pin_num);
+    else
+        base_addr->BSRR |= (1u << (pin_num + 16));
+
+    return true;
+}
+
+bool HwGpio::read()
+{
+    return base_addr->IDR & (1u << pin_num);
+}
+
 };  // namespace Stmh7
 };  // namespace LBR
