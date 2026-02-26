@@ -18,7 +18,7 @@ Stml4::StGpioParams led_params{
 
 Stml4::HwGpio led{led_params};
 
-Board board{.led = led};
+Board board{.led1 = led};
 
 Stml4::HwClock clock{};
 
