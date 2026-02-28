@@ -1,6 +1,6 @@
 /**
  * @file st_gpio.h
- * @brief Gpio driver specfiics for the stmh7.
+ * @brief Gpio driver specifics for the stmh7.
  * @author Kent Hong
  */
 
@@ -83,8 +83,23 @@ public:
      */
     bool init();
 
+    /**
+     * @brief toggles pin.
+     * @return Returns true if success.
+     */
     bool toggle() override;
+
+    /**
+     * @brief sets gpio state.
+     * @param active bool to set gpio with.
+     * @return Returns true if success.
+     */
     bool set(const bool active) override;
+
+    /**
+     * @brief Reads input register.
+     * @return Returns bool of the input register.
+     */
     bool read() override;
 
 private:

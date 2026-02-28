@@ -7,6 +7,7 @@ set(PREPROCESS_DEFS
 )
 
 add_subdirectory_for(STM32L476 bsp_l476)
+add_subdirectory_for(STM32H723 bsp_h723)
 
 if (TARGET blink_bsp)
 
