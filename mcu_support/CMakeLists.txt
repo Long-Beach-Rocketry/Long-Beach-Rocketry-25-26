@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 if(NOT "${TARGET_DEVICE}" STREQUAL "NATIVE")
     message("Including CMSIS subdirectory")
     add_subdirectory(CMSIS)
@@ -13,3 +14,18 @@ elseif(MCU_NAME MATCHES "^(STM32L4)[0-9]+")
 elseif(MCU_NAME MATCHES "^(STM32H7)[0-9]+")
     add_subdirectory(stm32/h7xx)   
 endif()
+=======
+if(NOT "${TARGET_DEVICE}" STREQUAL "NATIVE")
+    message("Including CMSIS subdirectory")
+    add_subdirectory(CMSIS)
+endif()
+if (MCU_NAME MATCHES "^(STM32F4)[0-9]+")
+    add_subdirectory(stm32/f4xx)
+elseif (MCU_NAME MATCHES "^(STM32F7)[0-9]+")
+    add_subdirectory(stm32/f7xx)
+elseif(MCU_NAME MATCHES "^(STM32H5)[0-9]+")
+    add_subdirectory(stm32/h5xx)
+elseif(MCU_NAME MATCHES "^(STM32L4)[0-9]+")
+    add_subdirectory(stm32/l4xx) #only supporting l4 for now
+endif()       
+>>>>>>> 319d772 (ekf)
