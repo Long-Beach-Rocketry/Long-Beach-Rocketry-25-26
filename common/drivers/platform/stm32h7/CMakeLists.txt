@@ -1,5 +1,6 @@
 add_library(hal STATIC
     st_gpio.cc
+    st_usart.cc
 )
 
 target_include_directories(hal PUBLIC
