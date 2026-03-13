@@ -42,8 +42,7 @@ int main(int argc, char* argv[])
 #endif
 #ifdef STM32L476xx
         hw.led1.toggle();
-        for (volatile size_t i = 0; i < 300000; i++)
-            ;
+        for (volatile size_t i = 0; i < 300000; i++);
 #endif
     }
 
