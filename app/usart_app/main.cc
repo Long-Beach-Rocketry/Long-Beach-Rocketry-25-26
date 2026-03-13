@@ -16,8 +16,7 @@ int main(int argc, char** argv)
         board.usart.send(txb);
 
         // Busy wait
-        for (volatile uint32_t i = 0; i < 1000000; i++)
-            ;
+        for (volatile uint32_t i = 0; i < 1000000; i++);
     }
 
     return 0;
