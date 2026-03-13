@@ -25,7 +25,8 @@ int main(int argc, char* argv[])
         // Forward
         for (size_t i = 0; i < leds.size() - 1; i++)
         {
-            for (volatile size_t j = 0; j < 800000; j++);
+            for (volatile size_t j = 0; j < 800000; j++)
+                ;
             leds[i].get().set(0);
             leds[i + 1].get().set(1);
         }
@@ -33,14 +34,16 @@ int main(int argc, char* argv[])
         // Backward
         for (int i = leds.size() - 1; i > 0; i--)
         {
-            for (volatile size_t j = 0; j < 800000; j++);
+            for (volatile size_t j = 0; j < 800000; j++)
+                ;
             leds[i].get().set(0);
             leds[i - 1].get().set(1);
         }
 #endif
 #ifdef STM32L476xx
         hw.led1.toggle();
-        for (volatile size_t i = 0; i < 300000; i++);
+        for (volatile size_t i = 0; i < 300000; i++)
+            ;
 #endif
     }
 

@@ -6,27 +6,26 @@
 
 #pragma once
 
-#include "stm32h723xx.h"
-#include "i2c.h"
-#include <cstdint>
 #include <array>
-
-#define H7_TIMEOUT_VALUE  100000
+#include <cstdint>
+#include "i2c.h"
+#include "stm32h723xx.h"
 
 namespace LBR
 {
 namespace Stmh7
 {
-  struct StI2cParams {
+struct StI2cParams
+{
     I2C_TypeDef* base_addr;
     uint32_t timingr;
-    uint32_t timeout_delay = 400000;
-  };
+    uint32_t timeout_delay_ms = 1000;
+};
 
-  class HwI2c : public I2c {
+class HwI2c : public I2c
+{
 
-    public:
-    
+public:
     explicit HwI2c(const StI2cParams& params);
 
     /**
@@ -44,17 +43,16 @@ namespace Stmh7
                   uint8_t dev_addr) override;
 
     bool mem_write(std::span<const uint8_t> data, const uint8_t reg_addr,
-                  uint8_t dev_addr) override;
+                   uint8_t dev_addr) override;
 
     bool mem_write(std::span<const uint8_t> data, const uint16_t reg_addr,
-                  uint8_t dev_addr) override;
+                   uint8_t dev_addr) override;
 
     bool read(std::span<uint8_t> data, uint8_t dev_addr) override;
 
     bool write(std::span<const uint8_t> data, uint8_t dev_addr) override;
 
-    private:
-    
+private:
     bool isEnabled();
 
     bool busFree();
@@ -63,8 +61,8 @@ namespace Stmh7
 
     I2C_TypeDef* m_base_addr;
     uint32_t m_timingr;
-    uint32_t m_timeout_delay;
-  };
+    uint32_t m_timeout_delay_ms;
+};
 
 }  // namespace Stmh7
 }  // namespace LBR
