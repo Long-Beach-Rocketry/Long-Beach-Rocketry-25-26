@@ -36,5 +36,4 @@ Board& get_board()
 {
     return board;
 }
-
 }  // namespace LBR
