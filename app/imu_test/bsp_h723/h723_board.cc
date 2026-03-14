@@ -4,10 +4,19 @@
 #include "st_gpio.h"
 #include "st_i2c.h"
 #include "stm32h7xx_hal.h"  // for the hal_init
+#include <stdio.h>
 // #include "st_sys_clock.h"
 
 namespace LBR
 {
+
+extern "C" void IncDelayTicks(void);
+
+extern "C" void SysTick_Handler(void)
+{
+    HAL_IncTick();      // for HAL
+    IncDelayTicks();    // increments g_ms_ticks
+}
 // For 64 MHZ, got this val from STM32CubeMX
 static constexpr uint32_t ChangVal{0x20303E5D};
 
@@ -49,7 +58,9 @@ bool bsp_init()
 
     // Enable peripheral clocks
     RCC->AHB4ENR |= RCC_AHB4ENR_GPIOBEN;
+    printf("Before I2C1 clock enable\n");
     RCC->APB1LENR |= RCC_APB1LENR_I2C1EN;
+    printf("After I2C1 clock enable\n");
 
     bool ret = true;
     ret = ret && sda.init();
