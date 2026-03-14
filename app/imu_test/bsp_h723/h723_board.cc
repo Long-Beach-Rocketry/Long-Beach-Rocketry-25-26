@@ -9,6 +9,22 @@
 namespace LBR
 {
 
+/* 
+* Functions that were supposed to be in st_sys_clock. REMOVE both IncDelayTicks()
+* and SysTick_Handler() when st_sys_clk finished.
+*
+* Also uncomment the #include "st_sys_clock.h"
+*
+* Also remove the #include "stm32h7xx_hal.h".
+*
+* Also remove the hard-coded timing register val `ChangVal`.
+*
+* Also remove the HAL_Init(); in the bsp_init() function.
+*
+* The DelayMs in the bsp_init() depends on g_ms_ticks getting updated using 
+* IncDelayTicks() which is called in the SysTick_Handler, a function in
+* the st_sys_clk which we don't have yet.
+*/
 extern "C" void IncDelayTicks(void);
 
 extern "C" void SysTick_Handler(void)
@@ -16,7 +32,7 @@ extern "C" void SysTick_Handler(void)
     HAL_IncTick();    // for HAL
     IncDelayTicks();  // increments g_ms_ticks
 }
-// For 64 MHZ, got this val from STM32CubeMX
+// For 64 MHZ, got this val from STM32CubeMX. REMOVE when st_sys_clk finished
 static constexpr uint32_t ChangVal{0x20303E5D};
 
 // SCL pin config (PB8)
@@ -52,7 +68,7 @@ Board board{.imu = imu};
 
 bool bsp_init()
 {
-    // Initialize system clock first
+    // Initialize system clock first; REMOVE when st_sys_clk finished
     HAL_Init();
 
     // Enable peripheral clocks

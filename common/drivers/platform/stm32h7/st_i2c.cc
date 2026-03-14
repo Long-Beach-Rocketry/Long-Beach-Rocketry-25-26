@@ -10,23 +10,23 @@ namespace Stmh7
 {
 
 HwI2c::HwI2c(const StI2cParams& params)
-    : m_base_addr{params.base_addr},
-      m_timingr{params.timingr},
-      m_timeout_delay_ms{params.timeout_delay_ms}
+    : base_addr{params.base_addr},
+      timingr{params.timingr},
+      timeout_delay_ms{params.timeout_delay_ms}
 {
 }
 
 bool HwI2c::init()
 {
-    if (m_base_addr)
+    if (base_addr)
     {
-        m_base_addr->CR1 &= ~I2C_CR1_PE;
+        base_addr->CR1 &= ~I2C_CR1_PE;  // Reset the peripheral
 
-        m_base_addr->TIMINGR = m_timingr;
+        base_addr->TIMINGR = timingr;  // Set the timing register
 
-        m_base_addr->CR2 &= ~I2C_CR2_ADD10;  // 7-bit addressing mode
+        base_addr->CR2 &= ~I2C_CR2_ADD10;  // 7-bit addressing mode
 
-        m_base_addr->CR1 |= I2C_CR1_PE;
+        base_addr->CR1 |= I2C_CR1_PE;  // Enabled the peripheral
 
         return true;
     }
@@ -35,38 +35,43 @@ bool HwI2c::init()
 
 /* Private Helpers */
 
-bool HwI2c::isEnabled()
+bool HwI2c::is_enabled()
 {
-    if (m_base_addr)
+    if (base_addr)  // check if not nullptr
     {
-        return (m_base_addr->CR1 & I2C_CR1_PE);
+        // Return if peripheral is enabled
+        return (base_addr->CR1 & I2C_CR1_PE);
     }
     return false;
 }
 
-bool HwI2c::busFree()
+bool HwI2c::bus_free()
 {
-    if (isEnabled())
+    if (is_enabled())
     {
-        return !(m_base_addr->ISR & I2C_ISR_BUSY);
+        // Return if busy
+        return !(base_addr->ISR & I2C_ISR_BUSY);
     }
     return false;
 }
 
-bool HwI2c::timedOut(uint32_t flag)
+bool HwI2c::timed_out(uint32_t flag)
 {
 
-    uint32_t timeout = m_timeout_delay_ms;
+    uint32_t timeout = timeout_delay_ms;
     while (--timeout)
     {
         LBR::Utils::DelayMs(1);
-        if (m_base_addr->ISR & (I2C_ISR_NACKF | I2C_ISR_BERR | I2C_ISR_ARLO))
+        // I2C Error flags
+        if (base_addr->ISR & (I2C_ISR_NACKF | I2C_ISR_BERR | I2C_ISR_ARLO))
         {
-            m_base_addr->ICR |=
-                I2C_ICR_NACKCF | I2C_ICR_BERRCF | I2C_ICR_ARLOCF;
+            // Clear the error flags if raised
+            base_addr->ICR |= I2C_ICR_NACKCF | I2C_ICR_BERRCF | I2C_ICR_ARLOCF;
             return true;
         }
-        if (flag & m_base_addr->ISR)
+
+        // Flag we are waiting for has been raised!
+        if (flag & base_addr->ISR)
         {
             return false;
         }
@@ -80,53 +85,55 @@ bool HwI2c::mem_read(std::span<uint8_t> data, const uint8_t reg_addr,
                      uint8_t dev_addr)
 {
     /* Check if ready */
-    if (!busFree())
+    if (!bus_free())
     {
         return false;
     }
 
     /* Write slave address, Write mode */
-    m_base_addr->CR2 &= ~(I2C_CR2_SADD_Msk | I2C_CR2_RD_WRN |
-                          I2C_CR2_NBYTES_Msk | I2C_CR2_AUTOEND);
-    m_base_addr->CR2 |= ((dev_addr << (I2C_CR2_SADD_Pos + 1)) | I2C_CR2_START |
-                         ((8 / 8) << I2C_CR2_NBYTES_Pos));
+    base_addr->CR2 &= ~(I2C_CR2_SADD_Msk | I2C_CR2_RD_WRN | I2C_CR2_NBYTES_Msk |
+                        I2C_CR2_AUTOEND);
+
+    // Shift NBYTES by 1 (reg_addr size / 8)
+    base_addr->CR2 |= ((dev_addr << (I2C_CR2_SADD_Pos + 1)) | I2C_CR2_START |
+                       (1 << I2C_CR2_NBYTES_Pos));
 
     /* Transmit register address */
-    if (timedOut(I2C_ISR_TXIS))
+    if (timed_out(I2C_ISR_TXIS))
     {
         return false;
     }
-    m_base_addr->TXDR = reg_addr;
+    base_addr->TXDR = reg_addr;
 
-    if (timedOut(I2C_ISR_TC))
+    if (timed_out(I2C_ISR_TC))
     {
         return false;
     }
 
     /* Write slave address, Read mode */
-    m_base_addr->CR2 &= ~(I2C_CR2_SADD_Msk | I2C_CR2_RD_WRN |
-                          I2C_CR2_NBYTES_Msk | I2C_CR2_AUTOEND);
-    m_base_addr->CR2 |=
+    base_addr->CR2 &= ~(I2C_CR2_SADD_Msk | I2C_CR2_RD_WRN | I2C_CR2_NBYTES_Msk |
+                        I2C_CR2_AUTOEND);
+    base_addr->CR2 |=
         ((dev_addr << (I2C_CR2_SADD_Pos + 1)) | I2C_CR2_RD_WRN | I2C_CR2_START |
          (data.size() << I2C_CR2_NBYTES_Pos) | I2C_CR2_AUTOEND);
 
     /* Read loop */
     for (uint8_t& byte : data)
     {
-        if (timedOut(I2C_ISR_RXNE))
+        if (timed_out(I2C_ISR_RXNE))
         {
             return false;
         }
 
-        byte = m_base_addr->RXDR;
+        byte = base_addr->RXDR;
     }
 
-    if (timedOut(I2C_ISR_STOPF))
+    if (timed_out(I2C_ISR_STOPF))
     {
         return false;
     }
 
-    m_base_addr->ICR |= I2C_ICR_STOPCF;
+    base_addr->ICR |= I2C_ICR_STOPCF;
 
     return true;
 }
@@ -135,58 +142,58 @@ bool HwI2c::mem_read(std::span<uint8_t> data, const uint16_t reg_addr,
                      uint8_t dev_addr)
 {
     /* Check if ready */
-    if (!busFree())
+    if (!bus_free())
     {
         return false;
     }
 
     /* Write slave address, Write mode */
-    m_base_addr->CR2 &= ~(I2C_CR2_SADD_Msk | I2C_CR2_RD_WRN |
-                          I2C_CR2_NBYTES_Msk | I2C_CR2_AUTOEND);
-    m_base_addr->CR2 |= ((dev_addr << (1 + I2C_CR2_SADD_Pos)) | I2C_CR2_START |
-                         ((16 / 8) << I2C_CR2_NBYTES_Pos));
+    base_addr->CR2 &= ~(I2C_CR2_SADD_Msk | I2C_CR2_RD_WRN | I2C_CR2_NBYTES_Msk |
+                        I2C_CR2_AUTOEND);
+    base_addr->CR2 |= ((dev_addr << (1 + I2C_CR2_SADD_Pos)) | I2C_CR2_START |
+                       ((16 / 8) << I2C_CR2_NBYTES_Pos));
 
     /* Transmit both halves of the register address */
-    if (timedOut(I2C_ISR_TXIS))
+    if (timed_out(I2C_ISR_TXIS))
     {
         return false;
     }
-    m_base_addr->TXDR =
+    base_addr->TXDR =
         static_cast<uint8_t>((reg_addr >> 8) & 0xFF);  // Upper half
 
-    if (timedOut(I2C_ISR_TXIS))
+    if (timed_out(I2C_ISR_TXIS))
     {
         return false;
     }
-    m_base_addr->TXDR = static_cast<uint8_t>(reg_addr & 0xFF);  // Lower half
+    base_addr->TXDR = static_cast<uint8_t>(reg_addr & 0xFF);  // Lower half
 
-    if (timedOut(I2C_ISR_TC))
+    if (timed_out(I2C_ISR_TC))
     {
         return false;
     }
 
     /* Write slave address, Read mode */
-    m_base_addr->CR2 &= ~(I2C_CR2_SADD_Msk | I2C_CR2_RD_WRN |
-                          I2C_CR2_NBYTES_Msk | I2C_CR2_AUTOEND);
-    m_base_addr->CR2 |=
+    base_addr->CR2 &= ~(I2C_CR2_SADD_Msk | I2C_CR2_RD_WRN | I2C_CR2_NBYTES_Msk |
+                        I2C_CR2_AUTOEND);
+    base_addr->CR2 |=
         ((dev_addr << (I2C_CR2_SADD_Pos + 1)) | I2C_CR2_RD_WRN | I2C_CR2_START |
          (data.size() << I2C_CR2_NBYTES_Pos) | I2C_CR2_AUTOEND);
 
     /* Read loop */
     for (uint8_t& byte : data)
     {
-        if (timedOut(I2C_ISR_RXNE))
+        if (timed_out(I2C_ISR_RXNE))
         {
             return false;
         }
 
-        byte = m_base_addr->RXDR;
+        byte = base_addr->RXDR;
     }
-    if (timedOut(I2C_ISR_STOPF))
+    if (timed_out(I2C_ISR_STOPF))
     {
         return false;
     }
-    m_base_addr->ICR |= I2C_ICR_STOPCF;
+    base_addr->ICR |= I2C_ICR_STOPCF;
 
     return true;
 }
@@ -195,47 +202,47 @@ bool HwI2c::mem_write(std::span<const uint8_t> data, const uint8_t reg_addr,
                       uint8_t dev_addr)
 {
     /* Check if ready */
-    if (!busFree())
+    if (!bus_free())
     {
         return false;
     }
 
     /* Write slave address, Write mode */
-    m_base_addr->CR2 &= ~(I2C_CR2_SADD_Msk | I2C_CR2_RD_WRN |
-                          I2C_CR2_NBYTES_Msk | I2C_CR2_AUTOEND);
-    m_base_addr->CR2 |=
+    base_addr->CR2 &= ~(I2C_CR2_SADD_Msk | I2C_CR2_RD_WRN | I2C_CR2_NBYTES_Msk |
+                        I2C_CR2_AUTOEND);
+    base_addr->CR2 |=
         ((dev_addr << (1 + I2C_CR2_SADD_Pos)) | I2C_CR2_START |
          ((8 / 8 + data.size()) << I2C_CR2_NBYTES_Pos) | I2C_CR2_AUTOEND);
 
-    if (timedOut(I2C_ISR_TXIS))
+    if (timed_out(I2C_ISR_TXIS))
     {
         return false;
     }
 
     /* Transmit register address */
-    m_base_addr->TXDR = reg_addr;
+    base_addr->TXDR = reg_addr;
 
     /* Write loop */
     for (const uint8_t byte : data)
     {
-        if (timedOut(I2C_ISR_TXIS))
+        if (timed_out(I2C_ISR_TXIS))
         {
             return false;
         }
-        if (m_base_addr->ISR & I2C_ISR_NACKF)
+        if (base_addr->ISR & I2C_ISR_NACKF)
         {
-            m_base_addr->ICR |= I2C_ICR_NACKCF;
+            base_addr->ICR |= I2C_ICR_NACKCF;
             return false;
         }
 
-        m_base_addr->TXDR = byte;
+        base_addr->TXDR = byte;
     }
 
-    if (timedOut(I2C_ISR_STOPF))
+    if (timed_out(I2C_ISR_STOPF))
     {
         return false;
     }
-    m_base_addr->ICR |= I2C_ICR_STOPCF;
+    base_addr->ICR |= I2C_ICR_STOPCF;
 
     return true;
 }
@@ -244,53 +251,53 @@ bool HwI2c::mem_write(std::span<const uint8_t> data, const uint16_t reg_addr,
                       uint8_t dev_addr)
 {
     /* Check if ready */
-    if (!busFree())
+    if (!bus_free())
     {
         return false;
     }
 
     /* Write slave address, Write mode */
-    m_base_addr->CR2 &= ~(I2C_CR2_SADD_Msk | I2C_CR2_RD_WRN |
-                          I2C_CR2_NBYTES_Msk | I2C_CR2_AUTOEND);
-    m_base_addr->CR2 |=
+    base_addr->CR2 &= ~(I2C_CR2_SADD_Msk | I2C_CR2_RD_WRN | I2C_CR2_NBYTES_Msk |
+                        I2C_CR2_AUTOEND);
+    base_addr->CR2 |=
         ((dev_addr << (1 + I2C_CR2_SADD_Pos)) | I2C_CR2_START |
          ((data.size() + 16 / 8) << I2C_CR2_NBYTES_Pos) | I2C_CR2_AUTOEND);
 
     /* Transmit both halves of the register address */
-    if (timedOut(I2C_ISR_TXIS))
+    if (timed_out(I2C_ISR_TXIS))
     {
         return false;
     }
-    m_base_addr->TXDR =
+    base_addr->TXDR =
         static_cast<uint8_t>((reg_addr >> 8) & 0xFF);  // Upper half
 
-    if (timedOut(I2C_ISR_TXIS))
+    if (timed_out(I2C_ISR_TXIS))
     {
         return false;
     }
-    m_base_addr->TXDR = static_cast<uint8_t>(reg_addr & 0xFF);  // Lower half
+    base_addr->TXDR = static_cast<uint8_t>(reg_addr & 0xFF);  // Lower half
 
     /* Write loop */
     for (const uint8_t byte : data)
     {
-        if (timedOut(I2C_ISR_TXIS))
+        if (timed_out(I2C_ISR_TXIS))
         {
             return false;
         }
-        if (m_base_addr->ISR & I2C_ISR_NACKF)
+        if (base_addr->ISR & I2C_ISR_NACKF)
         {
-            m_base_addr->ICR |= I2C_ICR_NACKCF;
+            base_addr->ICR |= I2C_ICR_NACKCF;
             return false;
         }
 
-        m_base_addr->TXDR = byte;
+        base_addr->TXDR = byte;
     }
 
-    if (timedOut(I2C_ISR_STOPF))
+    if (timed_out(I2C_ISR_STOPF))
     {
         return false;
     }
-    m_base_addr->ICR |= I2C_ICR_STOPCF;
+    base_addr->ICR |= I2C_ICR_STOPCF;
 
     return true;
 }
@@ -298,34 +305,34 @@ bool HwI2c::mem_write(std::span<const uint8_t> data, const uint16_t reg_addr,
 bool HwI2c::read(std::span<uint8_t> data, uint8_t dev_addr)
 {
     /* Check if ready */
-    if (!(busFree()))
+    if (!(bus_free()))
     {
         return false;
     }
 
     /* Write slave address, Read mode */
-    m_base_addr->CR2 &= ~(I2C_CR2_SADD_Msk | I2C_CR2_RD_WRN |
-                          I2C_CR2_NBYTES_Msk | I2C_CR2_AUTOEND);
-    m_base_addr->CR2 |=
+    base_addr->CR2 &= ~(I2C_CR2_SADD_Msk | I2C_CR2_RD_WRN | I2C_CR2_NBYTES_Msk |
+                        I2C_CR2_AUTOEND);
+    base_addr->CR2 |=
         ((dev_addr << (I2C_CR2_SADD_Pos + 1)) | I2C_CR2_RD_WRN | I2C_CR2_START |
          (data.size() << I2C_CR2_NBYTES_Pos) | I2C_CR2_AUTOEND);
 
     /* Read loop */
     for (uint8_t& byte : data)
     {
-        if (timedOut(I2C_ISR_RXNE))
+        if (timed_out(I2C_ISR_RXNE))
         {
             return false;
         }
 
-        byte = m_base_addr->RXDR;
+        byte = base_addr->RXDR;
     }
 
-    if (timedOut(I2C_ISR_STOPF))
+    if (timed_out(I2C_ISR_STOPF))
     {
         return false;
     }
-    m_base_addr->ICR |= I2C_ICR_STOPCF;
+    base_addr->ICR |= I2C_ICR_STOPCF;
 
     return true;
 }
@@ -333,38 +340,38 @@ bool HwI2c::read(std::span<uint8_t> data, uint8_t dev_addr)
 bool HwI2c::write(std::span<const uint8_t> data, uint8_t dev_addr)
 {
     /* Check if ready */
-    if (!busFree())
+    if (!bus_free())
     {
         return false;
     }
 
     /* Write slave address, Write mode */
-    m_base_addr->CR2 &= ~(I2C_CR2_SADD_Msk | I2C_CR2_RD_WRN |
-                          I2C_CR2_NBYTES_Msk | I2C_CR2_AUTOEND);
-    m_base_addr->CR2 |= ((dev_addr << (1 + I2C_CR2_SADD_Pos)) | I2C_CR2_START |
-                         (data.size() << I2C_CR2_NBYTES_Pos) | I2C_CR2_AUTOEND);
+    base_addr->CR2 &= ~(I2C_CR2_SADD_Msk | I2C_CR2_RD_WRN | I2C_CR2_NBYTES_Msk |
+                        I2C_CR2_AUTOEND);
+    base_addr->CR2 |= ((dev_addr << (1 + I2C_CR2_SADD_Pos)) | I2C_CR2_START |
+                       (data.size() << I2C_CR2_NBYTES_Pos) | I2C_CR2_AUTOEND);
 
     /* Write loop */
     for (const uint8_t byte : data)
     {
 
-        if (timedOut(I2C_ISR_TXIS))
+        if (timed_out(I2C_ISR_TXIS))
         {
             return false;
         }
-        if (I2C_ISR_NACKF & m_base_addr->ISR)
+        if (I2C_ISR_NACKF & base_addr->ISR)
         {
-            m_base_addr->ICR |= I2C_ICR_NACKCF;
+            base_addr->ICR |= I2C_ICR_NACKCF;
             return false;
         }
 
-        m_base_addr->TXDR = byte;
+        base_addr->TXDR = byte;
     }
-    if (timedOut(I2C_ISR_STOPF))
+    if (timed_out(I2C_ISR_STOPF))
     {
         return false;
     }
-    m_base_addr->ICR |= I2C_ICR_STOPCF;
+    base_addr->ICR |= I2C_ICR_STOPCF;
     return true;
 }
 
