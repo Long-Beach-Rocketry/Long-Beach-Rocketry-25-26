@@ -17,14 +17,13 @@ namespace LBR
 *
 * Also remove the #include "stm32h7xx_hal.h".
 *
-* Also remove the hard-coded timing register val `ChangVal`.
-*
 * Also remove the HAL_Init(); in the bsp_init() function.
 *
 * The DelayMs in the bsp_init() depends on g_ms_ticks getting updated using 
 * IncDelayTicks() which is called in the SysTick_Handler, a function in
 * the st_sys_clk which we don't have yet.
 */
+
 extern "C" void IncDelayTicks(void);
 
 extern "C" void SysTick_Handler(void)
@@ -33,7 +32,7 @@ extern "C" void SysTick_Handler(void)
     IncDelayTicks();  // increments g_ms_ticks
 }
 // For 64 MHZ, got this val from STM32CubeMX. REMOVE when st_sys_clk finished
-static constexpr uint32_t ChangVal{0x20303E5D};
+static constexpr uint32_t kTimingR{0x20303E5D};
 
 // SCL pin config (PB8)
 Stmh7::StGpioSettings scl_settings{
@@ -48,7 +47,7 @@ Stmh7::StGpioSettings sda_settings{
 const Stmh7::StGpioParams sda_params{sda_settings, 9, GPIOB};
 
 // I2C config
-const Stmh7::StI2cParams i2c_params{I2C1, ChangVal};
+const Stmh7::StI2cParams i2c_params{I2C1, kTimingR};
 
 // Create I2C, SCL pin, and SDA pin objects
 Stmh7::HwI2c i2c(i2c_params);
