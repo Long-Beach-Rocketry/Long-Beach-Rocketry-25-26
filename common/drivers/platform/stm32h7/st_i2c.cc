@@ -90,7 +90,7 @@ bool HwI2c::timed_out(uint32_t flag)
 bool HwI2c::mem_read(std::span<uint8_t> data, const uint8_t reg_addr,
                      uint8_t dev_addr)
 {
-    /* Check if ready */
+    /* Check if enabled & ready */
     if (!bus_free())
     {
         return false;
@@ -151,7 +151,7 @@ bool HwI2c::mem_read(std::span<uint8_t> data, const uint8_t reg_addr,
 bool HwI2c::mem_read(std::span<uint8_t> data, const uint16_t reg_addr,
                      uint8_t dev_addr)
 {
-    /* Check if ready */
+    /* Check if enabled & ready */
     if (!bus_free())
     {
         return false;
@@ -215,7 +215,7 @@ bool HwI2c::mem_read(std::span<uint8_t> data, const uint16_t reg_addr,
 bool HwI2c::mem_write(std::span<const uint8_t> data, const uint8_t reg_addr,
                       uint8_t dev_addr)
 {
-    /* Check if ready */
+    /* Check if enabled & ready */
     if (!bus_free())
     {
         return false;
@@ -267,7 +267,7 @@ bool HwI2c::mem_write(std::span<const uint8_t> data, const uint8_t reg_addr,
 bool HwI2c::mem_write(std::span<const uint8_t> data, const uint16_t reg_addr,
                       uint8_t dev_addr)
 {
-    /* Check if ready */
+    /* Check if enabled & ready */
     if (!bus_free())
     {
         return false;
@@ -326,7 +326,7 @@ bool HwI2c::mem_write(std::span<const uint8_t> data, const uint16_t reg_addr,
 
 bool HwI2c::read(std::span<uint8_t> data, uint8_t dev_addr)
 {
-    /* Check if ready */
+    /* Check if enabled & ready */
     if (!(bus_free()))
     {
         return false;
@@ -361,7 +361,7 @@ bool HwI2c::read(std::span<uint8_t> data, uint8_t dev_addr)
 
 bool HwI2c::write(std::span<const uint8_t> data, uint8_t dev_addr)
 {
-    /* Check if ready */
+    /* Check if enabled & ready */
     if (!bus_free())
     {
         return false;

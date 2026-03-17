@@ -61,11 +61,11 @@ public:
 
 private:
     /**
-     * @brief Private help function that hecks if the given I2C base address is valid
-     * and NOT `nullptr`.
+     * @brief Private help function that checks if the given I2C base address is valid
+     * and NOT `nullptr`. Also checks if the peripheral enabled flag was raised.
      * 
      * @param None
-     * @return `true` if valid and NOT `nullptr`, `false` otherwise
+     * @return `true` if valid and NOT `nullptr` and peripheral enabled, `false` otherwise
      */
     bool is_enabled();
 
