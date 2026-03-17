@@ -8,6 +8,7 @@ set(PREPROCESS_DEFS
 
 # Only add BSP for this target device
 add_subdirectory_for(STM32L476 bsp_l476)
+add_subdirectory_for(STM32H723 bsp_h723)
 
 if (TARGET bno055_bsp)
 
