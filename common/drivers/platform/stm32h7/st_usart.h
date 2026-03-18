@@ -7,16 +7,16 @@
  *      - FIFO mode to reduce interrupt frequency and improve throughput
  */
 
-#pragma once // Include guard to prevent multiple inclusions of this header file
+#pragma once  // Include guard to prevent multiple inclusions of this header file
 
-#include "stm32h723xx.h" // Include the correct header for the specific STM32H7 device being used
-#include "usart.h" // Include the generic USART class header
+#include "stm32h723xx.h"  // Include the correct header for the specific STM32H7 device being used
+#include "usart.h"  // Include the generic USART class header
 
-namespace LBR // Use the LBR namespace to avoid naming conflicts
+namespace LBR  // Use the LBR namespace to avoid naming conflicts
 {
-namespace Stmh7 // Use the Stmh7 namespace for STM32H7 specific implementations
+namespace Stmh7  // Use the Stmh7 namespace for STM32H7 specific implementations
 {
-class StUsart : public Usart 
+class StUsart : public Usart
 {
 public:
     /**
@@ -25,7 +25,11 @@ public:
      * @note BY_16 provides better noise tolerance (default).
      * @note BY_8 doubles the maximum achievable baud rate. 
      */
-    enum class OversampleMode { BY_16, BY_8 };
+    enum class OversampleMode
+    {
+        BY_16,
+        BY_8
+    };
 
     /**
      * @brief Parameterized constructor which initializes important values for specific USART object.
@@ -35,8 +39,8 @@ public:
      * @param baud_rate The chosen baud rate to send and receive data on a serial monitor
      * @param mode The chosen oversampling mode, default is by 16.
      */
-    StUsart(USART_TypeDef* base_addr, uint32_t sys_clck, uint32_t baud_rate, OversampleMode mode = OversampleMode::BY_16);
-
+    StUsart(USART_TypeDef* base_addr, uint32_t sys_clck, uint32_t baud_rate,
+            OversampleMode mode = OversampleMode::BY_16);
 
     /**
      * @brief sends data to serial output.
@@ -69,10 +73,10 @@ public:
     USART_TypeDef* get_addr();
 
 private:
-    USART_TypeDef* base_addr; // Pointer to the USART peripheral's base address
-    uint16_t usartdiv; // Variable to hold the calculated USARTDIV value for baud rate configuration
-    OversampleMode mode; // Variable to hold oversample mode
-
+    USART_TypeDef* base_addr;  // Pointer to the USART peripheral's base address
+    uint16_t
+        usartdiv;  // Variable to hold the calculated USARTDIV value for baud rate configuration
+    OversampleMode mode;  // Variable to hold oversample mode
 };
-} // namespace Stmh7
-} // namespace LBR
+}  // namespace Stmh7
+}  // namespace LBR
