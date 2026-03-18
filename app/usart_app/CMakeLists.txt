@@ -6,6 +6,7 @@ set(PREPROCESS_DEFS
     -DDEF_FLASH_SIZE=1024K
 )
 
+add_subdirectory_for(STM32H723 BSP_H723)  # add H723
 add_subdirectory_for(STM32L476 BSP_L476)
 
 if (TARGET usart_app_bsp)
@@ -17,7 +18,7 @@ if (TARGET usart_app_bsp)
 
     target_include_directories_for(${TARGET_DEVICE} ${EXECUTABLE}
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
-        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/BSP_L476
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/BSP_H723 # changed from pointing to L4 to pointing to H7
     )
 
     target_link_libraries_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
