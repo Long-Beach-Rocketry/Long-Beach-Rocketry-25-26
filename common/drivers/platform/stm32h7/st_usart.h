@@ -1,5 +1,10 @@
 /**
  * @brief This file is implementing hardware specific functions defined in the generic USART class.
+ * 
+ * @note Current implementation uses polling for TX/RX with FIFO disabled.
+ *      Future optimizations may include:
+ *      - DMA driven TX/RX to free CPU for navigation, IMU, and control tasks
+ *      - FIFO mode to reduce interrupt frequency and improve throughput
  */
 
 #pragma once // Include guard to prevent multiple inclusions of this header file
@@ -13,24 +18,30 @@ namespace Stmh7 // Use the Stmh7 namespace for STM32H7 specific implementations
 {
 class StUsart : public Usart 
 {
-private:
-    USART_TypeDef* base_addr; // Pointer to the USART peripheral's base address
-    uint16_t usartdiv; // Variable to hold the calculated USARTDIV value for baud rate configuration
-
 public:
+    /**
+     * @brief Public enum class that determines which oversampling mode will be used by the driver.
+     * 
+     * @note BY_16 provides better noise tolerance (default).
+     * @note BY_8 doubles the maximum achievable baud rate. 
+     */
+    enum class OversampleMode { BY_16, BY_8 };
+
     /**
      * @brief Parameterized constructor which initializes important values for specific USART object.
      * 
      * @param base_addr The base address of the USART peripheral to be used.
      * @param sys_clck The specific system clock frequency of hardware.
      * @param baud_rate The chosen baud rate to send and receive data on a serial monitor
+     * @param mode The chosen oversampling mode, default is by 16.
      */
-    StUsart(USART_TypeDef* base_addr, uint32_t sys_clck, uint32_t baud_rate);
+    StUsart(USART_TypeDef* base_addr, uint32_t sys_clck, uint32_t baud_rate, OversampleMode mode = OversampleMode::BY_16);
+
 
     /**
      * @brief sends data to serial output.
      * 
-     * @param txbuf An uint8_t std::array data to be sent
+     * @param txbuf An uint8_t std::array data to be sent.
      * @return True on success. False, otherwise.
      */
     bool send(std::span<const uint8_t> txbuf) override;
@@ -38,8 +49,8 @@ public:
     /**
      * @brief Receives data from serial input.
      * 
-     * @param byte Reference to store received byte
-     * @return True if byte was received, false if no data available
+     * @param byte Reference to store received byte.
+     * @return True if byte was received, false if no data available.
      */
     bool receive(uint8_t& byte) override;
 
@@ -56,6 +67,11 @@ public:
      * @return USART_TypeDef* 
      */
     USART_TypeDef* get_addr();
+
+private:
+    USART_TypeDef* base_addr; // Pointer to the USART peripheral's base address
+    uint16_t usartdiv; // Variable to hold the calculated USARTDIV value for baud rate configuration
+    OversampleMode mode; // Variable to hold oversample mode
 
 };
 } // namespace Stmh7
