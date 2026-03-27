@@ -73,7 +73,8 @@ public:
     USART_TypeDef* get_addr();
 
 private:
-    USART_TypeDef* base_addr;  // Pointer to the USART peripheral's base address
+    USART_TypeDef* const
+        base_addr;  // Pointer to the USART peripheral's base address
     uint16_t
         usartdiv;  // Variable to hold the calculated USARTDIV value for baud rate configuration
     OversampleMode mode;  // Variable to hold oversample mode
