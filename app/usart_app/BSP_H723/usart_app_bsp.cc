@@ -6,6 +6,8 @@ using namespace LBR::Stmh7;
 
 namespace LBR
 {
+namespace Stmh7
+{
 
 StGpioSettings tx_config = {GpioMode::ALT_FUNC, GpioOtype::PUSH_PULL,
                             GpioOspeed::LOW, GpioPupd::NO_PULL, 0x7};
@@ -24,8 +26,9 @@ HwGpio rx_gpio(rx_params);
 
 // Default frequency for the H7 (HSI / 1), (per Datasheet 8.7.2)
 StUsart usart(USART3, 64000000, 115200);
+};  // namespace Stmh7
 
-Board board{.usart = usart, .tx = tx_gpio, .rx = rx_gpio};
+Board board{.usart = Stmh7::usart, .rx = Stmh7::rx_gpio, .tx = Stmh7::tx_gpio};
 
 bool bsp_init()
 {
@@ -71,4 +74,4 @@ extern "C" void USART3_IRQHandler(void)
     }
 }
 
-}  // namespace LBR
+};  // namespace LBR
