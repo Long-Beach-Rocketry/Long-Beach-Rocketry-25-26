@@ -12,10 +12,10 @@
 
 namespace LBR 
 {
-
 namespace Stmh7 
 {
 
+  
 enum class PwmMode : uint8_t {
     EDGE_ALIGNED = 0,
     CENTER_ALIGNED_DOWN,
@@ -55,7 +55,6 @@ struct StPwmParams {
   TIM_TypeDef* base_addr;
   PwmChannel channel;
   StPwmSettings settings;
-
 };
 
 
@@ -77,9 +76,8 @@ class HwPwm : public Pwm {
     StPwmSettings settings;
     uint32_t curr_freq;
     uint8_t curr_duty_cycle;
-
-
 };
+
 
 }  // namespace Stmh7
 }  // namespace LBR
