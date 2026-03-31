@@ -48,7 +48,7 @@ bool StUsart::receive(uint8_t& byte)
             When FIFO mode is disabled, the RXNE bit is set to indicate that the content of the
             shift register is transferred to the RDR. In other words, data have been received and
             can be read (as well as their associated error flags).
-             */
+    */
 
     if (!(base_addr->ISR & USART_ISR_RXNE_RXFNE))
     {
@@ -59,7 +59,7 @@ bool StUsart::receive(uint8_t& byte)
             In single buffer mode:
             – When FIFO mode is disabled, clearing the RXNE flag is done by performing a software read 
             from the USART_RDR register. 
-            */
+    */
     byte = base_addr->RDR;
     return true;
 }
