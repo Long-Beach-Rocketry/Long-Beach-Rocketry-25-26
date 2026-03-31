@@ -34,13 +34,20 @@ public:
     /**
      * @brief Parameterized constructor which initializes important values for specific USART object.
      * 
-     * @param base_addr The base address of the USART peripheral to be used.
-     * @param sys_clck The specific system clock frequency of hardware.
-     * @param baud_rate The chosen baud rate to send and receive data on a serial monitor
-     * @param mode The chosen oversampling mode, default is by 16.
+     * @param params_ Struct containing USART configuration parameters:
+     *                - base_addr: base address of the USART peripheral to be used
+     *                - sys_clck: specific system clock frequency of hardware
+     *                - baud_rate: chosen baud rate to send and receive data on a serial monitor
+     *                - mode: chosen oversampling mode, default is by 16
      */
-    StUsart(USART_TypeDef* base_addr, uint32_t sys_clck, uint32_t baud_rate,
-            OversampleMode mode = OversampleMode::BY_16);
+    struct StUsartParams
+    {
+        USART_TypeDef* base_addr;
+        uint32_t sys_clck;
+        uint32_t baud_rate;
+        OversampleMode mode = OversampleMode::BY_16;
+    };
+    StUsart(const StUsartParams& params_);
 
     /**
      * @brief sends data to serial output.
@@ -57,6 +64,7 @@ public:
      * @return True if byte was received, false if no data available.
      */
     bool receive(uint8_t& byte) override;
+    // Note: why is this received in a form of byte/8 bits rather than a span/array?
 
     /**
      * @brief Initializes the USART and associated Rx and Tx pins.

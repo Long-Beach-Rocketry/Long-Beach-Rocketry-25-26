@@ -4,17 +4,16 @@ namespace LBR
 {
 namespace Stmh7
 {
-StUsart::StUsart(USART_TypeDef* const base_addr, uint32_t sys_clck,
-                 uint32_t baud_rate, OversampleMode mode)
-    : base_addr(base_addr), mode(mode)
+StUsart::StUsart(const StUsartParams& params_)
+    : base_addr(params_.base_addr), mode(params_.mode)
 {
     if (mode == OversampleMode::BY_8)
     {
-        usartdiv = (2 * sys_clck) / baud_rate;
+        usartdiv = (2 * params_.sys_clck) / params_.baud_rate;
     }
     else
     {
-        usartdiv = sys_clck / baud_rate;
+        usartdiv = params_.sys_clck / params_.baud_rate;
     }
 }
 
