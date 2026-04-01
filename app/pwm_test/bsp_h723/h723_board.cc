@@ -5,6 +5,8 @@
 
 namespace LBR
 {
+uint32_t kPclkFreq = 64000000;
+
 // Output pin config for Timer 4, Channel 3 (PB8)
 Stmh7::StGpioSettings pwm_output_settings{
     Stmh7::GpioMode::ALT_FUNC, Stmh7::GpioOtype::PUSH_PULL,
@@ -17,7 +19,8 @@ Stmh7::StPwmSettings pwm_settings{Stmh7::PwmMode::EDGE_ALIGNED,
                                   Stmh7::PwmOutputMode::MODE1,
                                   Stmh7::PwmDir::UPCOUNTING};
 
-const Stmh7::StPwmParams pwm_params{TIM4, Stmh7::PwmChannel::CH3, pwm_settings};
+const Stmh7::StPwmParams pwm_params{TIM4, Stmh7::PwmChannel::CH3, pwm_settings,
+                                    kPclkFreq};
 
 // Create PWM GPIO and PWM objects
 Stmh7::HwGpio pwm_output(pwm_output_params);

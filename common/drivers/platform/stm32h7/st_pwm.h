@@ -73,14 +73,13 @@ struct StPwmSettings
 
 /**
  * @brief Collection of timer base address, pwm settings, timer channel, and peripheral clock frequency
- * @note Default peripheral clock frequency is 64 Mhz
  */
 struct StPwmParams
 {
     TIM_TypeDef* base_addr;
     PwmChannel channel;
     StPwmSettings settings;
-    uint32_t pclk_freq = 64000000;
+    uint32_t pclk_freq;
 };
 
 class HwPwm : public Pwm
