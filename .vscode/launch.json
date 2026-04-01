@@ -294,10 +294,11 @@
         "monitor reset"
       ],
       "showDevDebugOutput": true
-    },    {
+    },
+    {
       "cwd": "${workspaceFolder}",
-      "executable": "${workspaceRoot}/build/stm32h723/app/pwm_test/pwm_test",
-      "name": "DEBUG PWM TEST H7",
+      "executable": "${workspaceRoot}/build/stm32h723/app/usart_app/usart_app",
+      "name": "DEBUG USART H7",
       "request": "launch",
       "type": "cortex-debug",
       "servertype": "openocd",
@@ -311,7 +312,7 @@
       ],
       "debuggerArgs": ["-d", "${workspaceRoot}"],
       "preRestartCommands": [
-        "add-symbol-file build/stm32h723/app/pwm_test/pwm_test",
+        "add-symbol-file build/stm32h723/app/usart_app/usart_app",
         "load",
         "enable breakpoint",
         "monitor reset"
