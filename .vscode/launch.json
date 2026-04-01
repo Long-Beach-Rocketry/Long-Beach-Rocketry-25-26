@@ -318,6 +318,6 @@
         "monitor reset"
       ],
       "showDevDebugOutput": true
-    },
+    }
   ]
 }
