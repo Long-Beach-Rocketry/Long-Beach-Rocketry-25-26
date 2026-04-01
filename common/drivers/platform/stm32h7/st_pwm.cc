@@ -6,22 +6,27 @@ namespace LBR
 namespace Stmh7
 {
 
-/**
-* @note Magic numbers that I will replace later.
-* Clock freq, ARR, PSC
-*/
-
-static constexpr uint32_t pclk_freq = 64000000;
 static constexpr uint8_t kArrVal = 99;
 static constexpr uint32_t kMaxPsc = 65536;  // 2^(16)
-static constexpr uint32_t kMaxEdgeAlignedFreq = pclk_freq / (kArrVal + 1);
-static constexpr uint32_t kMaxCenterAlignedFreq =
-    pclk_freq / (2 * (kArrVal + 1));
 
+// Bit lengths
 static constexpr uint8_t kTIM_CCMRx_OCxM_BitWidth = 4;
 static constexpr uint8_t kTIM_CR1_CMS_BitWidth = 2;
 static constexpr uint8_t kTIM_CR1_DIR_BitWidth = 1;
 static constexpr uint8_t kTIM_CCRx_BitWidth = 16;
+
+/**
+ * Maxmimum PWM frequencies according to ARR value
+ */
+static inline uint32_t max_edge_aligned_freq(uint32_t pclk_freq)
+{
+    return pclk_freq / (kArrVal + 1);
+}
+
+static inline uint32_t max_center_aligned_freq(uint32_t pclk_freq)
+{
+    return pclk_freq / (2 * (kArrVal + 1));
+}
 
 // For specific General-Purpose Timers
 static inline bool is_timer_12_to_17(TIM_TypeDef* t)
@@ -34,8 +39,9 @@ HwPwm::HwPwm(const StPwmParams& params_)
     : base_addr{params_.base_addr},
       channel{params_.channel},
       settings{params_.settings},
-      curr_freq{pclk_freq},
-      curr_duty_cycle{0}
+      curr_freq{params_.pclk_freq},
+      curr_duty_cycle{0},
+      pclk_freq{params_.pclk_freq}
 {
 }
 
@@ -48,12 +54,12 @@ bool HwPwm::init()
 
     base_addr->CR1 &= ~TIM_CR1_CEN;
     /* 
-  * TIM 1,8 have 4 channels and can have any mode
-  * TIM 2,3,4,5,23,24 have 4 channels and any mode
-  * TIM 6.7 cannot do PWM
-  * TIM 12,15 have 2 channels and edge up mode only
-  * TIM 13, 14,16,17 have 1 channel and edge up mode only 
-  */
+    * TIM 1,8 have 4 channels and can have any mode
+    * TIM 2,3,4,5,23,24 have 4 channels and any mode
+    * TIM 6.7 cannot do PWM
+    * TIM 12,15 have 2 channels and edge up mode only
+    * TIM 13, 14,16,17 have 1 channel and edge up mode only 
+    */
 
     if (base_addr == TIM6 || base_addr == TIM7)
     {
@@ -86,6 +92,7 @@ bool HwPwm::init()
                TIM_CR1_DIR_Pos, kTIM_CR1_DIR_BitWidth);
     }
 
+    // Channel setting
     switch (channel)
     {
 
@@ -155,28 +162,30 @@ bool HwPwm::init()
 
 bool HwPwm::set_freq(uint32_t freq)
 {
+    // If not enabled
     if (!(base_addr->CR1 & TIM_CR1_CEN_Msk))
     {
         return false;
     }
 
+    // If input not in range
     if (freq < 1 || pclk_freq < freq)
     {
         return false;
     }
-
-    else if (kMaxEdgeAlignedFreq < freq &&
+    else if (max_edge_aligned_freq(pclk_freq) < freq &&
              settings.mode == PwmMode::EDGE_ALIGNED)
     {
         return false;
     }
 
-    else if (kMaxCenterAlignedFreq < freq &&
+    else if (max_center_aligned_freq(pclk_freq) < freq &&
              settings.mode != PwmMode::EDGE_ALIGNED)
     {
         return false;
     }
 
+    // Compute according to the formula
     uint32_t psc_val = pclk_freq / (freq * (1 + kArrVal));
 
     if (settings.mode != PwmMode::EDGE_ALIGNED)
@@ -188,6 +197,7 @@ bool HwPwm::set_freq(uint32_t freq)
         return false;
     }
 
+    // Save value
     base_addr->PSC = psc_val - 1;
     curr_freq = freq;
 
@@ -196,15 +206,18 @@ bool HwPwm::set_freq(uint32_t freq)
 
 bool HwPwm::set_duty_cycle(uint8_t duty_cycle)
 {
+    // If not enabled
     if (!(base_addr->CR1 & TIM_CR1_CEN_Msk))
     {
         return false;
     }
+    // If not in range
     if (duty_cycle < 0 || 100 < duty_cycle)
     {
         return false;
     }
 
+    // Compute according to the formula
     // duty_cycle = (CCR / ARR) * 100
     // duty_cycle / 100 = CCR / ARR
     // duty_cycle * ARR / 100 = CCR
