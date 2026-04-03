@@ -2,9 +2,9 @@ name: Repository CI Pipelines
 
 on:
   push:
-    branches: ["main"]
+    branches: ["**"]
   pull_request:
-    branches: ["main"]
+    branches: ["**"]
 
 jobs:
   # Make sure code abides by the clang-format.
