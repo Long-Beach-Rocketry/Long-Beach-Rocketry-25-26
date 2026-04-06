@@ -1,17 +1,6 @@
 #include "st_spi.h"
 #include <cstdint>
 
-// We'll be using pins: PB3 for SPI1_SCK (serial clock), PG9 for SPI1_MISO, PD7 for SPI1_MOSI, PG10 for SPI1_NSS (the chip selector (CS))
-// PB3 GPIO alt. func. is under AF5, PG9 GPIO alt. func. is under AF5, PD7 GPIO alt. func. is under AF5, PG10 GPIO alt. func. is under AF5
-// For STM, it splits the AFRL (GPIO alternate function low register (GPIOx_AFRL)) into pins 0-7 and AFRH (GPIO alternate function high register (GPIOx_AFRH)) 
-// into pins 8-15, so PB3 and PD7 are in AFRL since 3 and 7 are in 0-7 and PG9 and PG10 are in AFRH since 9 and 10 are in 8-15.
-/* So to summarize:
-
-PB3 → AFRL, write 0101 into the AFR3 field
-PD7 → AFRL, write 0101 into the AFR7 field
-PG9 → AFRH, write 0101 into the AFR9 field
-PG10 → AFRH, write 0101 into the AFR10 field */
-
 namespace LBR
 {
 namespace Stmh7
