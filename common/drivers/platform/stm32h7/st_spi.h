@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <span>
+#include "reg_helpers.h"
 #include "spi.h"
 #include "stm32h723xx.h"
 
