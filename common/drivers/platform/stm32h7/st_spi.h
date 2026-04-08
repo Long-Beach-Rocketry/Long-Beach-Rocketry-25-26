@@ -87,13 +87,12 @@ enum class SpiDataSize : uint8_t
  */
 enum class SpiRxThreshold : uint8_t
 {
-    FIFO_1  = 0,  
+    FIFO_1 = 0,
     FIFO_2 = 1,
     FIFO_4 = 3,
     FIFO_8 = 7,
-    FIFO_16 = 15        
+    FIFO_16 = 15
 };
-
 
 /**
  * @brief Desired SPI control register settings to be applied during init().
@@ -101,11 +100,11 @@ enum class SpiRxThreshold : uint8_t
  */
 struct StSpiSettings
 {
-    SpiBaudRate baudrate;   // CFG1: MBR[2:0]
-    SpiBusMode busmode;    // CFG2: CPOL + CPHA
-    SpiBitOrder order;      // CFG2: LSBFRST
-    SpiDataSize datasize;   // CFG1: DSIZE[4:0]
-    SpiRxThreshold threshold; // CFG1: FTHLV[3:0]
+    SpiBaudRate baudrate;      // CFG1: MBR[2:0]
+    SpiBusMode busmode;        // CFG2: CPOL + CPHA
+    SpiBitOrder order;         // CFG2: LSBFRST
+    SpiDataSize datasize;      // CFG1: DSIZE[4:0]
+    SpiRxThreshold threshold;  // CFG1: FTHLV[3:0]
 };
 
 /**
@@ -168,10 +167,9 @@ public:
     bool init();
 
 private:
-    SPI_TypeDef*  instance; // Pointer to the SPI peripheral registers
-    StSpiSettings settings; // Copy of configuration settings
+    SPI_TypeDef* instance;   // Pointer to the SPI peripheral registers
+    StSpiSettings settings;  // Copy of configuration settings
 };
 
-
-}   // namespace Stmh7
-}   // namespace LBR
+}  // namespace Stmh7
+}  // namespace LBR
