@@ -21,7 +21,8 @@ bool HwSpi::read(std::span<uint8_t> rx_data)
         // Wait until TX FIFO has space available before sending dummy byte to generate clock pulse
         while (!(instance->SR & SPI_SR_TXP))
         {
-            if (--timeout == 0) return false;
+            if (--timeout == 0)
+                return false;
         }
 
         // Send dummy byte to TXDR to generate clock pulse for slave to shift out data
@@ -33,7 +34,8 @@ bool HwSpi::read(std::span<uint8_t> rx_data)
         // Wait until RX FIFO has at least one complete data packet available
         while (!(instance->SR & SPI_SR_RXP))
         {
-            if (--timeout == 0) return false;
+            if (--timeout == 0)
+                return false;
         }
 
         // Read received byte from RX FIFO into buffer
@@ -61,7 +63,8 @@ bool HwSpi::write(std::span<uint8_t> tx_data)
         // Wait until TX FIFO has space available before writing next byte
         while (!(instance->SR & SPI_SR_TXP))
         {
-            if (--timeout == 0) return false;
+            if (--timeout == 0)
+                return false;
         }
 
         // Write next byte to TXDR to start clocking it out to the slave
@@ -73,7 +76,8 @@ bool HwSpi::write(std::span<uint8_t> tx_data)
         // Wait for RX FIFO to be filled (data received for this transfer)
         while (!(instance->SR & SPI_SR_RXP))
         {
-            if (--timeout == 0) return false;
+            if (--timeout == 0)
+                return false;
         }
 
         /*
@@ -110,7 +114,8 @@ bool HwSpi::seq_transfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
         // Wait until TX FIFO has space available before writing next byte
         while (!(instance->SR & SPI_SR_TXP))
         {
-            if (--timeout == 0) return false;
+            if (--timeout == 0)
+                return false;
         }
 
         // Write next byte to TXDR to start clocking it out to the slave
@@ -122,7 +127,8 @@ bool HwSpi::seq_transfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
         // Wait for RX FIFO to be filled (data received for this transfer)
         while (!(instance->SR & SPI_SR_RXP))
         {
-            if (--timeout == 0) return false;
+            if (--timeout == 0)
+                return false;
         }
 
         /*
@@ -140,7 +146,8 @@ bool HwSpi::seq_transfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
         // Wait until TX FIFO has space available before sending dummy byte to generate clock pulse
         while (!(instance->SR & SPI_SR_TXP))
         {
-            if (--timeout == 0) return false;
+            if (--timeout == 0)
+                return false;
         }
 
         // Send dummy byte to TXDR to generate clock pulse for slave to shift out data
@@ -152,7 +159,8 @@ bool HwSpi::seq_transfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
         // Wait until RX FIFO has at least one complete data packet available
         while (!(instance->SR & SPI_SR_RXP))
         {
-            if (--timeout == 0) return false;
+            if (--timeout == 0)
+                return false;
         }
 
         // Read received byte from RX FIFO into buffer
@@ -173,15 +181,19 @@ bool HwSpi::seq_transfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
 bool HwSpi::init()
 {
     // Validate settings
-    if (static_cast<uint8_t>(settings.baudrate) > 7)   return false;
-    if (static_cast<uint8_t>(settings.busmode) > 3)    return false;
-    if (static_cast<uint8_t>(settings.order) > 1)      return false;
-    if (static_cast<uint8_t>(settings.datasize) > 31)  return false;
+    if (static_cast<uint8_t>(settings.baudrate) > 7)
+        return false;
+    if (static_cast<uint8_t>(settings.busmode) > 3)
+        return false;
+    if (static_cast<uint8_t>(settings.order) > 1)
+        return false;
+    if (static_cast<uint8_t>(settings.datasize) > 31)
+        return false;
 
     // Set to master mode
     instance->CFG2 |= SPI_CFG2_MASTER;
 
-    // Enable full duplex mode 
+    // Enable full duplex mode
     instance->CFG2 &= ~(SPI_CFG2_COMM);
 
     // Configure SPI sck Baudrate
@@ -200,7 +212,7 @@ bool HwSpi::init()
     SetReg(&instance->CFG1, uint32_t(settings.threshold), 5, 4);
 
     instance->CFG2 |= SPI_CFG2_SSM;  // software slave management
-    instance->CR1 |= SPI_CR1_SSI;   // keep NSS high by default
+    instance->CR1 |= SPI_CR1_SSI;    // keep NSS high by default
 
     // Enable serial peripheral clock
     instance->CR1 |= SPI_CR1_SPE;
@@ -208,5 +220,5 @@ bool HwSpi::init()
     return true;
 }
 
-}
-}
+}  // namespace Stmh7
+}  // namespace LBR
