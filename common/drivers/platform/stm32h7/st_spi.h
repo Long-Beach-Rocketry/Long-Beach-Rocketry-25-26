@@ -114,8 +114,8 @@ struct StSpiSettings
 enum class SpiStatus : uint8_t
 {
     OK = 0,
-    read_ERR,
-    write_ERR,
+    READ_ERR,
+    WRITE_ERR,
     TRANSFER_ERR,
     INIT_ERR
 };
@@ -129,7 +129,7 @@ public:
      * @param instance_ Pointer to the SPI peripheral to use (e.g. SPI1, SPI2)
      * @param settings_ Struct containing the desired SPI configuration
      */
-    explicit HwSpi(SPI_TypeDef* instance_, StSpiSettings& settings_);
+    explicit HwSpi(SPI_TypeDef* instance, StSpiSettings& settings);
 
     /**
      * @brief Read data from a slave device.

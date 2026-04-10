@@ -6,8 +6,8 @@ namespace LBR
 namespace Stmh7
 {
 
-HwSpi::HwSpi(SPI_TypeDef* instance_, StSpiSettings& settings_)
-    : instance{instance_}, settings{settings_}
+HwSpi::HwSpi(SPI_TypeDef* instance, StSpiSettings& settings)
+    : instance{instance}, settings{settings}
 {
 }
 
