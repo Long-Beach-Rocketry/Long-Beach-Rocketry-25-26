@@ -18,7 +18,9 @@ namespace LBR
 namespace Stmh7
 {
 
-//Spi settings enums and struct
+/**
+ * @brief These correspond to the division factor of the peripheral clock used to generate the SPI clock.
+ */
 enum class SpiBaudRate : uint8_t
 {
     FPCLK_2 = 0,
@@ -31,7 +33,9 @@ enum class SpiBaudRate : uint8_t
     FPCLK_256
 };
 
-//SPI bus modes (clock polarity and phase)
+/**
+ * @brief These correspond to the clock polarity and phase settings for SPI communication.   
+ */
 enum class SpiBusMode : uint8_t
 {
     MODE1 = 0,
@@ -40,21 +44,27 @@ enum class SpiBusMode : uint8_t
     MODE4
 };
 
-//SPI bit order
+/**
+ * @brief This determines whether the most significant bit or least significant bit is transmitted first.
+ */
 enum class SpiBitOrder : uint8_t
 {
     MSB = 0,
     LSB
 };
 
-//SPI RX threshold for FIFO
+/**
+ * @brief This determines the receive FIFO threshold for SPI communication.
+ */
 enum class SpiRxThreshold : uint8_t
 {
     FIFO_16bit = 0,
     FIFO_8bit
 };
 
-//SPI settings struct
+/**
+ * @brief Struct to hold SPI settings for initialization
+ */
 struct StSpiSettings
 {
     SpiBaudRate baudrate;
@@ -63,23 +73,47 @@ struct StSpiSettings
     SpiRxThreshold threshold;
 };
 
-//SPI driver class for STM32H723 board
+
 class HwSpi : public Spi
 {
 public:
-    //constructor takes SPI instance and settings struct
+    /**
+     * @brief Initializes the SPI peripheral with the specified settings.
+     * 
+     * @param instance_ pointer to the SPI instance 
+     * @param settings_ struct containing the SPI settings for initialization
+     */
     explicit HwSpi(SPI_TypeDef* instance_, const StSpiSettings& settings_);
 
+    /**
+     * @brief Implements the read function from the Spi interface. 
+     * Uses simple polling with timeout to read data from the SPI peripheral.
+     * @param rx_data span to store the received data
+     * @return True on successful read, false otherwise.
+     */
     bool read(std::span<uint8_t> rx_data) override;
+
+    /**
+     * @brief Implements the write function from the Spi interface.
+     * @param tx_data An uint8_t std::span data to be sent.
+     * @return True on success. False, otherwise.
+     */
     bool write(std::span<uint8_t> tx_data) override;
+
+    /**
+     * @brief Implements the seq_transfer function from the Spi interface. 
+     * @param tx_data An uint8_t std::span data to be sent.
+     * @param rx_data span to store the received data
+     * @return True on success. False, otherwise.
+     */
     bool seq_transfer(std::span<uint8_t> tx_data,
                       std::span<uint8_t> rx_data) override;
 
     bool init();
 
 private:
-    SPI_TypeDef* instance;
-    StSpiSettings settings;
+    SPI_TypeDef* instance; //Pointer to the SPI peripheral's base address
+    StSpiSettings settings; //Struct containing the SPI settings for initialization
 };
 
 }  // namespace Stmh7

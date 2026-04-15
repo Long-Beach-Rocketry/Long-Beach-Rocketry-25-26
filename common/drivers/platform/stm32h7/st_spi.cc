@@ -1,9 +1,3 @@
-/**
- * @file st_spi.cc
- * @brief SPI Driver class implementation for STM32H723
- * @author Nick Terrazas
- */
-
 #include "st_spi.h"
 
 namespace
