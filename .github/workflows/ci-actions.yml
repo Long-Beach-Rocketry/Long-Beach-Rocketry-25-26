@@ -83,6 +83,13 @@ jobs:
       - name: Build for L476
         run: cd build/stm32l476 && cmake --build .
 
+      - name: Configure CMake for H723
+        run: |
+          cmake --preset=stm32h723 -DTARGET_APP="" -DCMAKE_BUILD_TYPE="Debug"
+
+      - name: Build for H723
+        run: cd build/stm32h723 && cmake --build .
+
   # This runs native unit tests that verify functionality of non-HW specific code.
   unit_test:
     name: Run Native Unit Tests
