@@ -55,29 +55,27 @@ bool HwSpi::read(std::span<uint8_t> rx_data)
 
 bool HwSpi::write(std::span<uint8_t> tx_data)
 {
+    // Set CSTART to initiate master transfer before the loop
+    instance->CR1 |= SPI_CR1_CSTART;
+
     for (const auto& byte : tx_data)
     {
         // TODO: Replace with a proper timer-based timeout
-        uint32_t timeout = 100000;
 
         // Wait until TX FIFO has space available before writing next byte
         while (!(instance->SR & SPI_SR_TXP))
         {
-            if (--timeout == 0)
-                return false;
         }
+
 
         // Write next byte to TXDR to start clocking it out to the slave
         *(volatile uint8_t*)&instance->TXDR = byte;
 
         // TODO: Replace with a proper timer-based timeout
-        timeout = 100000;
 
         // Wait for RX FIFO to be filled (data received for this transfer)
         while (!(instance->SR & SPI_SR_RXP))
         {
-            if (--timeout == 0)
-                return false;
         }
 
         /*
@@ -106,29 +104,22 @@ bool HwSpi::seq_transfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
         return false;
     }
 
+    // Set CSTART to initiate master transfer
+    instance->CR1 |= SPI_CR1_CSTART;
+
     for (const auto& byte : tx_data)
     {
-        // TODO: Replace with a proper timer-based timeout
-        uint32_t timeout = 100000;
-
         // Wait until TX FIFO has space available before writing next byte
         while (!(instance->SR & SPI_SR_TXP))
         {
-            if (--timeout == 0)
-                return false;
         }
 
         // Write next byte to TXDR to start clocking it out to the slave
         *(volatile uint8_t*)&instance->TXDR = byte;
 
-        // TODO: Replace with a proper timer-based timeout
-        timeout = 100000;
-
         // Wait for RX FIFO to be filled (data received for this transfer)
         while (!(instance->SR & SPI_SR_RXP))
         {
-            if (--timeout == 0)
-                return false;
         }
 
         /*
@@ -140,27 +131,17 @@ bool HwSpi::seq_transfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
 
     for (auto& byte : rx_data)
     {
-        // TODO: Replace with a proper timer-based timeout
-        uint32_t timeout = 100000;
-
         // Wait until TX FIFO has space available before sending dummy byte to generate clock pulse
         while (!(instance->SR & SPI_SR_TXP))
         {
-            if (--timeout == 0)
-                return false;
         }
 
         // Send dummy byte to TXDR to generate clock pulse for slave to shift out data
         *(volatile uint8_t*)&instance->TXDR = 0x00;
 
-        // TODO: Replace with a proper timer-based timeout
-        timeout = 100000;
-
         // Wait until RX FIFO has at least one complete data packet available
         while (!(instance->SR & SPI_SR_RXP))
         {
-            if (--timeout == 0)
-                return false;
         }
 
         // Read received byte from RX FIFO into buffer
