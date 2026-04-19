@@ -192,9 +192,9 @@ bool HwI2c::mem_read(std::span<uint8_t> data, const uint16_t reg_addr,
     base_addr->CR2 &= ~(I2C_CR2_SADD_Msk | I2C_CR2_RD_WRN | I2C_CR2_NBYTES_Msk |
                         I2C_CR2_AUTOEND);
     base_addr->CR2 |=
-        ((dev_addr << (I2C_CR2_SADD_Pos + 1)) | I2C_CR2_RD_WRN | I2C_CR2_START |
-         (static_cast<uint32_t>((data.size() + 1) & 0xFF)
-          << I2C_CR2_NBYTES_Pos) |
+        ((dev_addr << (I2C_CR2_SADD_Pos + kShiftSADD)) | I2C_CR2_RD_WRN |
+         I2C_CR2_START |
+         (static_cast<uint32_t>(data.size() & 0xFF) << I2C_CR2_NBYTES_Pos) |
          I2C_CR2_AUTOEND);
 
     /* Read loop */
