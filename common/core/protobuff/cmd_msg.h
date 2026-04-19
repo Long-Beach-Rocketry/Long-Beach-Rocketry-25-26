@@ -15,7 +15,7 @@ namespace LBR
 class CmdMessage
 {
 public:
-    virtual ~CmdMessage() = default;
+    ~CmdMessage() = default;
 
     /**
     * @brief Encode the message into a buffer. Returns the number of bytes written, or -1 on failure.

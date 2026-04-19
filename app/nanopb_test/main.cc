@@ -1,10 +1,10 @@
 
-// Testing USART with protobuf messages using the helper functions defined in usart_pb_helper.h
+// Testing USART with protobuf messages using the helper functions defined in pb_helper.h
 #include <cstdio>
 #include <cstring>
 #include "board.h"
 #include "pb_cmd.h"
-#include "usart_pb_helper.h"
+#include "pb_helper.h"
 
 using namespace LBR;
 
@@ -15,16 +15,16 @@ int main(int argc, char** argv)
 
     // Create and fill a PbCmd message
     PbCmd tx_cmd;
-    strcpy(tx_cmd.msg.Name, "BEX ABB");
+    PbCmd rx_cmd;
+
+    // Fill the message with test data
+    strcpy(tx_cmd.msg.Name, "HELLO");
     tx_cmd.msg.Year = 2026;
     strcpy(tx_cmd.msg.clubName, "LBR");
     tx_cmd.msg.memberCount = 1;
 
-    // Send the protobuf message over USART
+    // Send & receive protobuf message over USART
     send_cmd_msg(&tx_cmd, board.usart);
-
-    // Receive a protobuf message over USART (example)
-    PbCmd rx_cmd;
     receive_cmd_msg(&rx_cmd, board.usart);
 
     // Print received data to verify correct encoding/decoding
@@ -33,7 +33,6 @@ int main(int argc, char** argv)
 
     while (1)
     {
-        // Main loop can be extended as needed
     }
 
     return 0;

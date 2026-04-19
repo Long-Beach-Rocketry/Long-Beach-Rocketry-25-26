@@ -22,7 +22,7 @@ public:
     // The actual protobuf message
     RocketStructProto msg;
 
-    virtual ~PbCmd();
+    ~PbCmd();
 
     /**
     * @brief Encode the message into a buffer. Returns the number of bytes written, or -1 on failure.
