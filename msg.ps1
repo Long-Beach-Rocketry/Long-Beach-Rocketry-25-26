@@ -1,0 +1,2 @@
+$plugin = Join-Path $PWD "external/nanopb/generator/protoc-gen-nanopb.bat"
+protoc --plugin=protoc-gen-nanopb="$plugin" --proto_path=common/core/protobuff --proto_path=external/nanopb/generator/proto --nanopb_out=common/core/protobuff common/core/protobuff/protobuff.proto
