@@ -1,4 +1,4 @@
-add_library(pb_helper STATIC usart_pb_helper.cc)
+add_library(pb_helper STATIC pb.cc)
 
 target_include_directories(pb_helper PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}
