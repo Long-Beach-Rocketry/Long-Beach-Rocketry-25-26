@@ -4,9 +4,15 @@
 #include <cstring>
 #include "board.h"
 #include "pb_cmd.h"
-#include "pb_helper.h"
+#include "pb_helper/pb.h"
 
 using namespace LBR;
+
+/**
+* @note The idea behind it is:
+*       Fill struct → encode with nanopb → send buffer → receive buffer → decode with nanopb → use struct.
+*/
+uint8_t rxb = 0;
 
 int main(int argc, char** argv)
 {
@@ -17,6 +23,9 @@ int main(int argc, char** argv)
     PbCmd tx_cmd;
     PbCmd rx_cmd;
 
+    // Create a PB helper instance
+    PB pb;
+
     // Fill the message with test data
     strcpy(tx_cmd.msg.Name, "HELLO");
     tx_cmd.msg.Year = 2026;
@@ -24,8 +33,8 @@ int main(int argc, char** argv)
     tx_cmd.msg.memberCount = 1;
 
     // Send & receive protobuf message over USART
-    send_cmd_msg(&tx_cmd, board.usart);
-    receive_cmd_msg(&rx_cmd, board.usart);
+    pb.send_cmd_msg(&tx_cmd, board.usart);
+    pb.receive_cmd_msg(&rx_cmd, board.usart);
 
     // Print received data to verify correct encoding/decoding
     printf("Received: %s %ld %s %ld\n", rx_cmd.msg.Name, (long)rx_cmd.msg.Year,
