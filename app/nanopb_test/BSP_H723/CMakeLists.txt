@@ -1,5 +1,5 @@
 add_library(nanopb_test_bsp STATIC
-    nanopb_test_bsp.cc
+    nanopb_app_bsp.cc
 )
 
 target_include_directories(nanopb_test_bsp PUBLIC

@@ -8,7 +8,7 @@
 #pragma once
 #include <stddef.h>
 #include <stdint.h>
-#include "cmd_msg.h"
+#include "nanopb.h"
 #include "pb_decode.h"
 #include "pb_encode.h"
 #include "protobuff.pb.h"
