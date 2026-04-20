@@ -3,8 +3,6 @@
 namespace LBR
 {
 
-PbCmd::~PbCmd() {};
-
 int PbCmd::encode(uint8_t* buffer, size_t maxlen) const
 {
 
