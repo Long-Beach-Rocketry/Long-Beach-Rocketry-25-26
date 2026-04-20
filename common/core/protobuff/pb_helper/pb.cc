@@ -3,7 +3,7 @@
 namespace LBR
 {
 
-bool send_cmd_msg(const CmdMessage* msg, Usart& usart)
+bool PB::send_cmd_msg(const CmdMessage* msg, Usart& usart)
 {
     // Fixed buffer size for simplicity
     uint8_t buffer[128];
@@ -18,7 +18,7 @@ bool send_cmd_msg(const CmdMessage* msg, Usart& usart)
     return usart.send(std::span<const uint8_t>(buffer, len));
 }
 
-bool receive_cmd_msg(CmdMessage* msg, Usart& usart, size_t maxlen)
+bool PB::receive_cmd_msg(CmdMessage* msg, Usart& usart, size_t maxlen)
 {
     // Fixed buffer size for simplicity (same)
     uint8_t buffer[128];

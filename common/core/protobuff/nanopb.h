@@ -1,5 +1,5 @@
 /**
-* @file cmd_msg.h
+* @file nanopb.h
 * @author Bex Saw
 * @brief Interface for command messages (protobuf)
 * @version 0.1

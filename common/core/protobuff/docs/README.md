@@ -20,15 +20,7 @@
 
 ### Generating C Code from .proto
 
-Use the following command to generate nanopb C files from your .proto file:
-
-```sh
-protoc --plugin=protoc-gen-nanopb="external/nanopb/generator/protoc-gen-nanopb.bat" \
-	--proto_path=common/core/protobuff \
-	--proto_path=external/nanopb/generator/proto \
-	--nanopb_out=common/core/protobuff \
-	protobuff.proto
-```
+Use the following command to generate nanopb C files from your .proto file running the: msg.ps1 shell script
 
 Replace `protobuff.proto` with your .proto file as needed. (well we anemd it this way no need to change)
 
