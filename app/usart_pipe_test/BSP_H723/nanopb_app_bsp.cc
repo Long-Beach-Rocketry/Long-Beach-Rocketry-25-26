@@ -4,6 +4,8 @@
 
 using namespace LBR::Stmh7;
 
+// TODO: Need to add RS485 (transceiver module) where it taking the bytestream from USART and send it to the Telemetry board's USART.
+
 namespace LBR
 {
 namespace Stmh7

@@ -1,4 +1,9 @@
-// This is a test file for the protobuff library.
+/**
+* @file mock.cc
+* @author Bex Saw
+* @brief Test file for encoding and decoding a PbCmd message using nanopb.
+* @version 0.1
+*/
 
 #include <stdint.h>
 #include <stdio.h>
@@ -7,10 +12,13 @@
 #include "protobuff.pb.h"
 
 using namespace LBR;
+
 int main()
 {
+
     // Buffer to hold the encoded data
     uint8_t buffer[128];
+
     // Create PbCmd instances for encoding and decoding
     PbCmd tx_cmd, rx_cmd;
 
@@ -18,7 +26,7 @@ int main()
     strcpy(tx_cmd.msg.Name, "Bex Saw");
     tx_cmd.msg.Year = 2026;
     strcpy(tx_cmd.msg.clubName, "Long Beach Rocketry");
-    tx_cmd.msg.memberCount = 1;
+    tx_cmd.msg.timestamp_ms = 1234567890;  // Example timestamp
 
     // Encode the message into the buffer
     int len = tx_cmd.encode(buffer, sizeof(buffer));
@@ -34,7 +42,7 @@ int main()
         printf("Name: %s\n", rx_cmd.msg.Name);
         printf("Year: %ld\n", (long)rx_cmd.msg.Year);
         printf("Club Name: %s\n", rx_cmd.msg.clubName);
-        printf("Member Count: %ld\n", (long)rx_cmd.msg.memberCount);
+        printf("Time Stamp: %ld\n", (long)rx_cmd.msg.timestamp_ms);
     }
     else
     {

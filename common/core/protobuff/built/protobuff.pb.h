@@ -15,7 +15,7 @@ typedef struct _RocketStructProto
     char Name[41];
     int32_t Year;
     char clubName[41];
-    int32_t memberCount;
+    uint64_t timestamp_ms;
 } RocketStructProto;
 
 typedef struct _Rockets
@@ -45,18 +45,18 @@ extern "C"
     }
 
 /* Field tags (for use in manual encoding/decoding) */
-#define RocketStructProto_Name_tag 1
-#define RocketStructProto_Year_tag 2
-#define RocketStructProto_clubName_tag 3
-#define RocketStructProto_memberCount_tag 4
+#define RocketStructProto_Name_tag 2
+#define RocketStructProto_Year_tag 3
+#define RocketStructProto_clubName_tag 4
+#define RocketStructProto_timestamp_ms_tag 5
 #define Rockets_rockets_tag 1
 
 /* Struct field encoding specification for nanopb */
 #define RocketStructProto_FIELDLIST(X, a)       \
-    X(a, STATIC, SINGULAR, STRING, Name, 1)     \
-    X(a, STATIC, SINGULAR, INT32, Year, 2)      \
-    X(a, STATIC, SINGULAR, STRING, clubName, 3) \
-    X(a, STATIC, SINGULAR, INT32, memberCount, 4)
+    X(a, STATIC, SINGULAR, STRING, Name, 2)     \
+    X(a, STATIC, SINGULAR, INT32, Year, 3)      \
+    X(a, STATIC, SINGULAR, STRING, clubName, 4) \
+    X(a, STATIC, SINGULAR, UINT64, timestamp_ms, 5)
 #define RocketStructProto_CALLBACK NULL
 #define RocketStructProto_DEFAULT NULL
 
