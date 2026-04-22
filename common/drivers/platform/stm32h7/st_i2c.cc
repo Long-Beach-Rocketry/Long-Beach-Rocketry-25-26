@@ -1,5 +1,5 @@
 #include "st_i2c.h"
-#include "delay.h"
+// #include "delay.h"
 
 // | 1 for read
 // | 0 for write
@@ -67,7 +67,7 @@ bool HwI2c::timed_out(uint32_t flag)
     uint32_t timeout = timeout_delay_ms;
     while (--timeout)
     {
-        LBR::Utils::DelayMs(1);
+        // LBR::Utils::DelayMs(1);
         // I2C Error flags
         if (base_addr->ISR & (I2C_ISR_NACKF | I2C_ISR_BERR | I2C_ISR_ARLO))
         {
@@ -77,7 +77,7 @@ bool HwI2c::timed_out(uint32_t flag)
         }
 
         // Flag we are waiting for has been raised!
-        if (flag & base_addr->ISR)
+        if (base_addr->ISR & flag)
         {
             return false;
         }
@@ -125,7 +125,9 @@ bool HwI2c::mem_read(std::span<uint8_t> data, const uint8_t reg_addr,
     // Shift NBYTES by data size
     base_addr->CR2 |=
         ((dev_addr << (I2C_CR2_SADD_Pos + kShiftSADD)) | I2C_CR2_RD_WRN |
-         I2C_CR2_START | (data.size() << I2C_CR2_NBYTES_Pos) | I2C_CR2_AUTOEND);
+         I2C_CR2_START |
+         (static_cast<uint32_t>(data.size() & 0xFF) << I2C_CR2_NBYTES_Pos) |
+         I2C_CR2_AUTOEND);
 
     /* Read loop */
     for (uint8_t& byte : data)
@@ -190,8 +192,10 @@ bool HwI2c::mem_read(std::span<uint8_t> data, const uint16_t reg_addr,
     base_addr->CR2 &= ~(I2C_CR2_SADD_Msk | I2C_CR2_RD_WRN | I2C_CR2_NBYTES_Msk |
                         I2C_CR2_AUTOEND);
     base_addr->CR2 |=
-        ((dev_addr << (I2C_CR2_SADD_Pos + 1)) | I2C_CR2_RD_WRN | I2C_CR2_START |
-         (data.size() << I2C_CR2_NBYTES_Pos) | I2C_CR2_AUTOEND);
+        ((dev_addr << (I2C_CR2_SADD_Pos + kShiftSADD)) | I2C_CR2_RD_WRN |
+         I2C_CR2_START |
+         (static_cast<uint32_t>(data.size() & 0xFF) << I2C_CR2_NBYTES_Pos) |
+         I2C_CR2_AUTOEND);
 
     /* Read loop */
     for (uint8_t& byte : data)
@@ -229,7 +233,9 @@ bool HwI2c::mem_write(std::span<const uint8_t> data, const uint8_t reg_addr,
     // NBYTES set as 1 (reg_addr size / 8) plus the data size
     base_addr->CR2 |=
         ((dev_addr << (kShiftSADD + I2C_CR2_SADD_Pos)) | I2C_CR2_START |
-         ((kNBytes8Bit + data.size()) << I2C_CR2_NBYTES_Pos) | I2C_CR2_AUTOEND);
+         (static_cast<uint32_t>((data.size() + kNBytes8Bit) & 0xFF)
+          << I2C_CR2_NBYTES_Pos) |
+         I2C_CR2_AUTOEND);
 
     if (timed_out(I2C_ISR_TXIS))
     {
@@ -281,7 +287,8 @@ bool HwI2c::mem_write(std::span<const uint8_t> data, const uint16_t reg_addr,
     // NBYTES set as 2 (reg_addr size / 8) plus data size
     base_addr->CR2 |=
         ((dev_addr << (kShiftSADD + I2C_CR2_SADD_Pos)) | I2C_CR2_START |
-         ((data.size() + kNBytes16Bit) << I2C_CR2_NBYTES_Pos) |
+         (static_cast<uint32_t>((data.size() + kNBytes16Bit) & 0xFF)
+          << I2C_CR2_NBYTES_Pos) |
          I2C_CR2_AUTOEND);
 
     /* Transmit both halves of the register address */
@@ -337,7 +344,9 @@ bool HwI2c::read(std::span<uint8_t> data, uint8_t dev_addr)
                         I2C_CR2_AUTOEND);
     base_addr->CR2 |=
         ((dev_addr << (I2C_CR2_SADD_Pos + kShiftSADD)) | I2C_CR2_RD_WRN |
-         I2C_CR2_START | (data.size() << I2C_CR2_NBYTES_Pos) | I2C_CR2_AUTOEND);
+         I2C_CR2_START |
+         (static_cast<uint32_t>(data.size() & 0xFF) << I2C_CR2_NBYTES_Pos) |
+         I2C_CR2_AUTOEND);
 
     /* Read loop */
     for (uint8_t& byte : data)
@@ -372,7 +381,8 @@ bool HwI2c::write(std::span<const uint8_t> data, uint8_t dev_addr)
                         I2C_CR2_AUTOEND);
     base_addr->CR2 |=
         ((dev_addr << (kShiftSADD + I2C_CR2_SADD_Pos)) | I2C_CR2_START |
-         (data.size() << I2C_CR2_NBYTES_Pos) | I2C_CR2_AUTOEND);
+         (static_cast<uint32_t>(data.size() & 0xFF) << I2C_CR2_NBYTES_Pos) |
+         I2C_CR2_AUTOEND);
 
     /* Write loop */
     for (const uint8_t byte : data)
