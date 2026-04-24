@@ -55,6 +55,9 @@ bool HwSpi::read(std::span<uint8_t> rx_data)
 
 bool HwSpi::write(std::span<uint8_t> tx_data)
 {
+    // Set TSIZE to number of bytes to transfer
+    instance->CR2 = tx_data.size();
+
     // Set CSTART to initiate master transfer before the loop
     instance->CR1 |= SPI_CR1_CSTART;
 
@@ -103,6 +106,10 @@ bool HwSpi::seq_transfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
     {
         return false;
     }
+
+    // Set TSIZE in CR2 to total number of bytes to transfer (tx + rx phases),
+    // required on H7 so the master knows how many frames to clock before stopping
+    instance->CR2 = tx_data.size() + rx_data.size();
 
     // Set CSTART to initiate master transfer
     instance->CR1 |= SPI_CR1_CSTART;
@@ -194,6 +201,9 @@ bool HwSpi::init()
 
     instance->CFG2 |= SPI_CFG2_SSM;  // software slave management
     instance->CR1 |= SPI_CR1_SSI;    // keep NSS high by default
+
+    // Clear MODF fault before enabling SPE clock
+    instance->IFCR |= SPI_IFCR_MODFC;
 
     // Enable serial peripheral clock
     instance->CR1 |= SPI_CR1_SPE;

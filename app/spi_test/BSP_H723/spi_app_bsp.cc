@@ -6,7 +6,7 @@
 
 using namespace LBR::Stmh7;
 
-// PB12 SPI2_NSS, PC2 SPI2_MISO, PB15 SPI2_MOSI, PB13 SPI2_SCK
+// PB9 SPI2_NSS, PC2 SPI2_MISO, PB15 SPI2_MOSI, PB13 SPI2_SCK
 
 namespace LBR
 {
@@ -14,12 +14,12 @@ namespace LBR
 // Make Chip Select Settings
 StGpioSettings cs_gpio_settings{GpioMode::GPOUT, GpioOtype::PUSH_PULL,
                                 GpioOspeed::VERY_HIGH, GpioPupd::NO_PULL, 0};
-StGpioParams cs_params{cs_gpio_settings, 12, GPIOB};  // PG10
+StGpioParams cs_params{cs_gpio_settings, 9, GPIOB};  // PB9
 HwGpio cs_gpio{cs_params};
 
 // Make SPI Register Config Settings
 Stmh7::StSpiSettings spi_settings{
-    Stmh7::SpiBaudRate::FPCLK_8, Stmh7::SpiBusMode::MODE1,
+    Stmh7::SpiBaudRate::FPCLK_16, Stmh7::SpiBusMode::MODE1,
     Stmh7::SpiBitOrder::MSB, Stmh7::SpiDataSize::DSIZE8,
     Stmh7::SpiRxThreshold::FIFO_8};
 Stmh7::HwSpi spi2{SPI2, spi_settings};
@@ -52,8 +52,20 @@ bool bsp_init()
     RCC->AHB4ENR |=
         (RCC_AHB4ENR_GPIOBEN | RCC_AHB4ENR_GPIOCEN);
 
-    // Enable the SPI clock
-    RCC->AHB1ENR |= RCC_APB1LENR_SPI2EN;
+    // Enable the SPI2 clock
+    RCC->APB1LENR |= RCC_APB1LENR_SPI2EN;
+
+    // Dummy read to ensure clock is enabled before accessing SPI2
+    (void)RCC->APB1LENR; 
+
+    // Enable SYSCFG clock 
+    RCC->APB4ENR |= RCC_APB4ENR_SYSCFGEN;
+
+    // Dummy read to ensure clock propagates
+    (void)RCC->APB4ENR; 
+
+    // Connect PC2 to PC2_C analog switch for digital use
+    SYSCFG->PMCR |= SYSCFG_PMCR_PC2SO;
 
     // Init SPI periph and check if it was successful
     result = result && spi2.init();
