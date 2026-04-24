@@ -16,3 +16,5 @@ target_include_directories(protobuff PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/built
 )
 
+target_link_libraries(protobuff PUBLIC nanopb)
+
