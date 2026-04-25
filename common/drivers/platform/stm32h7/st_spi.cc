@@ -70,7 +70,6 @@ bool HwSpi::write(std::span<uint8_t> tx_data)
         {
         }
 
-
         // Write next byte to TXDR to start clocking it out to the slave
         *(volatile uint8_t*)&instance->TXDR = byte;
 

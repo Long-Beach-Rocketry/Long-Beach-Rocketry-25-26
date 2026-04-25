@@ -35,7 +35,7 @@ Stml4::HwGpio mosi{mosi_params};
 // Create Chip Select Object to manual toggle cs pin
 GpioChipSelect chip_select{cs_gpio};
 
-Board board{.cs = chip_select, .spi1 = spi1};
+Board board{.cs = chip_select, .spi = spi1};
 
 // Initialize SPI BSP
 bool bsp_init()

@@ -40,7 +40,7 @@ Stmh7::HwGpio mosi{mosi_params};
 // Create Chip Select Object to manual toggle cs pin
 GpioChipSelect chip_select{cs_gpio};
 
-Board board{.cs = chip_select, .spi2 = spi2};
+Board board{.cs = chip_select, .spi = spi2};
 
 // Initialize SPI BSP
 bool bsp_init()
@@ -49,20 +49,19 @@ bool bsp_init()
     bool result = true;
 
     // Enable GPIOB, GPIOC clocks
-    RCC->AHB4ENR |=
-        (RCC_AHB4ENR_GPIOBEN | RCC_AHB4ENR_GPIOCEN);
+    RCC->AHB4ENR |= (RCC_AHB4ENR_GPIOBEN | RCC_AHB4ENR_GPIOCEN);
 
     // Enable the SPI2 clock
     RCC->APB1LENR |= RCC_APB1LENR_SPI2EN;
 
     // Dummy read to ensure clock is enabled before accessing SPI2
-    (void)RCC->APB1LENR; 
+    (void)RCC->APB1LENR;
 
-    // Enable SYSCFG clock 
+    // Enable SYSCFG clock
     RCC->APB4ENR |= RCC_APB4ENR_SYSCFGEN;
 
     // Dummy read to ensure clock propagates
-    (void)RCC->APB4ENR; 
+    (void)RCC->APB4ENR;
 
     // Connect PC2 to PC2_C analog switch for digital use
     SYSCFG->PMCR |= SYSCFG_PMCR_PC2SO;

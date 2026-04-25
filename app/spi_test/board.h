@@ -10,7 +10,7 @@ namespace LBR
 struct Board
 {
     GpioChipSelect& cs;
-    Spi& spi2;
+    Spi& spi;
 };
 
 bool bsp_init();

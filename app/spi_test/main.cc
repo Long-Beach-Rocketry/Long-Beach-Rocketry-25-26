@@ -18,7 +18,7 @@ int main(void)
     Board spi_board = get_board();
 
     // Send command byte 0x90 to read Manufacturer ID for the w25q
-    std::array<uint8_t, 4> tx_buffer = {0x90, 0x00, 0x00, 0x00};    // 10010000
+    std::array<uint8_t, 4> tx_buffer = {0x90, 0x00, 0x00, 0x00};  // 10010000
 
     // Create an array of data to receive (Should see rx_buffer[0] = 239 and rx_buffer[1] = 23)
     std::array<uint8_t, 2> rx_buffer;
@@ -28,7 +28,7 @@ int main(void)
         // Drive CS Pin low to allow write
         spi_board.cs.cs_enable();
         // Loop write to PA7
-        spi_board.spi2.seq_transfer(tx_buffer, rx_buffer);
+        spi_board.spi.seq_transfer(tx_buffer, rx_buffer);
         // Drive CS Pin high to end write
         spi_board.cs.cs_disable();
     }
