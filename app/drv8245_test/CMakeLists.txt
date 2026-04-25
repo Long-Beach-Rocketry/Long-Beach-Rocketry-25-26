@@ -8,7 +8,7 @@ set(PREPROCESS_DEFS
 
 add_subdirectory_for(STM32H723 bsp_h723)
 
-if (TARGET pwm_bsp)
+if (TARGET drv8245_bsp)
 
     add_executable_for(${TARGET_DEVICE} ${EXECUTABLE} ${LDF}
         main.cc
