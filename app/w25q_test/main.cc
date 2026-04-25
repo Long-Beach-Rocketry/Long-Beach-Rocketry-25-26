@@ -20,7 +20,7 @@ int main(void)
     Board spi_board = get_board();
 
     /* Create W25Q obj */
-    W25q flash{spi_board.spi2, spi_board.cs};
+    W25q flash{spi_board.spi, spi_board.cs};
 
     /* Verify reset (status should be true indicating WEL was cleared) */
     [[maybe_unused]] bool status = flash.reset();
