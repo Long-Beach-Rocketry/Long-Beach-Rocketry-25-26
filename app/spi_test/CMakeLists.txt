@@ -7,6 +7,7 @@ set(PREPROCESS_DEFS
 )
 
 add_subdirectory_for(STM32L476 BSP_L476)
+add_subdirectory_for(STM32H723 BSP_H723)
 
 if (TARGET spi_app_bsp)
 
@@ -15,9 +16,15 @@ if (TARGET spi_app_bsp)
         ${STARTUP_FILE}
     )
 
+    if (${TARGET_DEVICE} STREQUAL "STM32H723")
+        set(BSP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/BSP_H723)
+    else()
+        set(BSP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/BSP_L476)
+    endif()
+
     target_include_directories_for(${TARGET_DEVICE} ${EXECUTABLE}
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
-        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/BSP_L476
+        PRIVATE ${BSP_INCLUDE_DIR}
     )
 
     target_link_libraries_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
