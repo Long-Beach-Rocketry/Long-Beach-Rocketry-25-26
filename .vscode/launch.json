@@ -370,6 +370,34 @@
         "enabled": true,
         "samplesPerSecond": 2
       }
+    },
+    {
+      "cwd": "${workspaceFolder}",
+      "executable": "${workspaceRoot}/build/stm32h723/app/nanopb_test/nanopb_test",
+      "name": "DEBUG NANOPB TEST",
+      "request": "launch",
+      "type": "cortex-debug",
+      "servertype": "openocd",
+      "device": "STM32H7",
+      "svdFile": "${workspaceRoot}/mcu_support/h7xx/STM32H723.svd",
+      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "runToMain": true,
+      "configFiles": [
+        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+        "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
+      ],
+      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "preRestartCommands": [
+        "add-symbol-file build/stm32h723/app/nanopb_test/nanopb_test",
+        "load",
+        "enable breakpoint",
+        "monitor reset"
+      ],
+      "showDevDebugOutput": true,
+      "liveWatch": {
+        "enabled": true,
+        "samplesPerSecond": 2
+      }
     }
   ]
 }
