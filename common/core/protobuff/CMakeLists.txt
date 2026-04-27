@@ -1,6 +1,6 @@
 
 add_library(protobuff STATIC
-    test.cc
+    #test.cc
     pb_cmd.cc
     built/protobuff.pb.c
 )
