@@ -54,8 +54,40 @@ public:
     bool receive(PbCmd* msg, Usart& usart);
 
 private:
+    static constexpr uint8_t kFrameId{0x67};
+    static constexpr size_t kHeaderLen{2};
+    static constexpr size_t kCrcLen{4};
+    static constexpr size_t kMaxPayloadLen{255};
+
     // SX module receive buffer at 254 bytes of [ID][Length][Payload][Checksum]
     Ringbuffer<uint8_t, 256> rx_buffer;
     std::array<uint8_t, 256> tx_buffer;
+
+    /// NOTE: RECEIVE HELPERS
+    /**
+    * @brief Encode a PbCmd message into the tx_buffer with the frame format [ID][Length][Payload][Checksum].
+    * @param msg The command message object to encode.
+    * @param payload_len The length of the encoded payload (output parameter).
+    */
+    bool encode_payload(const PbCmd* msg, size_t& payload_len);
+
+    /**
+    * @brief Build the frame header in the tx_buffer with the given payload length.
+    * @param payload_len The length of the encoded payload to include in the frame header.
+    */
+    void build_frame(size_t payload_len);
+
+    /// NOTE: SEND HELPERS
+
+    /**
+    * @brief Polling the USART for incoming data and process it if a complete frame is recieved.
+    */
+    bool poll_usart(Usart& usart);
+
+    /**
+    * @brief Process the received frame in the rx_buffer and decode it into a PbCmd message if valid.
+    * @param msg The command message object to fill with decoded data.
+    */
+    bool process_frame(PbCmd* msg);
 };
 }  // namespace LBR
