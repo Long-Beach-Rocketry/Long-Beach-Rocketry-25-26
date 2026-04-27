@@ -6,6 +6,10 @@
 #error Regenerate this file with the current version of nanopb generator.
 #endif
 
-PB_BIND(RocketStructProto, RocketStructProto, AUTO)
+PB_BIND(Header, Header, AUTO)
 
-PB_BIND(Rockets, Rockets, AUTO)
+PB_BIND(IMUData, IMUData, AUTO)
+
+PB_BIND(BaroData, BaroData, AUTO)
+
+PB_BIND(RocketMessage, RocketMessage, AUTO)

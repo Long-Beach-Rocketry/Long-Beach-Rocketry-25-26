@@ -1,14 +1,31 @@
 syntax = "proto3";
 
-import "nanopb.proto";
-
-message RocketStructProto {
-    string Name = 2 [(nanopb).max_length = 40];
-    int32 Year = 3;
-    string clubName = 4 [(nanopb).max_length = 40];
-    uint64 timestamp_ms = 5;
+message Header {
+    uint32 device_id = 1;     
+    uint32 packet_count = 2;        
+    uint32 timestamp_ms = 3;     
 }
 
-message Rockets {
-    repeated RocketStructProto rockets = 1;
+message IMUData {
+    float accel_x = 1;
+    float accel_y = 2;
+    float accel_z = 3;
+    float gyro_x = 4;
+    float gyro_y = 5;
+    float gyro_z = 6;
+    float quat_w = 7;
+    float quat_x = 8;
+    float quat_y = 9;
+    float quat_z = 10;
+}
+
+message BaroData {
+    float pressure = 1;
+    float temperature = 2;
+}
+
+message RocketMessage {
+    Header header = 1;   
+    IMUData imu = 2;          
+    BaroData baro = 3;       
 }

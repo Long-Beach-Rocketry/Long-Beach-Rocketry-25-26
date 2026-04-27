@@ -9,7 +9,9 @@
 #include <array>
 #include <cstddef>
 #include <span>
+#include "package.h"
 #include "pb_cmd.h"
+#include "ring_buffer.h"
 #include "usart.h"
 
 /// TODO: Need to add RS485 (transceiver module) where it taking the bytestream from USART and send it to the Telemetry board's USART.
@@ -53,7 +55,7 @@ public:
 
 private:
     // SX module receive buffer at 254 bytes of [ID][Length][Payload][Checksum]
-    std::array<uint8_t, 256> rx_buffer;
+    Ringbuffer<uint8_t, 256> rx_buffer;
     std::array<uint8_t, 256> tx_buffer;
 };
 }  // namespace LBR
