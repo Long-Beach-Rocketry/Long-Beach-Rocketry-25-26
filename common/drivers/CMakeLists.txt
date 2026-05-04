@@ -13,6 +13,7 @@ add_library(driver INTERFACE)
 target_include_directories(driver INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/bus
     ${CMAKE_CURRENT_SOURCE_DIR}/io 
+    ${CMAKE_CURRENT_SOURCE_DIR}/checksum
 )
 
 target_link_libraries(driver INTERFACE
