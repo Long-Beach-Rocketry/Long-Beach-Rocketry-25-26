@@ -6,20 +6,42 @@ namespace LBR
 namespace Stmh7
 {
 
+static constexpr uint32_t kXorMask = 0xFFFFFFFF;
 static constexpr uint8_t kCRC_CR_REV_OUT_BitWidth = 1;
 static constexpr uint8_t kCRC_CR_REV_IN_BitWidth = 2;
-static constexpr uint8_t kCRC_CR_POLYSIZE = 2;
+static constexpr uint8_t kCRC_CR_POLYSIZE_BitWidth = 2;
+
+inline void HwCrc::load(uint8_t value)
+{
+    volatile uint8_t* dr8 = reinterpret_cast<volatile uint8_t*>(&base_addr->DR);
+    *dr8 = value;
+}
+inline void HwCrc::load(uint16_t value)
+{
+    volatile uint16_t* dr16 =
+        reinterpret_cast<volatile uint16_t*>(&base_addr->DR);
+    *dr16 = value;
+}
+inline void HwCrc::load(uint32_t value)
+{
+    volatile uint32_t* dr32 =
+        reinterpret_cast<volatile uint32_t*>(&base_addr->DR);
+    *dr32 = value;
+}
 
 HwCrc::HwCrc(const StCrcParams& params_)
     : base_addr{params_.base_addr},
       settings{params_.settings},
-      inital_crc{params_.initial_crc},
+      initial_crc{params_.initial_crc},
       generator_polynomial{params_.generator_polynomial}
 {
 }
 
 bool HwCrc::init()
 {
+    // Initial CRC value
+    base_addr->INIT = initial_crc;
+
     // REV OUT, REV IN, POLYSIZE
     SetReg(&base_addr->CR, uint32_t(settings.reverse_out), CRC_CR_REV_OUT_Pos,
            kCRC_CR_REV_OUT_BitWidth);
@@ -28,11 +50,10 @@ bool HwCrc::init()
            kCRC_CR_REV_IN_BitWidth);
 
     SetReg(&base_addr->CR, uint32_t(settings.poly_size), CRC_CR_POLYSIZE_Pos,
-           kCRC_CR_POLYSIZE);
+           kCRC_CR_POLYSIZE_BitWidth);
 
-    // Settings vals
-    base_addr->INIT = settings.initial_crc;
-    base_addr->POL = settings.generator_polynomial;
+    // Generator polynomial value
+    base_addr->POL = generator_polynomial;
 
     // Reset
     base_addr->CR |= CRC_CR_RESET;
@@ -40,17 +61,48 @@ bool HwCrc::init()
     return true;
 }
 
-bool HwCrc::compute(std::span<uint8_t> data, uint32_t& result)
+bool HwCrc::compute(std::span<const uint32_t> data, uint32_t& result)
 {
+    // Reset before each computation
     base_addr->CR |= CRC_CR_RESET;
 
-    for (uint8_t byte : data)
+    for (auto word : data)
     {
-        // for 8-byte
-        *reinterpret_cast<volatile uint8_t*>(&base_addr->DR) = byte;
+        load(word);
     }
 
-    result = base_addr->DR;
+    result = base_addr->DR ^ kXorMask;
+
+    return true;
+}
+
+bool HwCrc::compute(std::span<const uint16_t> data, uint32_t& result)
+{
+    // Reset before each computation
+    base_addr->CR |= CRC_CR_RESET;
+
+    for (auto halfword : data)
+    {
+        load(halfword);
+    }
+
+    result = base_addr->DR ^ kXorMask;
+
+    return true;
+}
+
+bool HwCrc::compute(std::span<const uint8_t> data, uint32_t& result)
+{
+    // Reset before each computation
+    base_addr->CR |= CRC_CR_RESET;
+
+    for (auto byte : data)
+    {
+        load(byte);
+    }
+
+    result = base_addr->DR ^ kXorMask;
+
     return true;
 }
 

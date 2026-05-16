@@ -18,13 +18,19 @@ class Crc
 public:
     /**
    * @brief Compute checksum from data
+   * @note F1, F2, F4, L1 | F0, F3, F7, G0, G4, H7, L0, L4, L4+, U5, WB, WL
+   * Data bits size:   32 | 8, 16, 32 
+   * Poly bits size:   32 | 7, 8, 16, 32     
    * 
-   * @param data block of memory to compute on
+   * @param data block of memory to compute crc on
+   * @param result block of memory to store result in
    * @return true if successful, false otherwise
    */
-    virtual bool compute(std::span<uint8_t> data) = 0;
-    // virtual bool compute(std::span<uint16_t> data) = 0;
-    // Idk what sizes we use yet, I do uint8_t for now
+    virtual bool compute(std::span<const uint32_t> data, uint32_t& result) = 0;
+    virtual bool compute(std::span<const uint16_t> data, uint32_t& result) = 0;
+    virtual bool compute(std::span<const uint8_t> data, uint32_t& result) = 0;
+    // For boards that do not support 8 and 16 bit input, return false.
+
     ~Crc() = default;
 };
 }  // namespace LBR
