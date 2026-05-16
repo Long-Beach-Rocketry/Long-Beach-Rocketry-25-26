@@ -38,9 +38,12 @@ public:
      * @param crc
      * @return true if given crc and computed crc are the same, false otherwise 
      */
-    virtual bool compare(const std::span<const uint32_t> data, const uint32_t crc) = 0;
-    virtual bool compare(const std::span<const uint16_t> data, const uint32_t crc) = 0;
-    virtual bool compare(const std::span<const uint8_t> data, const uint32_t crc) = 0;
+    virtual bool compare(const std::span<const uint32_t> data,
+                         const uint32_t crc) = 0;
+    virtual bool compare(const std::span<const uint16_t> data,
+                         const uint32_t crc) = 0;
+    virtual bool compare(const std::span<const uint8_t> data,
+                         const uint32_t crc) = 0;
     // For boards that do not support 8 and 16 bit input, return false.
 
     ~Crc() = default;

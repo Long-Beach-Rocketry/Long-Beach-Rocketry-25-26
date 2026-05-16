@@ -101,9 +101,12 @@ public:
      * @param crc
      * 
      */
-    bool compute(const std::span<const uint32_t> data, const uint32_t crc) override;
-    bool compute(const std::span<const uint16_t> data, const uint32_t crc) override;
-    bool compute(const std::span<const uint8_t> data, const uint32_t crc) override;
+    bool compare(const std::span<const uint32_t> data,
+                 const uint32_t crc) override;
+    bool compare(const std::span<const uint16_t> data,
+                 const uint32_t crc) override;
+    bool compare(const std::span<const uint8_t> data,
+                 const uint32_t crc) override;
 
 private:
     void load(uint8_t value);
