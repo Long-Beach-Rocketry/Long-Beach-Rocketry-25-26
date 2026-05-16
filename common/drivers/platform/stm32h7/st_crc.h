@@ -81,7 +81,8 @@ public:
     /**
      * @brief Computes the checksum from some data
      * @note STM32H7 can take input sizes of 8, 16, and 32 bits
-     * @param data, result
+     * @param data
+     * @param result
      * 
      * 
      * the dividend: the input data
@@ -91,6 +92,18 @@ public:
     bool compute(std::span<const uint32_t> data, uint32_t& result) override;
     bool compute(std::span<const uint16_t> data, uint32_t& result) override;
     bool compute(std::span<const uint8_t> data, uint32_t& result) override;
+
+    /**
+     * @brief Checks if the data has been flipped by computing a crc from the data and
+     *        comparing it to originally given crc.
+     * @note STM32H7 can take input sizes of 8, 16, and 32 bits
+     * @param data
+     * @param crc
+     * 
+     */
+    bool compute(const std::span<const uint32_t> data, const uint32_t crc) override;
+    bool compute(const std::span<const uint16_t> data, const uint32_t crc) override;
+    bool compute(const std::span<const uint8_t> data, const uint32_t crc) override;
 
 private:
     void load(uint8_t value);

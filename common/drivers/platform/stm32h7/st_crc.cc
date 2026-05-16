@@ -106,5 +106,30 @@ bool HwCrc::compute(std::span<const uint8_t> data, uint32_t& result)
     return true;
 }
 
+bool compare(const std::span<const uint32_t> data, const uint32_t crc) {
+    uint32_t actual_crc;
+
+    if (compute(data, actual_crc)) {
+        return (actual_crc == crc);
+    }
+    return false;
+}
+
+bool compare(const std::span<const uint16_t> data, const uint32_t crc) {
+    uint32_t actual_crc;
+    if (compute(data, actual_crc)) {
+        return (actual_crc == crc);
+    }
+    return false;
+}
+
+bool compare(const std::span<const uint8_t> data, const uint32_t crc) {
+    uint32_t actual_crc;
+    if (compute(data, actual_crc)) {
+        return (actual_crc == crc);
+    }
+    return false;
+}
+
 }  // namespace Stmh7
 }  // namespace LBR
