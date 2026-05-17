@@ -6,7 +6,6 @@ namespace LBR
 namespace Stmh7
 {
 
-static constexpr uint32_t kXorMask = 0xFFFFFFFF;
 static constexpr uint8_t kCRC_CR_REV_OUT_BitWidth = 1;
 static constexpr uint8_t kCRC_CR_REV_IN_BitWidth = 2;
 static constexpr uint8_t kCRC_CR_POLYSIZE_BitWidth = 2;
@@ -33,7 +32,8 @@ HwCrc::HwCrc(const StCrcParams& params_)
     : base_addr{params_.base_addr},
       settings{params_.settings},
       initial_crc{params_.initial_crc},
-      generator_polynomial{params_.generator_polynomial}
+      generator_polynomial{params_.generator_polynomial},
+      xor_out{params_.XOR_out}
 {
 }
 
@@ -71,7 +71,7 @@ bool HwCrc::compute(std::span<const uint32_t> data, uint32_t& result)
         load(word);
     }
 
-    result = base_addr->DR ^ kXorMask;
+    result = base_addr->DR ^ xor_out;
 
     return true;
 }
@@ -86,7 +86,7 @@ bool HwCrc::compute(std::span<const uint16_t> data, uint32_t& result)
         load(halfword);
     }
 
-    result = base_addr->DR ^ kXorMask;
+    result = base_addr->DR ^ xor_out;
 
     return true;
 }
@@ -101,38 +101,38 @@ bool HwCrc::compute(std::span<const uint8_t> data, uint32_t& result)
         load(byte);
     }
 
-    result = base_addr->DR ^ kXorMask;
+    result = base_addr->DR ^ xor_out;
 
     return true;
 }
 
 bool HwCrc::compare(const std::span<const uint32_t> data, const uint32_t crc)
 {
-    uint32_t actual_crc;
+    uint32_t expected_crc;
 
-    if (compute(data, actual_crc))
+    if (compute(data, expected_crc))
     {
-        return (actual_crc == crc);
+        return (expected_crc == crc);
     }
     return false;
 }
 
 bool HwCrc::compare(const std::span<const uint16_t> data, const uint32_t crc)
 {
-    uint32_t actual_crc;
-    if (compute(data, actual_crc))
+    uint32_t expected_crc;
+    if (compute(data, expected_crc))
     {
-        return (actual_crc == crc);
+        return (expected_crc == crc);
     }
     return false;
 }
 
 bool HwCrc::compare(const std::span<const uint8_t> data, const uint32_t crc)
 {
-    uint32_t actual_crc;
-    if (compute(data, actual_crc))
+    uint32_t expected_crc;
+    if (compute(data, expected_crc))
     {
-        return (actual_crc == crc);
+        return (expected_crc == crc);
     }
     return false;
 }

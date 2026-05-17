@@ -64,6 +64,7 @@ struct StCrcParams
     CRC_TypeDef* base_addr;  // I think there is only one actually
     uint32_t initial_crc;
     uint32_t generator_polynomial = 0x4C11DB7;  // default 0x4C11DB7
+    uint32_t XOR_out;
 };
 
 class HwCrc : public Crc
@@ -117,6 +118,8 @@ private:
     StCrcSettings settings;
     uint32_t initial_crc;
     uint32_t generator_polynomial;
+    uint32_t xor_out;
+
 };
 
 }  // namespace Stmh7
