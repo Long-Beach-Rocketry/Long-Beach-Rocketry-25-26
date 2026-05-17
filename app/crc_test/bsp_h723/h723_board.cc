@@ -20,7 +20,8 @@ Stmh7::StCrcSettings crc_settings{Stmh7::CrcRevOut::NO_REV,
                                   Stmh7::CrcRevIn::NO_REV,
                                   Stmh7::CrcPolySize::BIT_SIZE_32};
 
-const Stmh7::StCrcParams crc_params{crc_settings, CRC, kCrcValue, kDefaultPoly, kCrcXOROut};
+const Stmh7::StCrcParams crc_params{crc_settings, CRC, kCrcValue, kDefaultPoly,
+                                    kCrcXOROut};
 
 // Create Crc object
 Stmh7::HwCrc crc(crc_params);

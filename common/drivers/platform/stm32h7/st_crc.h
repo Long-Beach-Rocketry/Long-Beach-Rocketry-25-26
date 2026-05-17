@@ -119,7 +119,6 @@ private:
     uint32_t initial_crc;
     uint32_t generator_polynomial;
     uint32_t xor_out;
-
 };
 
 }  // namespace Stmh7

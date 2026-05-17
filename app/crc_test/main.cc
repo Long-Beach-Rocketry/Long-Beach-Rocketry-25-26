@@ -22,13 +22,13 @@ int main(int argc, char* argv[])
 
     while (1)
     {
-        hw.crc.compare(std::span(data8), kActualCrc); 
+        hw.crc.compare(std::span(data8), kActualCrc);
         for (volatile uint32_t i = 0; i < 1000000; i++);
 
         hw.crc.compare(std::span(data16), kActualCrc);
         for (volatile uint32_t i = 0; i < 1000000; i++);
 
-        hw.crc.compare(std::span(data32), kActualCrc); 
+        hw.crc.compare(std::span(data32), kActualCrc);
         for (volatile uint32_t i = 0; i < 1000000; i++);
     }
 
