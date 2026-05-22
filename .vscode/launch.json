@@ -146,7 +146,6 @@
       ],
       "showDevDebugOutput": true
     },
-
     {
       "cwd": "${workspaceFolder}",
       "executable": "${workspaceRoot}/build/stm32l476/app/bmp390_test/bmp390_test",
@@ -375,6 +374,23 @@
       "servertype": "openocd",
       "device": "STM32H723",
       "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "runToMain": true,
+      "configFiles": [
+        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+        "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
+      ],
+      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "preRestartCommands": [
+        "add-symbol-file build/stm32h723/app/w25q_test/w25q_test",
+        "load",
+        "enable breakpoint",
+        "monitor reset"
+      ],
+      "showDevDebugOutput": true
+    },
+    {
+      "cwd": "${workspaceFolder}",
       "executable": "${workspaceRoot}/build/stm32h723/app/bmp390_test/bmp390_test",
       "name": "DEBUG BMP390 H7",
       "request": "launch",
@@ -390,13 +406,11 @@
       ],
       "debuggerArgs": ["-d", "${workspaceRoot}"],
       "preRestartCommands": [
-        "add-symbol-file build/stm32h723/app/w25q_test/w25q_test",
         "add-symbol-file build/stm32h723/app/bmp390_test/bmp390_test",
         "load",
         "enable breakpoint",
         "monitor reset"
       ],
-      "showDevDebugOutput": "raw"
       "showDevDebugOutput": true,
       "liveWatch": {
         "enabled": true,

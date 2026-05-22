@@ -1,3 +1,11 @@
+/**
+ * @file st_spi.cc
+ * @author Alex Pulido
+ * @brief SPI Driver class implementation
+ * @date 2026-05-22
+ *
+ */
+
 #include "st_spi.h"
 #include <cstdint>
 
@@ -13,198 +21,206 @@ HwSpi::HwSpi(SPI_TypeDef* instance, StSpiSettings& settings)
 
 bool HwSpi::read(std::span<uint8_t> rx_data)
 {
-    for (auto& byte : rx_data)
+    size_t total_bytes = rx_data.size();
+    if (total_bytes == 0)
+        return false;
+
+    // Disable peripheral to unlock configuration registers
+    instance->CR1 &= ~SPI_CR1_SPE;
+    (void)instance->CR1;
+
+    // Flush any leftover bytes in the receive queue
+    while (instance->SR & SPI_SR_RXP)
     {
-        // TODO: Replace with a proper timer-based timeout
-        uint32_t timeout = 100000;
-
-        // Wait until TX FIFO has space available before sending dummy byte to generate clock pulse
-        while (!(instance->SR & SPI_SR_TXP))
-        {
-            if (--timeout == 0)
-                return false;
-        }
-
-        // Send dummy byte to TXDR to generate clock pulse for slave to shift out data
-        *(volatile uint8_t*)&instance->TXDR = 0x00;
-
-        // TODO: Replace with a proper timer-based timeout
-        timeout = 100000;
-
-        // Wait until RX FIFO has at least one complete data packet available
-        while (!(instance->SR & SPI_SR_RXP))
-        {
-            if (--timeout == 0)
-                return false;
-        }
-
-        // Read received byte from RX FIFO into buffer
-        byte = *(volatile uint8_t*)&instance->RXDR;
+        volatile uint32_t dummy = instance->RXDR;
+        (void)dummy;
     }
 
-    // Wait until full transfer is complete
+    // Configure total transfer count and master/ssm options
+    instance->CR2 = (instance->CR2 & ~SPI_CR2_TSIZE_Msk) |
+                    (total_bytes << SPI_CR2_TSIZE_Pos);
+    instance->CFG2 |= (SPI_CFG2_MASTER | SPI_CFG2_SSM);
+    (void)instance->CFG2;
+
+    // Re-enable peripheral and trigger clock generation
+    instance->CR1 |= (SPI_CR1_SPE | SPI_CR1_SSI);
+    (void)instance->CR1;
+    instance->CR1 |= SPI_CR1_CSTART;
+
+    size_t tx_count = 0;
+    size_t rx_count = 0;
+
+    // Full-duplex loop pushing clocks out to pull data back
+    while (rx_count < total_bytes)
+    {
+        if ((instance->SR & SPI_SR_TXP) && (tx_count < total_bytes))
+        {
+            *((volatile uint8_t*)&instance->TXDR) = 0x00;
+            tx_count++;
+        }
+
+        if (instance->SR & SPI_SR_RXP)
+        {
+            rx_data[rx_count++] = *((volatile uint8_t*)&instance->RXDR);
+        }
+    }
+
+    // Wait for the transfer block to finish shifting
     while (!(instance->SR & SPI_SR_EOT))
     {
     }
 
-    // Clear EOT flag by writing to IFCR, required before next transfer
-    instance->IFCR |= SPI_IFCR_EOTC;
+    // Clear completed event tracking flags
+    instance->IFCR |= (SPI_IFCR_EOTC | SPI_IFCR_TXTFC);
 
     return true;
 }
 
 bool HwSpi::write(std::span<uint8_t> tx_data)
 {
-    // Set TSIZE to number of bytes to transfer
-    instance->CR2 = tx_data.size();
+    size_t total_bytes = tx_data.size();
+    if (total_bytes == 0)
+        return false;
 
-    // Set CSTART to initiate master transfer before the loop
+    // Disable peripheral to unlock configuration registers
+    instance->CR1 &= ~SPI_CR1_SPE;
+    (void)instance->CR1;
+
+    // Configure total transfer count and master/ssm options
+    instance->CR2 = (instance->CR2 & ~SPI_CR2_TSIZE_Msk) |
+                    (total_bytes << SPI_CR2_TSIZE_Pos);
+    instance->CFG2 |= (SPI_CFG2_MASTER | SPI_CFG2_SSM);
+    (void)instance->CFG2;
+
+    // Re-enable peripheral and trigger master transmission
+    instance->CR1 |= (SPI_CR1_SPE | SPI_CR1_SSI);
+    (void)instance->CR1;
     instance->CR1 |= SPI_CR1_CSTART;
 
-    for (const auto& byte : tx_data)
+    size_t tx_count = 0;
+    size_t rx_count = 0;
+
+    // Full-duplex loop driving lines while draining incoming dummy bytes
+    while (tx_count < total_bytes || rx_count < total_bytes)
     {
-        // TODO: Replace with a proper timer-based timeout
-
-        // Wait until TX FIFO has space available before writing next byte
-        while (!(instance->SR & SPI_SR_TXP))
+        if ((instance->SR & SPI_SR_TXP) && (tx_count < total_bytes))
         {
+            *((volatile uint8_t*)&instance->TXDR) = tx_data[tx_count++];
         }
 
-        // Write next byte to TXDR to start clocking it out to the slave
-        *(volatile uint8_t*)&instance->TXDR = byte;
-
-        // TODO: Replace with a proper timer-based timeout
-
-        // Wait for RX FIFO to be filled (data received for this transfer)
-        while (!(instance->SR & SPI_SR_RXP))
+        if (instance->SR & SPI_SR_RXP)
         {
+            volatile uint8_t dummy = *((volatile uint8_t*)&instance->RXDR);
+            (void)dummy;
+            rx_count++;
         }
-
-        /*
-         * Clear RXP flag by performing a dummy read from RXDR.
-         * Dereferencing RXDR performs a read. Casting to void explicitly discards the unused value.
-         */
-        (void)(*(volatile uint8_t*)&instance->RXDR);
     }
 
-    // Wait until full transfer is complete
+    // Wait for the transfer block to finish shifting
     while (!(instance->SR & SPI_SR_EOT))
     {
     }
 
-    // Clear EOT flag by writing to IFCR, required before next transfer
-    instance->IFCR |= SPI_IFCR_EOTC;
+    // Clear completed event tracking flags
+    instance->IFCR |= (SPI_IFCR_EOTC | SPI_IFCR_TXTFC);
 
     return true;
 }
 
 bool HwSpi::seq_transfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
 {
-    // Check if SPI is enabled
-    if (!(instance->CR1 & SPI_CR1_SPE))
-    {
+    size_t total_bytes = tx_data.size();
+    if (total_bytes == 0)
         return false;
+
+    // Disable peripheral to unlock configuration registers
+    instance->CR1 &= ~SPI_CR1_SPE;
+    (void)instance->CR1;
+
+    // Flush any leftover bytes in the receive queue
+    while (instance->SR & SPI_SR_RXP)
+    {
+        volatile uint32_t dummy = instance->RXDR;
+        (void)dummy;
     }
 
-    // Set TSIZE in CR2 to total number of bytes to transfer (tx + rx phases),
-    // required on H7 so the master knows how many frames to clock before stopping
-    instance->CR2 = tx_data.size() + rx_data.size();
+    // Configure total transfer count and master/ssm options
+    instance->CR2 = (instance->CR2 & ~SPI_CR2_TSIZE_Msk) |
+                    (total_bytes << SPI_CR2_TSIZE_Pos);
+    instance->CFG2 |= (SPI_CFG2_MASTER | SPI_CFG2_SSM);
+    (void)instance->CFG2;
 
-    // Set CSTART to initiate master transfer
+    // Re-enable peripheral and start concurrent transfer
+    instance->CR1 |= (SPI_CR1_SPE | SPI_CR1_SSI);
+    (void)instance->CR1;
     instance->CR1 |= SPI_CR1_CSTART;
 
-    for (const auto& byte : tx_data)
+    size_t tx_count = 0;
+    size_t rx_count = 0;
+
+    // Match both indices simultaneously over the wire layout
+    while (rx_count < total_bytes)
     {
-        // Wait until TX FIFO has space available before writing next byte
-        while (!(instance->SR & SPI_SR_TXP))
+        if ((instance->SR & SPI_SR_TXP) && (tx_count < total_bytes))
         {
+            *((volatile uint8_t*)&instance->TXDR) = tx_data[tx_count++];
         }
 
-        // Write next byte to TXDR to start clocking it out to the slave
-        *(volatile uint8_t*)&instance->TXDR = byte;
-
-        // Wait for RX FIFO to be filled (data received for this transfer)
-        while (!(instance->SR & SPI_SR_RXP))
+        if (instance->SR & SPI_SR_RXP)
         {
+            rx_data[rx_count++] = *((volatile uint8_t*)&instance->RXDR);
         }
-
-        /*
-         * Clear RXP flag by performing a dummy read from RXDR.
-         * Dereferencing RXDR performs a read. Casting to void explicitly discards the unused value.
-         */
-        (void)(*(volatile uint8_t*)&instance->RXDR);
     }
 
-    for (auto& byte : rx_data)
-    {
-        // Wait until TX FIFO has space available before sending dummy byte to generate clock pulse
-        while (!(instance->SR & SPI_SR_TXP))
-        {
-        }
-
-        // Send dummy byte to TXDR to generate clock pulse for slave to shift out data
-        *(volatile uint8_t*)&instance->TXDR = 0x00;
-
-        // Wait until RX FIFO has at least one complete data packet available
-        while (!(instance->SR & SPI_SR_RXP))
-        {
-        }
-
-        // Read received byte from RX FIFO into buffer
-        byte = *(volatile uint8_t*)&instance->RXDR;
-    }
-
-    // Wait until full transfer is complete
+    // Wait for the transfer block to finish shifting
     while (!(instance->SR & SPI_SR_EOT))
     {
     }
 
-    // Clear EOT flag by writing to IFCR, required before next transfer
-    instance->IFCR |= SPI_IFCR_EOTC;
+    // Clear completed event tracking flags
+    instance->IFCR |= (SPI_IFCR_EOTC | SPI_IFCR_TXTFC);
 
     return true;
 }
 
 bool HwSpi::init()
 {
-    // Validate settings
+    // Validate configuration options
     if (static_cast<uint8_t>(settings.baudrate) > 7)
         return false;
     if (static_cast<uint8_t>(settings.busmode) > 3)
         return false;
     if (static_cast<uint8_t>(settings.order) > 1)
         return false;
-    if (static_cast<uint8_t>(settings.datasize) > 31)
+    if (static_cast<uint8_t>(settings.datasize) > 31 ||
+        static_cast<uint8_t>(settings.datasize) < 3)
         return false;
 
-    // Set to master mode
+    // Explicitly drop setup lock parameters, and disable I2S mode
+    instance->CR1 &= ~SPI_CR1_SPE;
+    instance->I2SCFGR &= ~SPI_I2SCFGR_I2SMOD;
+
+    // Set to Master Mode
     instance->CFG2 |= SPI_CFG2_MASTER;
 
     // Enable full duplex mode
     instance->CFG2 &= ~(SPI_CFG2_COMM);
 
-    // Configure SPI sck Baudrate
+    // Write parameters into register structures
     SetReg(&instance->CFG1, uint32_t(settings.baudrate), 28, 3);
-
-    // Configure the SPI Bus Mode
     SetReg(&instance->CFG2, uint32_t(settings.busmode), 24, 2);
-
-    // Configure Bit order
     SetReg(&instance->CFG2, uint32_t(settings.order), 23, 1);
-
-    // Configure SPI datasize
     SetReg(&instance->CFG1, uint32_t(settings.datasize), 0, 5);
-
-    // FIFO reception threshold
     SetReg(&instance->CFG1, uint32_t(settings.threshold), 5, 4);
 
-    instance->CFG2 |= SPI_CFG2_SSM;  // software slave management
-    instance->CR1 |= SPI_CR1_SSI;    // keep NSS high by default
+    // Apply software slave state handling overrides
+    instance->CFG2 |= SPI_CFG2_SSM;
+    instance->CR1 |= SPI_CR1_SSI;
 
-    // Clear MODF fault before enabling SPE clock
-    instance->IFCR |= SPI_IFCR_MODFC;
+    instance->CR2 = 0;
+    instance->IFCR = 0xFFFFFFFF;
 
-    // Enable serial peripheral clock
+    // Enable SPI peripheral
     instance->CR1 |= SPI_CR1_SPE;
 
     return true;
