@@ -22,7 +22,7 @@ namespace Stmh7
 struct ClockFrequencies
 {
     uint32_t sysclk;
-    uint32_t d1cpre;
+    uint32_t cpu;
     uint32_t ahb;
     uint32_t apb1;
     uint32_t apb2;
@@ -161,9 +161,15 @@ public:
     const ClockFrequencies& get_clock_frequencies() const;
 
 private:
+    bool validate_params();
+
+    void set_frequencies();
+
     bool SystemClock_ConfigHSI64();
 
     bool SystemClock_ConfigHSE8();
+
+    bool calc_sysclk_vars(uint32_t& divn, uint32_t& fracn, uint32_t f_ref_ck);
 
     ClockParams params;
     ClockFrequencies frequencies;
