@@ -155,7 +155,8 @@ private:
 
     bool SystemClock_ConfigHSE8();
 
-    bool calc_sysclk_vars(uint32_t& divn, uint32_t& fracn, uint32_t f_ref_ck);
+    bool calc_sysclk_vars(uint32_t& divn, uint32_t& fracn,
+                          uint32_t pll_input_hz, uint32_t pll_p);
 
     ClockParams params;
     ClockFrequencies frequencies;

@@ -372,6 +372,7 @@ bool HwClock::SystemClock_ConfigHSI64()
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
     constexpr uint32_t pll_m = 4U;
+    constexpr uint32_t pll_p = 1U;
     uint32_t core_clk = frequencies.cpu;
     uint32_t flash_latency = select_flash_latency(frequencies.ahb);
     uint32_t pll1_vci_range;
@@ -392,7 +393,7 @@ bool HwClock::SystemClock_ConfigHSI64()
 
     uint32_t divn, fracn;
 
-    if (!calc_sysclk_vars(divn, fracn, kHsi64Mhz))
+    if (!calc_sysclk_vars(divn, fracn, pll_input_hz, pll_p))
     {
         return false;
     }
@@ -409,7 +410,7 @@ bool HwClock::SystemClock_ConfigHSI64()
     RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
     RCC_OscInitStruct.PLL.PLLM = pll_m;
     RCC_OscInitStruct.PLL.PLLN = divn;
-    RCC_OscInitStruct.PLL.PLLP = 1;
+    RCC_OscInitStruct.PLL.PLLP = pll_p;
     RCC_OscInitStruct.PLL.PLLQ = 4;
     RCC_OscInitStruct.PLL.PLLR = 2;
     RCC_OscInitStruct.PLL.PLLRGE = pll1_vci_range;
@@ -447,6 +448,7 @@ bool HwClock::SystemClock_ConfigHSE8()
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
     constexpr uint32_t pll_m = 1U;
+    constexpr uint32_t pll_p = 1U;
     uint32_t core_clk = frequencies.cpu;
     uint32_t flash_latency = select_flash_latency(frequencies.ahb);
     uint32_t pll1_vci_range;
@@ -467,7 +469,7 @@ bool HwClock::SystemClock_ConfigHSE8()
 
     uint32_t divn, fracn;
 
-    if (!calc_sysclk_vars(divn, fracn, kHse8Mhz))
+    if (!calc_sysclk_vars(divn, fracn, pll_input_hz, pll_p))
     {
         return false;
     }
@@ -483,7 +485,7 @@ bool HwClock::SystemClock_ConfigHSE8()
     RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
     RCC_OscInitStruct.PLL.PLLM = pll_m;
     RCC_OscInitStruct.PLL.PLLN = divn;
-    RCC_OscInitStruct.PLL.PLLP = 1;
+    RCC_OscInitStruct.PLL.PLLP = pll_p;
     RCC_OscInitStruct.PLL.PLLQ = 4;  // Ignore and leave
     RCC_OscInitStruct.PLL.PLLR = 2;  // Ignore and leave
     RCC_OscInitStruct.PLL.PLLRGE = pll1_vci_range;
@@ -517,32 +519,35 @@ bool HwClock::SystemClock_ConfigHSE8()
 }
 
 bool HwClock::calc_sysclk_vars(uint32_t& divn, uint32_t& fracn,
-                               uint32_t f_ref_ck)
+                               uint32_t pll_input_hz, uint32_t pll_p)
 {
     static constexpr uint32_t kMinDivn{4U};
     static constexpr uint32_t kMaxDivn{512U};
 
-    if ((f_ref_ck == 0U) || (params.sysclk == 0U) ||
+    if ((pll_input_hz == 0U) || (pll_p == 0U) || (params.sysclk == 0U) ||
         (params.sysclk > kMaxSysclk))
     {
         return false;
     }
 
+    // H7 PLL input frequency (after PLLM) must stay in [1,16] MHz.
+    if ((pll_input_hz < kMinPllInputHz) || (pll_input_hz > kMaxPllInputHz))
+    {
+        return false;
+    }
+
     if ((params.clk_src == Source::HSE8_MHZ) &&
-        ((f_ref_ck < kMinHseFreq) || (f_ref_ck > kMaxHseFreq)))
+        ((kHse8Mhz < kMinHseFreq) || (kHse8Mhz > kMaxHseFreq)))
     {
         return false;
     }
 
-    if ((params.clk_src == Source::HSI64_MHZ) && (f_ref_ck != kHsi64Mhz))
-    {
-        return false;
-    }
-
-    // Round to the nearest FRACN step: scaled = DIVN * 2^13 + FRACN.
-    uint64_t scaled = ((static_cast<uint64_t>(params.sysclk) * kFracDenom) +
-                       (f_ref_ck / 2U)) /
-                      static_cast<uint64_t>(f_ref_ck);
+    // SYSCLK = (pll_input_hz * (N + FRACN/8192)) / PLLP.
+    // Solve for scaled = (N * 8192 + FRACN), rounded to nearest.
+    uint64_t numerator = static_cast<uint64_t>(params.sysclk) *
+                         static_cast<uint64_t>(pll_p) * kFracDenom;
+    uint64_t scaled = (numerator + (static_cast<uint64_t>(pll_input_hz) / 2U)) /
+                      static_cast<uint64_t>(pll_input_hz);
 
     uint32_t divn_tmp = static_cast<uint32_t>(scaled / kFracDenom);
     uint32_t fracn_tmp = static_cast<uint32_t>(scaled % kFracDenom);
