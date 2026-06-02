@@ -9,26 +9,12 @@
 #include <cstdint>
 #include "stm32h7xx.h"
 #include "stm32h7xx_hal.h"
+#include "sys_clock.h"
 
 namespace LBR
 {
 namespace Stmh7
 {
-
-/**
- * @brief Clock frequencies in Hz
- * 
- */
-struct ClockFrequencies
-{
-    uint32_t sysclk;
-    uint32_t cpu;
-    uint32_t ahb;
-    uint32_t apb1;
-    uint32_t apb2;
-    uint32_t apb3;
-    uint32_t apb4;
-};
 
 enum class Source
 {
@@ -141,7 +127,7 @@ struct ClockParams
  * @note Only supports HSI RC and HSE for now and cannot change clock configs during runtime.
  * 
  */
-class HwClock
+class HwClock : public Clock
 {
 public:
     explicit HwClock(const ClockParams& params_);
@@ -158,7 +144,7 @@ public:
          * 
          * @return ClockFrequencies struct of all current clock frequencies (sysclk, d1cpre, ahb, apb1, apb2, apb3, apb4)
          */
-    const ClockFrequencies& get_clock_frequencies() const;
+    const ClockFrequencies& get_clock_frequencies() const override;
 
 private:
     bool validate_params();
