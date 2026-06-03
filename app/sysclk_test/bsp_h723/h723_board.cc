@@ -78,6 +78,14 @@ Board& get_board()
     return board;
 }
 
+extern "C" void IncDelayTicks(void);
+
+extern "C" void SysTick_Handler(void)
+{
+    HAL_IncTick();
+    IncDelayTicks();
+}
+
 extern "C" void USART3_IRQHandler(void)
 {
     if (Stmh7::usart.get_addr()->ISR & USART_ISR_RXNE_RXFNE)
