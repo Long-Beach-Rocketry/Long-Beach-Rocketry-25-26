@@ -329,13 +329,6 @@ bool HwClock::validate_params()
         (ahb_clk <= kMaxAhb) && (apb1_clk <= kMaxApb) &&
         (apb2_clk <= kMaxApb) && (apb3_clk <= kMaxApb) && (apb4_clk <= kMaxApb))
     {
-        frequencies.sysclk = params.sysclk;
-        frequencies.cpu = d1cpre_clk;
-        frequencies.ahb = ahb_clk;
-        frequencies.apb1 = apb1_clk;
-        frequencies.apb2 = apb2_clk;
-        frequencies.apb3 = apb3_clk;
-        frequencies.apb4 = apb4_clk;
         return true;
     }
 
