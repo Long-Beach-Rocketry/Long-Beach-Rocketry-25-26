@@ -11,13 +11,18 @@
       "servertype": "openocd",
       "device": "STM32F746",
       "svdFile": "${workspaceRoot}/mcu_support/stm32/f7xx/f746/STM32F746.svd",
-      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "searchDir": [
+        "${workspaceRoot}/mcu_support/stm32"
+      ],
       "runToMain": true,
       "configFiles": [
         "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
         "${workspaceRoot}/mcu_support/stm32/f7xx/stm32f7x.cfg"
       ],
-      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "debuggerArgs": [
+        "-d",
+        "${workspaceRoot}"
+      ],
       "preRestartCommands": [
         "add-symbol-file /build/stm32f746/app/cli_app/cli_app",
         "load",
@@ -34,14 +39,19 @@
       "type": "cortex-debug",
       "servertype": "openocd",
       "device": "STM32L4",
-      "svdFile": "${workspaceRoot}/mcu_support/l4xx/STM32L4x2.svd",
-      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
+      "searchDir": [
+        "${workspaceRoot}/mcu_support/stm32"
+      ],
       "runToMain": true,
       "configFiles": [
         "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
         "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
       ],
-      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "debuggerArgs": [
+        "-d",
+        "${workspaceRoot}"
+      ],
       "preRestartCommands": [
         "add-symbol-file build/stm32l476/app/blink/blink",
         "load",
@@ -58,11 +68,19 @@
       "type": "cortex-debug",
       "servertype": "openocd",
       "device": "STM32L4",
-      "svdFile": "${workspaceRoot}/mcu_support/l4xx/STM32L4x2.svd",
-      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
+      "searchDir": [
+        "${workspaceRoot}/mcu_support/stm32"
+      ],
       "runToMain": true,
-      "configFiles": ["stlink-dap.cfg", "l4xx/stm32l4x.cfg"],
-      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "configFiles": [
+        "stlink-dap.cfg",
+        "l4xx/stm32l4x.cfg"
+      ],
+      "debuggerArgs": [
+        "-d",
+        "${workspaceRoot}"
+      ],
       "preRestartCommands": [
         "add-symbol-file build/stm32l476/app/spi_test/spi_test",
         "load",
@@ -79,14 +97,19 @@
       "type": "cortex-debug",
       "servertype": "openocd",
       "device": "STM32L4",
-      "svdFile": "${workspaceRoot}/mcu_support/l4xx/STM32L4x2.svd",
-      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
+      "searchDir": [
+        "${workspaceRoot}/mcu_support/stm32"
+      ],
       "runToMain": true,
       "configFiles": [
         "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
         "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
       ],
-      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "debuggerArgs": [
+        "-d",
+        "${workspaceRoot}"
+      ],
       "preRestartCommands": [
         "add-symbol-file build/stm32l476/app/i2c_test/i2c_test",
         "load",
@@ -104,13 +127,18 @@
       "servertype": "openocd",
       "device": "STM32L4",
       "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
-      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "searchDir": [
+        "${workspaceRoot}/mcu_support/stm32"
+      ],
       "runToMain": true,
       "configFiles": [
         "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
         "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
       ],
-      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "debuggerArgs": [
+        "-d",
+        "${workspaceRoot}"
+      ],
       "preRestartCommands": [
         "add-symbol-file build/stm32l476/app/imu_test/imu_test",
         "load",
@@ -130,14 +158,19 @@
       "type": "cortex-debug",
       "servertype": "openocd",
       "device": "STM32L4",
-      "svdFile": "${workspaceRoot}/mcu_support/l4xx/STM32L4x2.svd",
-      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
+      "searchDir": [
+        "${workspaceRoot}/mcu_support/stm32"
+      ],
       "runToMain": true,
       "configFiles": [
         "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
         "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
       ],
-      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "debuggerArgs": [
+        "-d",
+        "${workspaceRoot}"
+      ],
       "preRestartCommands": [
         "add-symbol-file build/stm32l476/app/pwm_test/pwm_test",
         "load",
@@ -154,14 +187,19 @@
       "type": "cortex-debug",
       "servertype": "openocd",
       "device": "STM32L4",
-      "svdFile": "${workspaceRoot}/mcu_support/l4xx/STM32L4x2.svd",
-      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
+      "searchDir": [
+        "${workspaceRoot}/mcu_support/stm32"
+      ],
       "runToMain": true,
       "configFiles": [
         "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
         "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
       ],
-      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "debuggerArgs": [
+        "-d",
+        "${workspaceRoot}"
+      ],
       "preRestartCommands": [
         "add-symbol-file build/stm32l476/app/bmp390_test/bmp390_test",
         "load",
@@ -178,14 +216,19 @@
       "type": "cortex-debug",
       "servertype": "openocd",
       "device": "STM32L4",
-      "svdFile": "${workspaceRoot}/mcu_support/l4xx/STM32L4x2.svd",
-      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
+      "searchDir": [
+        "${workspaceRoot}/mcu_support/stm32"
+      ],
       "runToMain": true,
       "configFiles": [
         "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
         "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
       ],
-      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "debuggerArgs": [
+        "-d",
+        "${workspaceRoot}"
+      ],
       "preRestartCommands": [
         "add-symbol-file build/stm32l476/app/w25q_test/w25q_test",
         "load",
@@ -202,14 +245,19 @@
       "type": "cortex-debug",
       "servertype": "openocd",
       "device": "STM32L4",
-      "svdFile": "${workspaceRoot}/mcu_support/l4xx/STM32L4x2.svd",
-      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
+      "searchDir": [
+        "${workspaceRoot}/mcu_support/stm32"
+      ],
       "runToMain": true,
       "configFiles": [
         "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
         "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
       ],
-      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "debuggerArgs": [
+        "-d",
+        "${workspaceRoot}"
+      ],
       "preRestartCommands": [
         "add-symbol-file build/stm32l476/app/usart_app/uasrt_app",
         "load",
@@ -226,14 +274,19 @@
       "type": "cortex-debug",
       "servertype": "openocd",
       "device": "STM32H7",
-      "svdFile": "${workspaceRoot}/mcu_support/h7xx/STM32H723.svd",
-      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+      "searchDir": [
+        "${workspaceRoot}/mcu_support/stm32"
+      ],
       "runToMain": true,
       "configFiles": [
         "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
         "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
       ],
-      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "debuggerArgs": [
+        "-d",
+        "${workspaceRoot}"
+      ],
       "preRestartCommands": [
         "add-symbol-file build/stm32h723/app/blink/blink",
         "load",
@@ -250,14 +303,19 @@
       "type": "cortex-debug",
       "servertype": "openocd",
       "device": "STM32H7",
-      "svdFile": "${workspaceRoot}/mcu_support/h7xx/STM32H723.svd",
-      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+      "searchDir": [
+        "${workspaceRoot}/mcu_support/stm32"
+      ],
       "runToMain": true,
       "configFiles": [
         "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
         "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
       ],
-      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "debuggerArgs": [
+        "-d",
+        "${workspaceRoot}"
+      ],
       "preRestartCommands": [
         "add-symbol-file build/stm32h723/app/imu_test/imu_test",
         "load",
@@ -278,14 +336,19 @@
       "type": "cortex-debug",
       "servertype": "openocd",
       "device": "STM32H7",
-      "svdFile": "${workspaceRoot}/mcu_support/h7xx/STM32H723.svd",
-      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+      "searchDir": [
+        "${workspaceRoot}/mcu_support/stm32"
+      ],
       "runToMain": true,
       "configFiles": [
         "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
         "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
       ],
-      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "debuggerArgs": [
+        "-d",
+        "${workspaceRoot}"
+      ],
       "preRestartCommands": [
         "add-symbol-file build/stm32h723/app/i2c_test/i2c_test",
         "load",
@@ -302,14 +365,19 @@
       "type": "cortex-debug",
       "servertype": "openocd",
       "device": "STM32H7",
-      "svdFile": "${workspaceRoot}/mcu_support/h7xx/STM32H723.svd",
-      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+      "searchDir": [
+        "${workspaceRoot}/mcu_support/stm32"
+      ],
       "runToMain": true,
       "configFiles": [
         "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
         "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
       ],
-      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "debuggerArgs": [
+        "-d",
+        "${workspaceRoot}"
+      ],
       "preRestartCommands": [
         "add-symbol-file build/stm32h723/app/usart_app/usart_app",
         "load",
@@ -326,14 +394,19 @@
       "type": "cortex-debug",
       "servertype": "openocd",
       "device": "STM32H7",
-      "svdFile": "${workspaceRoot}/mcu_support/h7xx/STM32H723.svd",
-      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+      "searchDir": [
+        "${workspaceRoot}/mcu_support/stm32"
+      ],
       "runToMain": true,
       "configFiles": [
         "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
         "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
       ],
-      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "debuggerArgs": [
+        "-d",
+        "${workspaceRoot}"
+      ],
       "preRestartCommands": [
         "add-symbol-file build/stm32h723/app/pwm_test/pwm_test",
         "load",
@@ -351,7 +424,9 @@
       "servertype": "openocd",
       "device": "STM32H723",
       "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
-      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "searchDir": [
+        "${workspaceRoot}/mcu_support/stm32"
+      ],
       "runToMain": true,
       "configFiles": [
         "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
@@ -374,13 +449,18 @@
       "servertype": "openocd",
       "device": "STM32H723",
       "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
-      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "searchDir": [
+        "${workspaceRoot}/mcu_support/stm32"
+      ],
       "runToMain": true,
       "configFiles": [
         "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
         "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
       ],
-      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "debuggerArgs": [
+        "-d",
+        "${workspaceRoot}"
+      ],
       "preRestartCommands": [
         "add-symbol-file build/stm32h723/app/w25q_test/w25q_test",
         "load",
@@ -397,14 +477,19 @@
       "type": "cortex-debug",
       "servertype": "openocd",
       "device": "STM32H7",
-      "svdFile": "${workspaceRoot}/mcu_support/h7xx/STM32H723.svd",
-      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+      "searchDir": [
+        "${workspaceRoot}/mcu_support/stm32"
+      ],
       "runToMain": true,
       "configFiles": [
         "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
         "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
       ],
-      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "debuggerArgs": [
+        "-d",
+        "${workspaceRoot}"
+      ],
       "preRestartCommands": [
         "add-symbol-file build/stm32h723/app/bmp390_test/bmp390_test",
         "load",
@@ -425,14 +510,19 @@
       "type": "cortex-debug",
       "servertype": "openocd",
       "device": "STM32H7",
-      "svdFile": "${workspaceRoot}/mcu_support/h7xx/STM32H723.svd",
-      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
+      "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+      "searchDir": [
+        "${workspaceRoot}/mcu_support/stm32"
+      ],
       "runToMain": true,
       "configFiles": [
         "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
         "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
       ],
-      "debuggerArgs": ["-d", "${workspaceRoot}"],
+      "debuggerArgs": [
+        "-d",
+        "${workspaceRoot}"
+      ],
       "preRestartCommands": [
         "add-symbol-file build/stm32h723/app/sysclk_test/sysclk_test",
         "load",
