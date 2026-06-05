@@ -9,6 +9,10 @@ namespace LBR
  * @note We can configure the crc according to some crc standard/algorithm.
  * Use https://ninjacalc.mbedded.ninja/calculators/software/crc-calculator as 
  * reference to see what to configure and the proper output.
+ * 
+ * Or https://crccalc.com/?crc=12345678&method=&datatype=hex&outtype=hex
+ * 
+ * Current crc standard for the test: CRC-32/BZIP2
  */
 
 static constexpr uint32_t kDefaultPoly{0x4C11DB7};

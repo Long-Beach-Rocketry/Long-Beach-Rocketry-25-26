@@ -17,19 +17,19 @@ int main(int argc, char* argv[])
 
     // Data formatted because of endianess
     const uint8_t data8[] = {0x01, 0x02, 0x03, 0x04};
-    const uint16_t data16[] = {0x0201, 0x0403};
-    const uint32_t data32[] = {0x04030201};
+    const uint16_t data16[] = {0x0102, 0x0304};
+    const uint32_t data32[] = {0x01020304};
 
     while (1)
     {
         hw.crc.compare(std::span(data8), kActualCrc);
-        for (volatile uint32_t i = 0; i < 1000000; i++);
+        for (volatile uint32_t i = 0; i < 100000; i++);
 
         hw.crc.compare(std::span(data16), kActualCrc);
-        for (volatile uint32_t i = 0; i < 1000000; i++);
+        for (volatile uint32_t i = 0; i < 100000; i++);
 
         hw.crc.compare(std::span(data32), kActualCrc);
-        for (volatile uint32_t i = 0; i < 1000000; i++);
+        for (volatile uint32_t i = 0; i < 100000; i++);
     }
 
     return 0;
