@@ -28,7 +28,7 @@
                 "MCU_FAMILY": "STM32L4"
             }
         },
-         {
+        {
             "name": "stm32h7",
             "hidden": true,
             "inherits": "build",

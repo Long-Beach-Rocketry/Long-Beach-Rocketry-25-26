@@ -16,22 +16,19 @@ namespace LBR  // Use the LBR namespace to avoid naming conflicts
 {
 namespace Stmh7  // Use the Stmh7 namespace for STM32H7 specific implementations
 {
-class StUsart : public Usart
-{
-public:
-    /**
+/**
      * @brief Public enum class that determines which oversampling mode will be used by the driver.
      * 
      * @note BY_16 provides better noise tolerance (default).
      * @note BY_8 doubles the maximum achievable baud rate. 
      */
-    enum class OversampleMode
-    {
-        BY_16,
-        BY_8
-    };
+enum class OversampleMode
+{
+    BY_16,
+    BY_8
+};
 
-    /**
+/**
      * @brief Parameterized constructor which initializes important values for specific USART object.
      * 
      * @param params_ Struct containing USART configuration parameters:
@@ -40,13 +37,16 @@ public:
      *                - baud_rate: chosen baud rate to send and receive data on a serial monitor
      *                - mode: chosen oversampling mode, default is by 16
      */
-    struct StUsartParams
-    {
-        USART_TypeDef* base_addr;
-        uint32_t sys_clck;
-        uint32_t baud_rate;
-        OversampleMode mode = OversampleMode::BY_16;
-    };
+struct StUsartParams
+{
+    USART_TypeDef* base_addr;
+    uint32_t sys_clck;
+    uint32_t baud_rate;
+    OversampleMode mode = OversampleMode::BY_16;
+};
+class StUsart : public Usart
+{
+public:
     StUsart(const StUsartParams& params_);
 
     /**
