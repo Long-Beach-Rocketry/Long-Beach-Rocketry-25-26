@@ -10,6 +10,22 @@
 #include <cstdint>
 namespace LBR
 {
+
+/**
+ * @brief Clock frequencies in Hz
+ * 
+ */
+struct ClockFrequencies
+{
+    uint32_t sysclk{0};
+    uint32_t cpu{0};
+    uint32_t ahb{0};
+    uint32_t apb1{0};
+    uint32_t apb2{0};
+    uint32_t apb3{0};
+    uint32_t apb4{0};
+};
+
 /**
  * @class Clock
  * @brief Configures system clock as well as anything else in the clock
@@ -19,7 +35,11 @@ namespace LBR
 class Clock
 {
 public:
-    virtual uint32_t get_hz() const = 0;
-    virtual uint32_t get_timingR() const = 0;
+    /**
+     * @brief Get the frequencies of all clocks in the clock tree (sysclk, d1cpre (cpu), ahb, apb1, apb2, apb3, apb4) in Hz
+     * 
+     * @return const ClockFrequencies& 
+     */
+    virtual const ClockFrequencies& get_clock_frequencies() const = 0;
 };
 }  // namespace LBR

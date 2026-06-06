@@ -9,26 +9,12 @@
 #include <cstdint>
 #include "stm32h7xx.h"
 #include "stm32h7xx_hal.h"
+#include "sys_clock.h"
 
 namespace LBR
 {
 namespace Stmh7
 {
-
-/**
- * @brief Clock frequencies in Hz
- * 
- */
-struct ClockFrequencies
-{
-    uint32_t sysclk;
-    uint32_t d1cpre;
-    uint32_t ahb;
-    uint32_t apb1;
-    uint32_t apb2;
-    uint32_t apb3;
-    uint32_t apb4;
-};
 
 enum class Source
 {
@@ -38,7 +24,7 @@ enum class Source
 
 /**
      * @brief Prescales Sysclk to acquire D1CPRE Clock
-     * @example If Sysclk is 550 MHz and SysclkPrescaler is DIV2, then Hclk is 275 MHz (550 MHz / 2 = 275 MHz)
+     * @example If Sysclk is 550 MHz and SysclkPrescaler is DIV1, then D1CPRE/CPU freq is 550 MHz (550 MHz / 1 = 550 MHz)
      * @note Max frequency after prescale is 550 MHz
      */
 enum class D1cprePrescaler : uint32_t
@@ -56,6 +42,7 @@ enum class D1cprePrescaler : uint32_t
 
 /**
      * @brief Prescales D1CPRE Clock to acquire all AHB clocks (HCLK)
+     * @example If D1CPRE/CPU freq is 550 MHz and AhbPrescaler is DIV2, then HCLK/AHB freq is 275 MHz (550 MHz / 2 = 275 MHz)
      * @note Max frequency after prescale is 275 MHz
      */
 enum class AhbPrescaler : uint32_t
@@ -73,6 +60,7 @@ enum class AhbPrescaler : uint32_t
 
 /**
      * @brief Prescales AHB clock to acquire APB1 clock (PCLK1)
+     * @example If HCLK/AHB freq is 275 MHz and Apb1Prescaler is DIV2, then PCLK1/APB1 freq is 137.5 MHz (275 MHz / 2 = 137.5 MHz)
      * @note Max frequency after prescale is 137.5 MHz
      */
 enum class Apb1Prescaler : uint32_t
@@ -86,6 +74,7 @@ enum class Apb1Prescaler : uint32_t
 
 /**
      * @brief Prescales AHB clock to acquire APB2 clock (PCLK2)
+     * @example If HCLK/AHB freq is 275 MHz and Apb2Prescaler is DIV2, then PCLK2/APB2 freq is 137.5 MHz (275 MHz / 2 = 137.5 MHz)
      * @note Max frequency after prescale is 137.5 MHz
      */
 enum class Apb2Prescaler : uint32_t
@@ -99,6 +88,7 @@ enum class Apb2Prescaler : uint32_t
 
 /**
      * @brief Prescales AHB clock to acquire APB3 clock (PCLK3)
+     * @example If HCLK/AHB freq is 275 MHz and Apb3Prescaler is DIV2, then PCLK3/APB3 freq is 137.5 MHz (275 MHz / 2 = 137.5 MHz)
      * @note Max frequency after prescale is 137.5 MHz
      */
 enum class Apb3Prescaler : uint32_t
@@ -112,6 +102,7 @@ enum class Apb3Prescaler : uint32_t
 
 /**
      * @brief Prescales AHB clock to acquire APB4 clock (PCLK4)
+     * @example If HCLK/AHB freq is 275 MHz and Apb4Prescaler is DIV2, then PCLK4/APB4 freq is 137.5 MHz (275 MHz / 2 = 137.5 MHz)
      * @note Max frequency after prescale is 137.5 MHz
      */
 enum class Apb4Prescaler : uint32_t
@@ -141,7 +132,7 @@ struct ClockParams
  * @note Only supports HSI RC and HSE for now and cannot change clock configs during runtime.
  * 
  */
-class HwClock
+class HwClock : public Clock
 {
 public:
     explicit HwClock(const ClockParams& params_);
@@ -158,12 +149,49 @@ public:
          * 
          * @return ClockFrequencies struct of all current clock frequencies (sysclk, d1cpre, ahb, apb1, apb2, apb3, apb4)
          */
-    const ClockFrequencies& get_clock_frequencies() const;
+    const ClockFrequencies& get_clock_frequencies() const override;
 
 private:
+    /**
+     * @brief Validates the clock parameters to ensure they are within acceptable ranges and that the resulting clock frequencies do not exceed the maximum allowed values for the STM32H7.
+     * 
+     * @return true Clock parameters are valid, false otherwise
+     */
+    bool validate_params();
+
+    /**
+     * @brief Set the frequencies struct to the current clock frequencies (sysclk, d1cpre, ahb, apb1, apb2, apb3, apb4) in Hz
+     * 
+     */
+    void set_frequencies();
+
+    /**
+     * @brief Configures the system clock to use the HSI64 oscillator as the clock source.
+     * 
+     * @return true Clock configuration success, false otherwise
+     */
     bool SystemClock_ConfigHSI64();
 
+    /**
+     * @brief Configures the system clock to use the HSE8 oscillator as the clock source.
+     * 
+     * @return true Clock configuration success, false otherwise
+     */
     bool SystemClock_ConfigHSE8();
+
+    /**
+     * @brief Calculates the system clock variables based on the provided PLL input frequency and desired output frequency.
+     * 
+     * @param divn Division factor for the PLL
+     * @param fracn Fractional part for the PLL
+     * @param pll_input_hz Input frequency to the PLL in Hz
+     * @param pll_p PLL output division factor
+     * @return true Calculation success, false otherwise
+     *
+     * @return true Clock configuration success, false otherwise
+     */
+    bool calc_sysclk_vars(uint32_t& divn, uint32_t& fracn,
+                          uint32_t pll_input_hz, uint32_t pll_p);
 
     ClockParams params;
     ClockFrequencies frequencies;
