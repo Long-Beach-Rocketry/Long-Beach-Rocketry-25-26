@@ -22,21 +22,21 @@ int main(int argc, char** argv)
                            "--------------------------------\r\n"
                            " SYSCLK TEST\r\n"
                            "--------------------------------\r\n"
-                           " SYSCLK : %10u MHz\r\n"
-                           " CPU    : %10u MHz\r\n"
-                           " HCLK   : %10u MHz\r\n"
-                           " PCLK1  : %10u MHz\r\n"
-                           " PCLK2  : %10u MHz\r\n"
-                           " PCLK3  : %10u MHz\r\n"
-                           " PCLK4  : %10u MHz\r\n"
+                           " SYSCLK : %10f MHz\r\n"
+                           " CPU    : %10f MHz\r\n"
+                           " HCLK   : %10f MHz\r\n"
+                           " PCLK1  : %10f MHz\r\n"
+                           " PCLK2  : %10f MHz\r\n"
+                           " PCLK3  : %10f MHz\r\n"
+                           " PCLK4  : %10f MHz\r\n"
                            "--------------------------------\r\n",
-                           static_cast<unsigned int>(freqs.sysclk / kHzPerMHz),
-                           static_cast<unsigned int>(freqs.cpu / kHzPerMHz),
-                           static_cast<unsigned int>(freqs.ahb / kHzPerMHz),
-                           static_cast<unsigned int>(freqs.apb1 / kHzPerMHz),
-                           static_cast<unsigned int>(freqs.apb2 / kHzPerMHz),
-                           static_cast<unsigned int>(freqs.apb3 / kHzPerMHz),
-                           static_cast<unsigned int>(freqs.apb4 / kHzPerMHz));
+                           static_cast<float>(freqs.sysclk / kHzPerMHz),
+                           static_cast<float>(freqs.cpu / kHzPerMHz),
+                           static_cast<float>(freqs.ahb / kHzPerMHz),
+                           static_cast<float>(freqs.apb1 / kHzPerMHz),
+                           static_cast<float>(freqs.apb2 / kHzPerMHz),
+                           static_cast<float>(freqs.apb3 / kHzPerMHz),
+                           static_cast<float>(freqs.apb4 / kHzPerMHz));
 
         if (len < 0)
         {

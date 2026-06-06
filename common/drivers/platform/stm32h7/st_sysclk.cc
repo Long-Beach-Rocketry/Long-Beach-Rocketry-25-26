@@ -366,8 +366,12 @@ bool HwClock::SystemClock_ConfigHSI64()
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
     constexpr uint32_t pll_m = 4U;
     constexpr uint32_t pll_p = 1U;
-    uint32_t core_clk = frequencies.cpu;
-    uint32_t flash_latency = select_flash_latency(frequencies.ahb);
+    ConvertedPrescalers prescalers =
+        convert_prescalers(params.d1cpre_psc, params.ahb_psc, params.apb1_psc,
+                           params.apb2_psc, params.apb3_psc, params.apb4_psc);
+    uint32_t core_clk = params.sysclk / prescalers.d1cpre_psc;
+    uint32_t ahb_clk = core_clk / prescalers.ahb_psc;
+    uint32_t flash_latency = select_flash_latency(ahb_clk);
     uint32_t pll1_vci_range;
     uint32_t pll_input_hz = kHsi64Mhz / pll_m;
 
@@ -442,8 +446,12 @@ bool HwClock::SystemClock_ConfigHSE8()
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
     constexpr uint32_t pll_m = 1U;
     constexpr uint32_t pll_p = 1U;
-    uint32_t core_clk = frequencies.cpu;
-    uint32_t flash_latency = select_flash_latency(frequencies.ahb);
+    ConvertedPrescalers prescalers =
+        convert_prescalers(params.d1cpre_psc, params.ahb_psc, params.apb1_psc,
+                           params.apb2_psc, params.apb3_psc, params.apb4_psc);
+    uint32_t core_clk = params.sysclk / prescalers.d1cpre_psc;
+    uint32_t ahb_clk = core_clk / prescalers.ahb_psc;
+    uint32_t flash_latency = select_flash_latency(ahb_clk);
     uint32_t pll1_vci_range;
     uint32_t pll_input_hz = kHse8Mhz / pll_m;
 
