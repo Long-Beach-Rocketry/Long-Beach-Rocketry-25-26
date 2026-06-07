@@ -3,8 +3,7 @@
 #include "st_sysclk.h"
 #include "st_usart.h"
 
-static constexpr uint32_t kSysclkHz{100'000'000};
-static constexpr uint32_t kDefaultUsartKernelHz{64'000'000};
+static constexpr uint32_t kSysclkHz{8'000'000};
 static constexpr uint32_t kBaudRate{115'200};
 
 namespace LBR
@@ -21,14 +20,14 @@ HwGpio usart_tx{usart_tx_params};
 HwGpio usart_rx{usart_rx_params};
 
 // Create USART3 object
-StUsartParams usart_params{USART3, kDefaultUsartKernelHz, kBaudRate};
+StUsartParams usart_params{USART3, kSysclkHz, kBaudRate};
 StUsart usart{usart_params};
 
-// Create Clock object (Sysclk = 100 MHz, HCLK = 50 MHz, PCLK1 = PCLK2 = PCLK3 = PCLK4 = 25 MHz)
-ClockParams clock_params{Source::HSI64_MHZ,     kSysclkHz,
-                         D1cprePrescaler::DIV1, AhbPrescaler::DIV2,
-                         Apb1Prescaler::DIV2,   Apb2Prescaler::DIV2,
-                         Apb3Prescaler::DIV2,   Apb4Prescaler::DIV2};
+// Create Clock object (Sysclk = 65 MHz, HCLK = 32.5 MHz, PCLK1 = PCLK2 = PCLK3 = PCLK4 = 16.25 MHz)
+ClockParams clock_params{Source::HSE8_MHZ_BYPASS, kSysclkHz,
+                         D1cprePrescaler::DIV1,   AhbPrescaler::DIV2,
+                         Apb1Prescaler::DIV2,     Apb2Prescaler::DIV2,
+                         Apb3Prescaler::DIV2,     Apb4Prescaler::DIV2};
 HwClock clock{clock_params};
 }  // namespace Stmh7
 

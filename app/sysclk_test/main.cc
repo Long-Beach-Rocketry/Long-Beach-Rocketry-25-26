@@ -15,28 +15,25 @@ int main(int argc, char** argv)
     while (1)
     {
         const ClockFrequencies& freqs = board.clock.get_clock_frequencies();
-        constexpr uint32_t kHzPerMHz = 1'000'000U;
+        constexpr double kHzPerMHz = 1'000'000.0;
 
         char buf[320];
         int len = snprintf(buf, sizeof(buf),
                            "--------------------------------\r\n"
-                           " SYSCLK TEST\r\n"
+                           " CLOCK TREE\r\n"
                            "--------------------------------\r\n"
-                           " SYSCLK : %10f MHz\r\n"
-                           " CPU    : %10f MHz\r\n"
-                           " HCLK   : %10f MHz\r\n"
-                           " PCLK1  : %10f MHz\r\n"
-                           " PCLK2  : %10f MHz\r\n"
-                           " PCLK3  : %10f MHz\r\n"
-                           " PCLK4  : %10f MHz\r\n"
+                           " SYSCLK : %.2f MHz\r\n"
+                           " CPU    : %.2f MHz\r\n"
+                           " HCLK   : %.2f MHz\r\n"
+                           " PCLK1  : %.2f MHz\r\n"
+                           " PCLK2  : %.2f MHz\r\n"
+                           " PCLK3  : %.2f MHz\r\n"
+                           " PCLK4  : %.2f MHz\r\n"
                            "--------------------------------\r\n",
-                           static_cast<float>(freqs.sysclk / kHzPerMHz),
-                           static_cast<float>(freqs.cpu / kHzPerMHz),
-                           static_cast<float>(freqs.ahb / kHzPerMHz),
-                           static_cast<float>(freqs.apb1 / kHzPerMHz),
-                           static_cast<float>(freqs.apb2 / kHzPerMHz),
-                           static_cast<float>(freqs.apb3 / kHzPerMHz),
-                           static_cast<float>(freqs.apb4 / kHzPerMHz));
+                           freqs.sysclk / kHzPerMHz, freqs.cpu / kHzPerMHz,
+                           freqs.ahb / kHzPerMHz, freqs.apb1 / kHzPerMHz,
+                           freqs.apb2 / kHzPerMHz, freqs.apb3 / kHzPerMHz,
+                           freqs.apb4 / kHzPerMHz);
 
         if (len < 0)
         {
@@ -53,7 +50,7 @@ int main(int argc, char** argv)
         board.usart.send(tx_span);
 
         // Busy wait
-        Utils::DelayMs(1000);
+        Utils::DelayMs(2500);
     }
 
     return 0;

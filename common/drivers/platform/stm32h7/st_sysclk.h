@@ -19,7 +19,8 @@ namespace Stmh7
 enum class Source
 {
     HSI64_MHZ,
-    HSE8_MHZ
+    HSE8_MHZ_BYPASS,
+    HSE8_MHZ_CRYSTAL
 };
 
 /**
@@ -177,7 +178,14 @@ private:
      * 
      * @return true Clock configuration success, false otherwise
      */
-    bool SystemClock_ConfigHSE8();
+    bool SystemClock_ConfigHSE8_Crystal();
+
+    /**
+     * @brief Configures the system clock to use the HSE8 oscillator in bypass mode as the clock source (HSE8 from onboard ST-LINK MCU).
+     * 
+     * @return true Clock configuration success, false otherwise
+     */
+    bool SystemClock_ConfigHSE8_Bypass();
 
     /**
      * @brief Calculates the system clock variables based on the provided PLL input frequency and desired output frequency.
@@ -191,7 +199,8 @@ private:
      * @return true Clock configuration success, false otherwise
      */
     bool calc_sysclk_vars(uint32_t& divn, uint32_t& fracn,
-                          uint32_t pll_input_hz, uint32_t pll_p);
+                          uint32_t& pll_input_hz, uint32_t& pll_m,
+                          uint32_t& pll_p);
 
     ClockParams params;
     ClockFrequencies frequencies;
