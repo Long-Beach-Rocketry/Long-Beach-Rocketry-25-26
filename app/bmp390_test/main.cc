@@ -20,7 +20,8 @@ int main(int argc, char* argv[])
         printf("Pressure: %f\nTemperature: %f\n", press, temp);
 
         for (volatile size_t i = 0; i < 100000; i++)
-            ;
+        {
+        }
     }
 
     return 0;
