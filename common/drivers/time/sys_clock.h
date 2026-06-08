@@ -17,13 +17,13 @@ namespace LBR
  */
 struct ClockFrequencies
 {
-    uint32_t sysclk{0};
-    uint32_t cpu{0};
-    uint32_t ahb{0};
-    uint32_t apb1{0};
-    uint32_t apb2{0};
-    uint32_t apb3{0};
-    uint32_t apb4{0};
+    double sysclk{0};
+    double cpu{0};
+    double ahb{0};
+    double apb1{0};
+    double apb2{0};
+    double apb3{0};
+    double apb4{0};
 };
 
 /**
