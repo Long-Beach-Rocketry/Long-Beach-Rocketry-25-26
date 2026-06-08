@@ -9,7 +9,6 @@
 #include <array>
 #include <cstddef>
 #include <span>
-#include "package.h"
 #include "pb_cmd.h"
 #include "ring_buffer.h"
 #include "usart.h"
@@ -60,7 +59,7 @@ private:
     static constexpr size_t kMaxPayloadLen{255};
 
     // SX module receive buffer at 254 bytes of [ID][Length][Payload][Checksum]
-    Ringbuffer<uint8_t, 256> rx_buffer;
+    RingBuffer<uint8_t, 256> rx_buffer;
     std::array<uint8_t, 256> tx_buffer;
 
     /// NOTE: RECEIVE HELPERS

@@ -52,6 +52,6 @@ public:
     /**
      * @brief Sends the telemetry message
      */
-    void send_telemetry(Bno055Data& imu, Bmp390& baro);
+    PbCmd send_telemetry(Bno055& imu, Bmp390& baro);
 };
 }  // namespace LBR

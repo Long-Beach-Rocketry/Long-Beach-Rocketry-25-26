@@ -16,7 +16,6 @@ bool Pipeline::send(const PbCmd* msg, Usart& usart)
         return false;
     }
 
-    uint8_t* payload_start = tx_buffer.data() + kHeaderLen;
     size_t payload_capacity = tx_buffer.size() - kHeaderLen - kCrcLen;
 
     // Messages should not exceed buffer size
@@ -30,11 +29,9 @@ bool Pipeline::send(const PbCmd* msg, Usart& usart)
     tx_buffer[0] = kFrameId;
     tx_buffer[1] = static_cast<uint8_t>(payload_len);
 
-    // Add CRC
+    // TODO: compute and append CRC over [ID, Length, Payload]
 
-    // Combine all of the frame + length + frame + crc into a single buffer to send over USART to RS485.
-
-    // int final_msg = (frame & length) + payload_len + crc_len;
+    size_t final_msg = kHeaderLen + static_cast<size_t>(payload_len) + kCrcLen;
 
     // Enable RS485 High (Transmit mode)
 
@@ -59,9 +56,6 @@ bool Pipeline::receive(PbCmd* msg, Usart& usart)
     }
 
     // TODO: Add RS485 reception logic here to receive from Telemetry board's USART and fill rx_buffer.
-
-    // Read bytes from USART until we receive all available data or fill the buffer
-    size_t count = 0;
 
     // 1. Pull all available USART bytes into ring buffer
     uint8_t byte = 0;

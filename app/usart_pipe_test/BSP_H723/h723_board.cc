@@ -24,7 +24,7 @@ HwGpio tx_gpio(tx_params);
 HwGpio rx_gpio(rx_params);
 
 // Default frequency for the H7 (HSI / 1), (per Datasheet 8.7.2)
-StUsart::StUsartParams usart_params = {USART3, 64000000, 115200};
+StUsartParams usart_params = {USART3, 64000000, 115200};
 
 StUsart usart(usart_params);
 }  // namespace Stmh7
