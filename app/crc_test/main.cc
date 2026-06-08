@@ -2,6 +2,7 @@
 #include <span>
 #include "board.h"
 #include "crc.h"
+#include "delay.h"
 
 using namespace LBR;
 
@@ -13,6 +14,14 @@ using namespace LBR;
 // CRC standard used is CRC-32/BZIP2.
 constexpr uint32_t kActualCrc_1 = 0x86C8C832;
 constexpr uint32_t kActualCrc_2 = 0x8F06E7CE;
+
+std::array<uint8_t, 8> txb8{"1234567"};
+std::array<uint8_t, 16> txb16{"1234567 1234567"};
+std::array<uint8_t, 32> txb32{"1234567 1234567 1234567 1234567"};
+
+std::vector<std::span<uint8_t>> packets = {txb8, txb16, txb32};
+
+uint8_t rxb;
 
 int main(int argc, char* argv[])
 {
@@ -28,31 +37,69 @@ int main(int argc, char* argv[])
     const uint16_t data16_2[] = {0x0A0B, 0x0C0D};
     const uint32_t data32_2[] = {0x0A0B0C0D};
 
+    /* uint8_t test */
+
+    hw.crc.compare(std::span(data8_1), kActualCrc_1);
+    hw.usart.send(data8_1);
+    for (volatile uint32_t i = 0; i < 100000; i++);
+
+    hw.crc.compare(std::span(data8_2), kActualCrc_2);
+    hw.usart.send(data8_2);
+    for (volatile uint32_t i = 0; i < 100000; i++);
+
+    /* uint16_t test */
+
+    hw.crc.compare(std::span(data16_1), kActualCrc_1);
+    for (volatile uint32_t i = 0; i < 100000; i++);
+
+    hw.crc.compare(std::span(data16_2), kActualCrc_2);
+    for (volatile uint32_t i = 0; i < 100000; i++);
+
+    /* uint32_t test */
+
+    hw.crc.compare(std::span(data32_1), kActualCrc_1);
+    for (volatile uint32_t i = 0; i < 100000; i++);
+
+    hw.crc.compare(std::span(data32_2), kActualCrc_2);
+    for (volatile uint32_t i = 0; i < 100000; i++);
+
     while (1)
     {
-        /* uint8_t test */
+        for (auto packet : packets)
+        {
 
-        hw.crc.compare(std::span(data8_1), kActualCrc_1);
-        for (volatile uint32_t i = 0; i < 100000; i++);
+            uint32_t crc_result;
+            hw.crc.compute(packet, crc_result);
 
-        hw.crc.compare(std::span(data8_2), kActualCrc_2);
-        for (volatile uint32_t i = 0; i < 100000; i++);
+            auto string = simulate_noise(packet, 0.01, 0.01);
 
-        /* uint16_t test */
+            hw.usart.send(string);
 
-        hw.crc.compare(std::span(data16_1), kActualCrc_1);
-        for (volatile uint32_t i = 0; i < 100000; i++);
+            // Busy wait
+            for (volatile uint32_t i = 0; i < 1000000; i++);
 
-        hw.crc.compare(std::span(data16_2), kActualCrc_2);
-        for (volatile uint32_t i = 0; i < 100000; i++);
+            std::array<uint8_t, 20> resultb{"\r\nCrc result: "};
+            hw.usart.send(resultb);
 
-        /* uint32_t test */
+            // Busy wait
+            for (volatile uint32_t i = 0; i < 1000000; i++);
 
-        hw.crc.compare(std::span(data32_1), kActualCrc_1);
-        for (volatile uint32_t i = 0; i < 100000; i++);
+            std::array<uint8_t, 1> crcb{hw.crc.compare(string, crc_result) ? 'o'
+                                                                           : 'x'
 
-        hw.crc.compare(std::span(data32_2), kActualCrc_2);
-        for (volatile uint32_t i = 0; i < 100000; i++);
+            };
+            hw.usart.send(crcb);
+
+            // Busy wait
+            for (volatile uint32_t i = 0; i < 1000000; i++);
+
+            std::array<uint8_t, 4> endb{"\r\n"};
+            hw.usart.send(endb);
+
+            // Busy wait
+            for (volatile uint32_t i = 0; i < 1000000; i++);
+            
+        }
     }
 
     return 0;
