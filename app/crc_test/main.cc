@@ -98,7 +98,6 @@ int main(int argc, char* argv[])
 
             // Busy wait
             for (volatile uint32_t i = 0; i < 1000000; i++);
-            
         }
     }
 
