@@ -7,4 +7,5 @@ target_include_directories(pipeline PUBLIC
     ${CMAKE_SOURCE_DIR}/common/core/protobuff
     ${CMAKE_SOURCE_DIR}/external/nanopb
     ${CMAKE_SOURCE_DIR}/common/core/protobuff/built
+    ${CMAKE_SOURCE_DIR}/common/core/container
 )

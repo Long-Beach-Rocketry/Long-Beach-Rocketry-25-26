@@ -21,33 +21,25 @@ static void map_imu_data(IMUData& pb_imu, const Bno055Data& sensor_imu)
 
 PbCmd TelemetryPacket::send_telemetry(Bno055& imu, Bmp390& baro)
 {
-    PbCmd msg;
-    Bmp390Data baro_data;
+    PbCmd cmd;
+    cmd.msg = RocketMessage_init_default;
+
+    cmd.msg.has_header = true;
+    cmd.msg.header.device_id = 0x67;
+    cmd.msg.header.packet_count = message_counter++;
+    cmd.msg.header.timestamp_ms = 0;  // TODO: replace with actual millis()
+
     Bno055Data imu_data;
-
-    // Initialize the telemetry payload
-    msg.payload.telemetry = Telemetry_init_default;
-
-    // Fill header
-    msg.payload.telemetry.header.device_id = 0x67;  // This board is ID 67
-    msg.payload.telemetry.header.packet_count = message_counter++;
-    msg.payload.telemetry.header.timestamp_ms =
-        0;  // replace with actual millis()
-
-    // Read the data directly from sensors!
     if (imu.read_all(imu_data))
     {
-        map_imu_data(msg.payload.telemetry.imu, imu_data);
+        cmd.msg.has_imu = true;
+        map_imu_data(cmd.msg.imu, imu_data);
     }
 
-    // Read Baro
-    if (baro.get_pressure(baro_data.pressure) &&
-        baro.get_temperature(baro_data.temperature))
-    {
-        msg.payload.telemetry.baro.pressure_pa = baro_data.pressure;
-        msg.payload.telemetry.baro.temperature = baro_data.temperature;
-    }
+    cmd.msg.has_baro = true;
+    cmd.msg.baro.pressure = baro.get_pressure();
+    cmd.msg.baro.temperature = baro.get_temperature();
 
-    return msg;
+    return cmd;
 }
 }  // namespace LBR

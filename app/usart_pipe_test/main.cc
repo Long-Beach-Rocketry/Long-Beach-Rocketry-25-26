@@ -26,22 +26,25 @@ int main(int argc, char** argv)
     // Create a Pipeline instance
     Pipeline pb;
 
-    // Counter for different timestamp values
-    int32_t count = 0;
+    // Counter for different packet values
+    uint32_t count = 0;
 
     // Fill the message with test data
-    strcpy(tx.msg.Name, "LBR");
-    tx.msg.Year = 2026;
-    strcpy(tx.msg.clubName, "LBR");
-    tx.msg.timestamp_ms = count++;  // Increment timestamp for each message
+    tx.msg = RocketMessage_init_default;
+    tx.msg.has_header = true;
+    tx.msg.header.device_id = 0x67;
+    tx.msg.header.packet_count = count++;
+    tx.msg.header.timestamp_ms = 0;
 
     // Send & receive protobuf message over USART
     pb.send(&tx, board.usart);
     pb.receive(&rx, board.usart);
 
     // Print received data to verify correct encoding/decoding
-    printf("Received: %s %ld %s %ld\n", rx.msg.Name, (long)rx.msg.Year,
-           rx.msg.clubName, (long)rx.msg.timestamp_ms);
+    printf("Received: device=0x%lx packet=%lu ts=%lu\n",
+           (unsigned long)rx.msg.header.device_id,
+           (unsigned long)rx.msg.header.packet_count,
+           (unsigned long)rx.msg.header.timestamp_ms);
 
     while (1)
     {
