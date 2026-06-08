@@ -5,3 +5,7 @@ add_library(nanopb STATIC
 )
 
 add_subdirectory(nanopb)
+
+if("${TARGET_DEVICE}" STREQUAL "NATIVE")
+    add_subdirectory(googletest)
+endif()

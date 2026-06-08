@@ -1,2 +1,2 @@
 # This script verifies the formatting in the target directories.
-find app common -iname '*.h' -o -iname '*.c' -o -iname '*.cc' | xargs clang-format --dry-run -Werror
+find app common \( -iname '*.h' -o -iname '*.c' -o -iname '*.cc' \) ! -iname '*.pb.h' ! -iname '*.pb.c' ! -iname '*.pb.cc' | xargs clang-format --dry-run -Werror
