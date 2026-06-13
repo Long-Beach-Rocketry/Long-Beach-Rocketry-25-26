@@ -7,8 +7,14 @@
 using json = nlohmann::json;
 using namespace std;
 
+// How to run (works for myself, may be different for others):
+// 1. cmd + shift + p
+// 2. Tasks: Run Task
+// 3. Build SITL
+// 4 ./app/sitl_test/main
 
-class SITL : public AirbrakeApp {
+// Simple SITL simulation for testing AirbrakeApp logic
+class SITL : public AirbrakeApp { 
     private:
         double time_s = 0.0;
         double time_step_s = 0.1;
@@ -17,6 +23,7 @@ class SITL : public AirbrakeApp {
         double velocity_mps = 0.0;
         double acceleration_mps2 = -9.81;
 
+        // Load simulation parameters and initial conditions from JSON config file
         void loadSimulationConfig(const string& config_path) {
             ifstream file(config_path);
 
@@ -37,12 +44,14 @@ class SITL : public AirbrakeApp {
         }
 
     public:
+        // Initialize AirbrakeApp with config file and simulation parameters
         SITL() : AirbrakeApp("app/sitl_test/config/airbrake.json") {
             loadSimulationConfig("app/sitl_test/config/airbrake.json");
         }
 
         void run() {
             AirbrakeApp::init();
+            // Run until rocket reaches ground or timeout occurs
             while (altitude_m >= 0.0 && time_s <= max_simulation_time) {
                 SensorData data{
                     time_s, altitude_m, velocity_mps, acceleration_mps2

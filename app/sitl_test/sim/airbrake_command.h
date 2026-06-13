@@ -1,9 +1,8 @@
 #pragma once
 
-
-// Current state of the airbrakes
+// Represents the state of the airbrakes (retracted or deployed)
 struct AirbrakeState {
-    double deployment = 0.0;
-    // 0.0 = retracted
-    // 1.0 = deployed
+    bool deployment = false;
+    // false = retracted
+    // true = deployed
 };

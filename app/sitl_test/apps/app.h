@@ -1,6 +1,5 @@
 #pragma once
 
-
 // Sensor data which'll be used in every application (airbrake, camera, telemtry)
 struct SensorData {
     double time_s;
@@ -9,10 +8,10 @@ struct SensorData {
     double acceleration_mps2;
 };
 
-
-// Base class other apps will inherit from [an init() and update() function]
+// Abstract base class other apps will inherit from
 class App {
     public:
-        virtual void init() = 0;
-        virtual void update(const SensorData& data) = 0;
+        virtual void init() = 0; // Called once at the start of simulation
+        virtual void update(const SensorData& data) = 0; // Called every simulation loop with the latest sensor data
+        virtual ~App() = default; // Virtual destructor for proper cleanup
 };

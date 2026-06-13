@@ -1,4 +1,4 @@
-#pragma once
+#pragma "once"
 #include "app.h"
 #include "../sim/airbrake_command.h"
 
@@ -9,6 +9,7 @@
 
 using json = nlohmann::json;
 using namespace std;
+
 
 class AirbrakeApp : public App {
     public:
@@ -48,6 +49,7 @@ class AirbrakeApp : public App {
             << endl;
         }
 
+        // Return current airbrake command
         AirbrakeState getCommand() const {
             return state;
         }
@@ -60,21 +62,26 @@ class AirbrakeApp : public App {
 
             AirbrakeState state;
 
+            // Calculating airbrake extension based on current sensor data and target apogee
             double calculateExtension(const SensorData& data) {
+                // Do not deploy below activation altitude
                 if (data.altitude_m <= deploy_altitude_m) {
                     return 0.0;
                 }
+                // Do not deploy if velocity is zero or negative (descending)
                 if (data.velocity_mps <= 0.0) {
                     return 0.0;
                 }
-                constexpr double g = 9.81;
+
+                constexpr double g = 9.81; // Gravity constant
 
                 double predicted_apogee = data.altitude_m + (data.velocity_mps * data.velocity_mps) / (2.0 * g);
 
                 double error = predicted_apogee - target_apogee_m;
-                double output = kp * error;;
-                if (deployment < 0.0) deployment = 0.0;
-                if (deployment > 1.0) deployment = 1.0;
-                return deployment;
+                double output = kp * error;
+
+                if (output < 0.0) output = 0.0;
+                if (output > 1.0) output = 1.0;
+                return output;
             }
 };
