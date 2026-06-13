@@ -1,53 +1,77 @@
 #include <cstdio>
-#include <cstring>
 #include "board.h"
 #include "usart_pipe.h"
 
 using namespace LBR;
 
 /**
-* @note The idea behind it is:
-*       Fill struct → encode with nanopb → tx_bf bytestream → rs485 → 
-*                     receive tx_buffer → check if get all tx_buffer → rx_buffer 
-*/
+ * @note Loopback test for the USART pipeline with protobuf encoding/decoding.
+ *       Requires PD8 (TX) wired to PD9 (RX) for loopback.
+ *
+ *       Flow: fill PbCmd → pipeline.send() frames + CRC32 → USART TX
+ *             → loopback wire → USART RX → pipeline.receive() validates + decodes → PbCmd
+ */
 
-// Testing USART with nanopb encoding/decoding for Board-To-Board communication.
-uint8_t rxb;
-
-int main(int argc, char** argv)
+int main()
 {
     bsp_init();
     Board board = get_board();
 
-    // Create and fill a PbCmd message
-    PbCmd tx;
-    PbCmd rx;
+    Pipeline pipeline(board.crc);
 
-    // Create a Pipeline instance
-    Pipeline pb;
-
-    // Counter for different packet values
+    PbCmd tx{};
+    PbCmd rx{};
     uint32_t count = 0;
-
-    // Fill the message with test data
-    tx.msg = RocketMessage_init_default;
-    tx.msg.has_header = true;
-    tx.msg.header.device_id = 0x67;
-    tx.msg.header.packet_count = count++;
-    tx.msg.header.timestamp_ms = 0;
-
-    // Send & receive protobuf message over USART
-    pb.send(&tx, board.usart);
-    pb.receive(&rx, board.usart);
-
-    // Print received data to verify correct encoding/decoding
-    printf("Received: device=0x%lx packet=%lu ts=%lu\n",
-           (unsigned long)rx.msg.header.device_id,
-           (unsigned long)rx.msg.header.packet_count,
-           (unsigned long)rx.msg.header.timestamp_ms);
 
     while (1)
     {
+        // Fill all three sub-messages to exercise the full protobuf payload
+        // Hardcoded values for testing for now, but could be replaced with real data later.
+        tx.msg = RocketMessage_init_default;
+
+        tx.msg.has_header = true;
+        tx.msg.header.device_id = 0x01;
+        tx.msg.header.packet_count = count;
+        tx.msg.header.timestamp_ms = count * 10;
+
+        tx.msg.has_imu = true;
+        tx.msg.imu.accel_x = 1.0f;
+        tx.msg.imu.accel_y = 2.0f;
+        tx.msg.imu.accel_z = 9.81f;
+        tx.msg.imu.gyro_x = 0.1f;
+        tx.msg.imu.gyro_y = 0.2f;
+        tx.msg.imu.gyro_z = 0.3f;
+
+        tx.msg.has_baro = true;
+        tx.msg.baro.pressure = 101325.0f;
+        tx.msg.baro.temperature = 25.0f;
+
+        pipeline.send(&tx, board.usart);
+
+        // Wait for all bytes to arrive back via loopback (~22ms at 115200 baud)
+        for (volatile uint32_t i = 0; i < 5000000; i++);
+
+        bool ok = pipeline.receive(&rx, board.usart);
+
+        if (ok)
+        {
+            printf(
+                "[PASS] pkt=%lu dev=0x%lx ts=%lu | ax=%.2f ay=%.2f az=%.2f | "
+                "p=%.1f t=%.1f\r\n",
+                (unsigned long)rx.msg.header.packet_count,
+                (unsigned long)rx.msg.header.device_id,
+                (unsigned long)rx.msg.header.timestamp_ms, rx.msg.imu.accel_x,
+                rx.msg.imu.accel_y, rx.msg.imu.accel_z, rx.msg.baro.pressure,
+                rx.msg.baro.temperature);
+        }
+        else
+        {
+            printf("[FAIL] pkt=%lu\r\n", (unsigned long)count);
+        }
+
+        count++;
+
+        for (volatile uint32_t i = 0; i < 5000000; i++);
     }
 
     return 0;

@@ -1,91 +1,70 @@
 /**
-* @file cmd_msg.h
+* @file usart_pipe.h
 * @author Bex Saw
-* @brief Helper functions for sending and receiving protobuf messages over USART-RS485-USART communication between the Board-To-Board.
-* @version 0.1
+* @brief Framer for board-to-board communication over USART→RS485→USART.
+*        Frame format: [SOF:1][LEN:1][PAYLOAD:N][CRC32:4][EOF:1]
+* @version 0.2
 */
 #pragma once
 
 #include <array>
 #include <cstddef>
 #include <span>
+#include "crc.h"
 #include "pb_cmd.h"
 #include "ring_buffer.h"
 #include "usart.h"
-
-/// TODO: Need to add RS485 (transceiver module) where it taking the bytestream from USART and send it to the Telemetry board's USART.
-
-/**
-* @brief At the @send: It's throw the raw data + struct messages into a buffer encode into a payload and adding data frame of ID, Length, Payload, Checksum. 
-*           Then send the buffer over USART to RS485 to USART of Telemetry board. The data frame should be like this: [ID][Length][Payload][Checksum]
-*        id: 1 byte, length: 1 byte, payload: variable length (up to 128 bytes or more), crc: 1 byte 
-*
-*        At the @recieve: It's recieve the data from the RS485-TO-USART RX. 
-*        Then pass that into a recieve buffer and then they will be statemachine 
-*        abstract over the buffer to validate frame throw in ring buffer and then 
-*        throw in the SX module to bytestream LoRa
-*      
-*/
 
 namespace LBR
 {
 class Pipeline
 {
 public:
+    explicit Pipeline(Crc& crc) : crc(crc)
+    {
+    }
+
     /**
-    * @brief Helper funciton to send a CmdMessage over USART. 
-    * @note Board-To-TelemBoard communication is USART-RS485-USART 
-    *       *RS485 is a bus so it will take the bytestream from USART and send it to the Telemetry board's USART. 
-    *        The Telemetry board will then decode the bytestream to get the original message.
-    * @param msg The command message object to send.
-    * @param usart The USART interface to use for sending the protobuf message.
+    * @brief Sends a protobuf message over USART with framing and CRC.
+    * @param msg Pointer to the PbCmd message to send.
+    * @param usart Reference to the Usart instance.
+    * @return True if the message was sent successfully, false otherwise.
     */
     bool send(const PbCmd* msg, Usart& usart);
 
     /**
-    * @brief Helper function to receive a CmdMessage over USART. 
-    * @note TelemBoard-communication is USART-RS485-USART 
-    *       *RS485 is a bus so it will take the bytestream from USART and send it to the Telemetry board's USART. 
-    *        The Telemetry board will then decode the bytestream to get the original message.
-    * @param msg The command message object to fill with received data.
-    * @param usart The USART interface to use for receiving the protobuf message.
+    * @brief Receives a protobuf message over USART with framing and CRC.
+    * @param msg Pointer to the PbCmd message to receive.
+    * @param usart Reference to the Usart instance.
+    * @return True if a valid message was received, false otherwise.
     */
     bool receive(PbCmd* msg, Usart& usart);
 
 private:
-    static constexpr uint8_t kFrameId{0x67};
+    // Format of the frame: [SOF:1][LEN:1][PAYLOAD:N][CRC32:4][EOF:1]
+    static constexpr uint8_t kSof{0x67};
+    static constexpr uint8_t kEof{0xC0};
     static constexpr size_t kHeaderLen{2};
     static constexpr size_t kCrcLen{4};
-    static constexpr size_t kMaxPayloadLen{255};
+    static constexpr size_t kEofLen{1};
+    static constexpr size_t kBufSize{256};
+    static constexpr size_t kFrameOverhead = kHeaderLen + kCrcLen + kEofLen;
+    static constexpr size_t kMaxPayloadLen = kBufSize - kFrameOverhead;
 
-    // SX module receive buffer at 254 bytes of [ID][Length][Payload][Checksum]
-    RingBuffer<uint8_t, 256> rx_buffer;
-    std::array<uint8_t, 256> tx_buffer;
+    Crc& crc;
+    RingBuffer<uint8_t, kBufSize> rx_buffer;
+    std::array<uint8_t, kBufSize> tx_buffer;
 
-    /// NOTE: RECEIVE HELPERS
     /**
-    * @brief Encode a PbCmd message into the tx_buffer with the frame format [ID][Length][Payload][Checksum].
-    * @param msg The command message object to encode.
-    * @param payload_len The length of the encoded payload (output parameter).
+    * @brief Poll the USART for incoming bytes and push them into the RX ring buffer.
+    * @param usart Reference to the Usart instance to poll.
     */
-    bool encode_payload(const PbCmd* msg, size_t& payload_len);
+    void poll_usart(Usart& usart);
 
     /**
-    * @brief Build the frame header in the tx_buffer with the given payload length.
-    * @param payload_len The length of the encoded payload to include in the frame header.
-    */
-    void build_frame(size_t payload_len);
-
-    /// NOTE: SEND HELPERS
-
-    /**
-    * @brief Polling the USART for incoming data and process it if a complete frame is recieved.
-    */
-    bool poll_usart(Usart& usart);
-
-    /**
-    * @brief Process the received frame in the rx_buffer and decode it into a PbCmd message if valid.
-    * @param msg The command message object to fill with decoded data.
+    * @brief Process the RX buffer to extract and validate a complete frame, then decode the protobuf message.
+    * @param msg Pointer to the PbCmd message to populate with the decoded data.
+    * @return True if a valid frame was processed and decoded, false otherwise.
     */
     bool process_frame(PbCmd* msg);
 };
