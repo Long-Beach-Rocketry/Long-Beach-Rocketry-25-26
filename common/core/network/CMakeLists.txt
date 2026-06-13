@@ -1,5 +1,4 @@
 add_subdirectory(pipeline)
-add_subdirectory(telemetry)
 
 add_library(network INTERFACE)
 target_link_libraries(network INTERFACE 
