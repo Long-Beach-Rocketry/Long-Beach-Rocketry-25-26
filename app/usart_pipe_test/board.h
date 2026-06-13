@@ -6,6 +6,7 @@
 */
 
 #pragma once
+#include "crc.h"
 #include "gpio.h"
 #include "usart.h"
 
@@ -19,6 +20,7 @@ struct Board
     Gpio& rx;
     Gpio& tx;
     // Rs485& rs485; // TODO: Add RS485 control pin if needed
+    Crc& crc;
 };
 
 bool bsp_init();

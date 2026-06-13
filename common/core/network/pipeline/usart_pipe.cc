@@ -1,134 +1,157 @@
 #include "usart_pipe.h"
 
-/// TODO: SIMPLIFY THIS CODE! This is just a rough draft to get the logic down.
-
 namespace LBR
 {
 
-/// SEQUENCE: 1. Encode the CmdMessage into a byte buffer using the encode function of PbCmd.
-///           2. Send the encoded byte buffer over USART to RS485.
-///           3. RS485 will then transmit the byte buffer to the Telemetry board's USART.
 bool Pipeline::send(const PbCmd* msg, Usart& usart)
 {
-    // Check if the message is valid before encoding
     if (msg == nullptr)
-    {
         return false;
-    }
 
-    size_t payload_capacity = tx_buffer.size() - kHeaderLen - kCrcLen;
+    /* Format of the frame: [SOF:1][LEN:1][PAYLOAD:N][CRC32:4][EOF:1] */
 
-    // Messages should not exceed buffer size
-    int payload_len = msg->encode(tx_buffer.data(), tx_buffer.size());
-
-    if (payload_len <= 0 || static_cast<size_t>(payload_len) > payload_capacity)
-    {
+    // Encode protobuf payload after the header slot
+    int payload_len =
+        msg->encode(tx_buffer.data() + kHeaderLen, kMaxPayloadLen);
+    if (payload_len <= 0)
         return false;
-    }
 
-    tx_buffer[0] = kFrameId;
+    // Build header
+    tx_buffer[0] = kSof;
     tx_buffer[1] = static_cast<uint8_t>(payload_len);
 
-    // TODO: compute and append CRC over [ID, Length, Payload]
+    // Compute CRC32 over [SOF][LEN][PAYLOAD]
+    // Note: we do CRC32 b/c the payload is variable length
+    // and we want to avoid copying it into a separate buffer for crc calculation
 
-    size_t final_msg = kHeaderLen + static_cast<size_t>(payload_len) + kCrcLen;
-
-    // Enable RS485 High (Transmit mode)
-
-    // Send! the encoded message over USART to RS485
-    usart.send(std::span<const uint8_t>(tx_buffer.data(), final_msg));
-
-    // TODO: Add RS485 transmission logic here send to Telemetry board's USART.
-
-    // After sending, we can disable RS485 High (Transmit mode) to allow it to receive again.
-
-    return true;
-}
-
-/// SEQUENCE: 1. Receive bytes from RS485 then to UART into rx_buffer until no more data or buffer is full.
-///           2. Once we have data in rx_buffer, we can then process it to SX module so it can be sent over LoRa.
-///           ** At this logic it's only Recieve to Telemetry board's USART. We will add another logic on top of that when sending to SX module or within this function to process it.
-bool Pipeline::receive(PbCmd* msg, Usart& usart)
-{
-    if (msg == nullptr)
+    size_t crc_input_len = kHeaderLen + static_cast<size_t>(payload_len);
+    uint32_t crc_val = 0;
+    if (!crc.compute(std::span<const uint8_t>(tx_buffer.data(), crc_input_len),
+                     crc_val))
     {
         return false;
     }
 
-    // TODO: Add RS485 reception logic here to receive from Telemetry board's USART and fill rx_buffer.
+    // Append CRC32 little-endian after payload
+    size_t crc_offset = crc_input_len;
+    tx_buffer[crc_offset + 0] = static_cast<uint8_t>(crc_val);
+    tx_buffer[crc_offset + 1] = static_cast<uint8_t>(crc_val >> 8);
+    tx_buffer[crc_offset + 2] = static_cast<uint8_t>(crc_val >> 16);
+    tx_buffer[crc_offset + 3] = static_cast<uint8_t>(crc_val >> 24);
 
-    // 1. Pull all available USART bytes into ring buffer
+    // Append EOF
+    tx_buffer[crc_offset + kCrcLen] = kEof;
+
+    size_t frame_len = kFrameOverhead + static_cast<size_t>(payload_len);
+
+    return usart.send(std::span<const uint8_t>(tx_buffer.data(), frame_len));
+}
+
+void Pipeline::poll_usart(Usart& usart)
+{
     uint8_t byte = 0;
 
+    // Poll the USART for new bytes and push them into the RX ring buffer
     while (usart.receive(byte))
     {
-        if (!rx_buffer.push(byte))
-        {
-            // RX ring buffer full
-            return false;
-        }
+        rx_buffer.push(byte);
     }
+}
 
-    // Look for frame ID & drop junk bytes until we find it
-    while (rx_buffer.size() > 0)
+bool Pipeline::process_frame(PbCmd* msg)
+{
+    // Drop bytes before SOF
+    while (!rx_buffer.empty())
     {
         uint8_t candidate = 0;
-
         if (!rx_buffer.peek(0, candidate))
-        {
             return false;
-        }
-
-        if (candidate == kFrameId)
-        {
+        if (candidate == kSof)
             break;
-        }
-
-        // Drop junk byte until frame ID is found
         rx_buffer.pop(candidate);
     }
 
-    // Need header after cleanup
+    // We need at least enough bytes for the header to know the payload length
     if (rx_buffer.size() < kHeaderLen)
+        return false;
+
+    // Peek length byte to determine full frame size before processing
+    uint8_t len_byte = 0;
+    rx_buffer.peek(1, len_byte);
+    size_t payload_len = static_cast<size_t>(len_byte);
+
+    // Reject payloads that would exceed our buffer
+    if (payload_len > kMaxPayloadLen)
     {
+        uint8_t dummy = 0;
+        rx_buffer.pop(dummy);
         return false;
     }
 
-    // We have frame ID, so we can read the payload length
-    uint8_t frame_id = 0;
-    uint8_t payload_len_u8 = 0;
+    // We need the full frame (header + payload + crc + eof) to proceed
+    size_t frame_len = kFrameOverhead + payload_len;
+    if (rx_buffer.size() < frame_len)
+        return false;
 
-    // Peek frame ID and payload length without popping them yet
-    rx_buffer.peek(0, frame_id);
-    rx_buffer.peek(1, payload_len_u8);
-
-    // Validate frame ID
-    if (frame_id != kFrameId)
+    // Peek full frame into a linear buffer for validation and decode
+    std::array<uint8_t, kBufSize> frame{};
+    for (size_t i = 0; i < frame_len; i++)
     {
+        rx_buffer.peek(i, frame[i]);
+    }
+
+    // Validate EOF
+    if (frame[frame_len - 1] != kEof)
+    {
+        for (size_t i = 0; i < frame_len; i++)
+        {
+            uint8_t dummy = 0;
+            rx_buffer.pop(dummy);
+        }
         return false;
     }
 
-    // Calculate total expected frame length (header + payload + CRC)
-    size_t payload_len = static_cast<size_t>(payload_len_u8);
-    size_t full_frame_len = kHeaderLen + payload_len + kCrcLen;
+    // Validate CRC32 over [SOF][LEN][PAYLOAD]
+    size_t crc_offset = kHeaderLen + payload_len;
+    uint32_t received_crc =
+        static_cast<uint32_t>(frame[crc_offset]) |
+        (static_cast<uint32_t>(frame[crc_offset + 1]) << 8) |
+        (static_cast<uint32_t>(frame[crc_offset + 2]) << 16) |
+        (static_cast<uint32_t>(frame[crc_offset + 3]) << 24);
 
-    // Wait until we have recieved the full frame
-    if (rx_buffer.size() < full_frame_len)
+    // Compare the CRC32 in the frame with a freshly computed CRC32 over the header+payload
+    if (!crc.compare(std::span<const uint8_t>(frame.data(), crc_offset),
+                     received_crc))
     {
-        // Not enough data for a full frame yet
+        for (size_t i = 0; i < frame_len; i++)
+        {
+            uint8_t dummy = 0;
+            rx_buffer.pop(dummy);
+        }
         return false;
     }
 
-    // Copy full frame from ring buffer into linear temp buffer
+    // Consume the validated frame from the ring buffer
+    for (size_t i = 0; i < frame_len; i++)
+    {
+        uint8_t dummy = 0;
+        rx_buffer.pop(dummy);
+    }
 
-    // Extract received CRC
-
-    // CRC covers frame id + payload length + payload
-
-    // Calculate CRC of received frame and compare to extracted CRC
-
-    // If CRC matches, send it to SX module for LoRa transmission
-
-    return true;
+    // Decode the message if it's true that we got here with a valid frame
+    return msg->decode(frame.data() + kHeaderLen, payload_len);
 }
+
+bool Pipeline::receive(PbCmd* msg, Usart& usart)
+{
+    if (msg == nullptr)
+        return false;
+
+    // Poll the usart for new bytes from the ring buffer
+    poll_usart(usart);
+
+    // Process the rx buffer to extract and validate a complete frame, then decode the protobuf message
+    return process_frame(msg);
+}
+
 }  // namespace LBR
