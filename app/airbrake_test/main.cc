@@ -1,7 +1,6 @@
-#include "bno055_imu.h"
-#include "bmp390.h"
 #include "airbrake.h"
-
+#include "bmp390.h"
+#include "bno055_imu.h"
 
 Bno055Data data;
 uint8_t chip_id = 0;
@@ -27,19 +26,19 @@ int main(int argc, char* argv[])
 
     Airbrake airbrake(motor);
 
-    while (1) {
-      hw.imu.read_all(data);
-      airbrake.fetchImuData(data);
+    while (1)
+    {
+        hw.imu.read_all(data);
+        airbrake.fetchImuData(data);
 
-      press = hw.bmp390.get_pressure();
-      temp = hw.bmp390.get_temperature();
-      
-      airbrake.fetchPressData(press);
-      airbrake.fetchTempData(temp);
+        press = hw.bmp390.get_pressure();
+        temp = hw.bmp390.get_temperature();
 
-      airbrake.update();
+        airbrake.fetchPressData(press);
+        airbrake.fetchTempData(temp);
 
-    }  
+        airbrake.update();
+    }
 
-  return 0;
+    return 0;
 }
