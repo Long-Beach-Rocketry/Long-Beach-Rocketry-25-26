@@ -48,7 +48,8 @@ void AirBrake::update()
    * LAUNCH_SIGNAL
    */
 
-    float altitude = calcAltitude(init_temperature, init_pressure, pressure) - base_altitude;
+    float altitude =
+        calcAltitude(init_temperature, init_pressure, pressure) - base_altitude;
     float time;          // temp placeholder for time from start
     bool launch_signal;  // temp placeholder
 
