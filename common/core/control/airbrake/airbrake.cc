@@ -1,6 +1,7 @@
 #include "airbrake.h"
 #include <cstdint>
 #include "airbrake_constants.h"
+#include "airbrake_utils.h"
 
 namespace LBR
 {
@@ -47,7 +48,7 @@ void AirBrake::update()
    * LAUNCH_SIGNAL
    */
 
-    float altitude = calcAltitude() - base_altitude;
+    float altitude = calcAltitude(init_temperature, init_pressure, pressure) - base_altitude;
     float time;          // temp placeholder for time from start
     bool launch_signal;  // temp placeholder
 

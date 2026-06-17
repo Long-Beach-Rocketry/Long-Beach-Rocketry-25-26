@@ -78,10 +78,11 @@ public:
 
 private:
     AirbrakeState state = AirbrakeState::PRELAUNCH;
-    float pressure, temperature, base_altitude;
+
+    // It appears that temperature is not used (yet).
+    float init_pressure, pressure, init_temperature, temperature, base_altitude;
     ServoMotor motor;
     LBR::Bno055Data imu;
-    // Motor& ;
 };
 
 }  // namespace LBR
