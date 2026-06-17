@@ -22,12 +22,21 @@ float calc_velocity(float v0, float aZ, float time)
     return v0 + aZ * time;
 }
 
-bool monitor_imu(void)
+bool monitor_imu(Bno055& bno055)
 {
-    return true;
+    // I just copied paste from the imu test
+    uint8_t chip_id = 0;
+    Bno055::Mode opr_mode = Bno055::Mode::CONFIG;
+    uint8_t sys_status = 0;
+    uint8_t self_test = 0;
+    uint8_t sys_error = 0;
+
+    return bno055.get_chip_id(chip_id) && bno055.get_opr_mode(opr_mode) &&
+           bno055.get_sys_status(sys_status) && bno055.run_post(self_test) &&
+           bno055.get_sys_error(sys_error);
 }
 
-bool monitor_baro(void)
+bool monitor_baro(Bmp390& bmp390)
 {
     return true;
 }

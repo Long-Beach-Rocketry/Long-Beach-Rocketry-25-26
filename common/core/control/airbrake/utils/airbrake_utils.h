@@ -4,6 +4,10 @@
  * @author Joseph Chang
 */
 
+#pragma once
+#include "bmp390.h"
+#include "bno055_imu.h"
+
 /**
  * @brief Helper function to convert Celsius temperature to Kelvins
  * @param temp The temperature in Celsius to convert
@@ -42,11 +46,15 @@ float calc_altitude(float init_temp, float init_press, float curr_press);
 float calc_velocity(float v0, float aZ, float time);
 
 /**
- * @brief "we might just do a helper function that just check the sensor health at the start and send back to us thru uart debug header or serial comm maybe"
+* @brief Helper function to check the imu sensor health at start of main
+ * @param bno055 The imu sensor used
+ * @return True if successful and healthy, False otherwise
  */
-bool monitor_imu(void);
+bool monitor_imu(Bno055& bno055);
 
 /**
- * @brief "we might just do a helper function that just check the sensor health at the start and send back to us thru uart debug header or serial comm maybe"
+ * @brief Helper function to check the barometer sensor health at start of main
+ * @param bmp390 The barometer sensor used
+ * @return True if successful and healthy, False otherwise
  */
-bool monitor_baro(void);
+bool monitor_baro(Bmp390& bmp390);

@@ -1,14 +1,9 @@
 #include "airbrake.h"
+#include "airbrake_utils.h"
 #include "bmp390.h"
 #include "bno055_imu.h"
 
 Bno055Data data;
-uint8_t chip_id = 0;
-Bno055::Mode opr_mode = Bno055::Mode::CONFIG;
-uint8_t sys_status = 0;
-uint8_t self_test = 0;
-uint8_t sys_error = 0;
-
 float press, temp;
 
 int main(int argc, char* argv[])
@@ -16,11 +11,9 @@ int main(int argc, char* argv[])
     bsp_init();
     Board hw = get_board();
 
-    hw.imu.get_chip_id(chip_id);
-    hw.imu.get_opr_mode(opr_mode);
-    hw.imu.get_sys_status(sys_status);
-    hw.imu.run_post(self_test);
-    hw.imu.get_sys_error(sys_error);
+    // should probably pass this in the airbrake ye?
+    monitor_imu(hw.imu);
+    monitor_imu(hw.bmp390);
 
     press = hw.bmp390.get_pressure();
 
