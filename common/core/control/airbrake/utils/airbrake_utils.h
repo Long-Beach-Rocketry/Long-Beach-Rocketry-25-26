@@ -9,7 +9,7 @@
  * @param temp The temperature in Celsius to convert
  * @return The same temperature but in Kelvin units
  */
-inline float celsiusToKelvin(float temp);
+inline float celsius_to_kelvin(float temp);
 
 /**
  * @brief Helper function to calculate altitude from barometer information
@@ -28,7 +28,7 @@ inline float celsiusToKelvin(float temp);
  * @param curr_press The current pressure reading by the barometer
  * @return The calculated altitude in meters
  */
-float calcAltitude(float init_temp, float init_press, float curr_press);
+float calc_altitude(float init_temp, float init_press, float curr_press);
 
 /**
  * @brief Helper function that calculates the current velocity
@@ -39,4 +39,14 @@ float calcAltitude(float init_temp, float init_press, float curr_press);
  * @param time Time from last reading
  * @return The current velocity of the rocket
  */
-float calcVelocity(float v0, float aZ, float time);
+float calc_velocity(float v0, float aZ, float time);
+
+/**
+ * @brief "we might just do a helper function that just check the sensor health at the start and send back to us thru uart debug header or serial comm maybe"
+ */
+bool monitor_imu(void);
+
+/**
+ * @brief "we might just do a helper function that just check the sensor health at the start and send back to us thru uart debug header or serial comm maybe"
+ */
+bool monitor_baro(void);
