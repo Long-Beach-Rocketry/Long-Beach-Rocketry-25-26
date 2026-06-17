@@ -1,31 +1,57 @@
 syntax = "proto3";
 
-message Header {
-    uint32 device_id = 1;     
-    uint32 packet_count = 2;        
-    uint32 timestamp_ms = 3;     
+// mock enums — update when airbrake FSW is finalized
+enum FswStatus {
+    FSW_STATUS_UNKNOWN = 0;
+    FSW_STATUS_IDLE    = 1;
+    FSW_STATUS_ACTIVE  = 2;
+}
+
+enum RocketState {
+    ROCKET_STATE_UNKNOWN        = 0;
+    ROCKET_STATE_IDLE           = 1;
+    ROCKET_STATE_POWERED_FLIGHT = 2;
+    ROCKET_STATE_COAST          = 3;
+    ROCKET_STATE_APOGEE         = 4;
+    ROCKET_STATE_DESCENT        = 5;
+    ROCKET_STATE_LANDED         = 6;
+}
+
+enum AirbrakeStatus {
+    AIRBRAKE_STATUS_UNKNOWN   = 0;
+    AIRBRAKE_STATUS_RETRACTED = 1;
+    AIRBRAKE_STATUS_DEPLOYED  = 2;
+}
+
+message StatusData {
+    FswStatus      fsw_status      = 1;
+    RocketState    rocket_state    = 2;
+    AirbrakeStatus airbrake_status = 3;
 }
 
 message IMUData {
-    float accel_x = 1;
-    float accel_y = 2;
-    float accel_z = 3;
-    float gyro_x = 4;
-    float gyro_y = 5;
-    float gyro_z = 6;
-    float quat_w = 7;
-    float quat_x = 8;
-    float quat_y = 9;
-    float quat_z = 10;
+    float accel_x        = 1;
+    float accel_y        = 2;
+    float accel_z        = 3;
+    float gyro_x         = 4;
+    float gyro_y         = 5;
+    float gyro_z         = 6;
+    float quat_x         = 7;
+    float quat_y         = 8;
+    float quat_z         = 9;
+    float linear_accel_x = 10;
+    float linear_accel_y = 11;
+    float linear_accel_z = 12;
 }
 
 message BaroData {
-    float pressure = 1;
-    float temperature = 2;
+    float air_pressure = 1;  // Pascals
+    float altitude     = 2;  // Meters
 }
 
 message RocketMessage {
-    Header header = 1;   
-    IMUData imu = 2;          
-    BaroData baro = 3;       
+    StatusData status       = 1;
+    IMUData    imu          = 2;
+    BaroData   baro         = 3;
+    uint32     timestamp_us = 4;
 }

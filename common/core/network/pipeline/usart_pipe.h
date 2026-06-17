@@ -2,8 +2,8 @@
 * @file usart_pipe.h
 * @author Bex Saw
 * @brief Framer for board-to-board communication over USART→RS485→USART.
-*        Frame format: [SOF:1][LEN:1][PAYLOAD:N][CRC32:4][EOF:1]
-* @version 0.2
+*        Frame format: [SOF:4][LEN:1][PAYLOAD:N][CRC32:4][EOF:4]
+* @version 0.3
 */
 #pragma once
 
@@ -41,12 +41,13 @@ public:
     bool receive(PbCmd* msg, Usart& usart);
 
 private:
-    // Format of the frame: [SOF:1][LEN:1][PAYLOAD:N][CRC32:4][EOF:1]
-    static constexpr uint8_t kSof{0x67};
-    static constexpr uint8_t kEof{0xC0};
-    static constexpr size_t kHeaderLen{2};
+    // Format of the frame: [SOF:4][LEN:1][PAYLOAD:N][CRC32:4][EOF:4]
+    static constexpr uint32_t kSof{0xAB6B0BAA};
+    static constexpr uint32_t kEof{0x67676767};
+    static constexpr size_t kSofLen{4};
+    static constexpr size_t kHeaderLen{kSofLen + 1};  // SOF + LEN byte
     static constexpr size_t kCrcLen{4};
-    static constexpr size_t kEofLen{1};
+    static constexpr size_t kEofLen{4};
     static constexpr size_t kBufSize{256};
     static constexpr size_t kFrameOverhead = kHeaderLen + kCrcLen + kEofLen;
     static constexpr size_t kMaxPayloadLen = kBufSize - kFrameOverhead;

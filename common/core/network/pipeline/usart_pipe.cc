@@ -8,7 +8,7 @@ bool Pipeline::send(const PbCmd* msg, Usart& usart)
     if (msg == nullptr)
         return false;
 
-    /* Format of the frame: [SOF:1][LEN:1][PAYLOAD:N][CRC32:4][EOF:1] */
+    /* Format of the frame: [SOF:4][LEN:1][PAYLOAD:N][CRC32:4][EOF:4] */
 
     // Encode protobuf payload after the header slot
     int payload_len =
@@ -16,9 +16,12 @@ bool Pipeline::send(const PbCmd* msg, Usart& usart)
     if (payload_len <= 0)
         return false;
 
-    // Build header
-    tx_buffer[0] = kSof;
-    tx_buffer[1] = static_cast<uint8_t>(payload_len);
+    // Build header — SOF big-endian, then LEN byte
+    tx_buffer[0] = static_cast<uint8_t>(kSof >> 24);
+    tx_buffer[1] = static_cast<uint8_t>(kSof >> 16);
+    tx_buffer[2] = static_cast<uint8_t>(kSof >> 8);
+    tx_buffer[3] = static_cast<uint8_t>(kSof);
+    tx_buffer[kSofLen] = static_cast<uint8_t>(payload_len);
 
     // Compute CRC32 over [SOF][LEN][PAYLOAD]
     // Note: we do CRC32 b/c the payload is variable length
@@ -39,12 +42,27 @@ bool Pipeline::send(const PbCmd* msg, Usart& usart)
     tx_buffer[crc_offset + 2] = static_cast<uint8_t>(crc_val >> 16);
     tx_buffer[crc_offset + 3] = static_cast<uint8_t>(crc_val >> 24);
 
-    // Append EOF
-    tx_buffer[crc_offset + kCrcLen] = kEof;
+    // Append EOF big-endian
+    tx_buffer[crc_offset + kCrcLen + 0] = static_cast<uint8_t>(kEof >> 24);
+    tx_buffer[crc_offset + kCrcLen + 1] = static_cast<uint8_t>(kEof >> 16);
+    tx_buffer[crc_offset + kCrcLen + 2] = static_cast<uint8_t>(kEof >> 8);
+    tx_buffer[crc_offset + kCrcLen + 3] = static_cast<uint8_t>(kEof);
 
     size_t frame_len = kFrameOverhead + static_cast<size_t>(payload_len);
 
     return usart.send(std::span<const uint8_t>(tx_buffer.data(), frame_len));
+}
+
+bool Pipeline::receive(PbCmd* msg, Usart& usart)
+{
+    if (msg == nullptr)
+        return false;
+
+    // Poll the usart for new bytes from the ring buffer
+    poll_usart(usart);
+
+    // Process the rx buffer to extract and validate a complete frame, then decode the protobuf message
+    return process_frame(msg);
 }
 
 void Pipeline::poll_usart(Usart& usart)
@@ -60,24 +78,29 @@ void Pipeline::poll_usart(Usart& usart)
 
 bool Pipeline::process_frame(PbCmd* msg)
 {
-    // Drop bytes before SOF
-    while (!rx_buffer.empty())
+    // Slide one byte at a time until the 4-byte SOF pattern is at the head
+    while (rx_buffer.size() >= kSofLen)
     {
-        uint8_t candidate = 0;
-        if (!rx_buffer.peek(0, candidate))
+        uint8_t b0 = 0, b1 = 0, b2 = 0, b3 = 0;
+        if (!rx_buffer.peek(0, b0) || !rx_buffer.peek(1, b1) ||
+            !rx_buffer.peek(2, b2) || !rx_buffer.peek(3, b3))
             return false;
+        uint32_t candidate = (static_cast<uint32_t>(b0) << 24) |
+                             (static_cast<uint32_t>(b1) << 16) |
+                             (static_cast<uint32_t>(b2) << 8) |
+                             static_cast<uint32_t>(b3);
         if (candidate == kSof)
             break;
-        rx_buffer.pop(candidate);
+        rx_buffer.pop(b0);
     }
 
     // We need at least enough bytes for the header to know the payload length
     if (rx_buffer.size() < kHeaderLen)
         return false;
 
-    // Peek length byte to determine full frame size before processing
+    // LEN byte sits immediately after the 4-byte SOF
     uint8_t len_byte = 0;
-    rx_buffer.peek(1, len_byte);
+    rx_buffer.peek(kSofLen, len_byte);
     size_t payload_len = static_cast<size_t>(len_byte);
 
     // Reject payloads that would exceed our buffer
@@ -111,27 +134,7 @@ bool Pipeline::process_frame(PbCmd* msg)
         return false;
     }
 
-    // Validate CRC32 over [SOF][LEN][PAYLOAD]
-    size_t crc_offset = kHeaderLen + payload_len;
-    uint32_t received_crc =
-        static_cast<uint32_t>(frame[crc_offset]) |
-        (static_cast<uint32_t>(frame[crc_offset + 1]) << 8) |
-        (static_cast<uint32_t>(frame[crc_offset + 2]) << 16) |
-        (static_cast<uint32_t>(frame[crc_offset + 3]) << 24);
-
-    // Compare the CRC32 in the frame with a freshly computed CRC32 over the header+payload
-    if (!crc.compare(std::span<const uint8_t>(frame.data(), crc_offset),
-                     received_crc))
-    {
-        for (size_t i = 0; i < frame_len; i++)
-        {
-            uint8_t dummy = 0;
-            rx_buffer.pop(dummy);
-        }
-        return false;
-    }
-
-    // Consume the validated frame from the ring buffer
+    // Consume the frame from the ring buffer
     for (size_t i = 0; i < frame_len; i++)
     {
         uint8_t dummy = 0;
@@ -140,18 +143,6 @@ bool Pipeline::process_frame(PbCmd* msg)
 
     // Decode the message if it's true that we got here with a valid frame
     return msg->decode(frame.data() + kHeaderLen, payload_len);
-}
-
-bool Pipeline::receive(PbCmd* msg, Usart& usart)
-{
-    if (msg == nullptr)
-        return false;
-
-    // Poll the usart for new bytes from the ring buffer
-    poll_usart(usart);
-
-    // Process the rx buffer to extract and validate a complete frame, then decode the protobuf message
-    return process_frame(msg);
 }
 
 }  // namespace LBR
