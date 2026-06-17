@@ -8,7 +8,7 @@
 #pragma once
 
 #include <array>
-#include <cstddef>
+#include <cstdint>
 #include <span>
 #include "crc.h"
 #include "pb_cmd.h"
@@ -44,13 +44,13 @@ private:
     // Format of the frame: [SOF:4][LEN:1][PAYLOAD:N][CRC32:4][EOF:4]
     static constexpr uint32_t kSof{0xAB6B0BAA};
     static constexpr uint32_t kEof{0x67676767};
-    static constexpr size_t kSofLen{4};
-    static constexpr size_t kHeaderLen{kSofLen + 1};  // SOF + LEN byte
-    static constexpr size_t kCrcLen{4};
-    static constexpr size_t kEofLen{4};
-    static constexpr size_t kBufSize{256};
-    static constexpr size_t kFrameOverhead = kHeaderLen + kCrcLen + kEofLen;
-    static constexpr size_t kMaxPayloadLen = kBufSize - kFrameOverhead;
+    static constexpr uint8_t kSofLen{4};
+    static constexpr uint8_t kHeaderLen{kSofLen + 1};  // SOF + LEN byte
+    static constexpr uint8_t kCrcLen{4};
+    static constexpr uint8_t kEofLen{4};
+    static constexpr uint16_t kBufSize{256};
+    static constexpr uint8_t kFrameOverhead = kHeaderLen + kCrcLen + kEofLen;
+    static constexpr uint16_t kMaxPayloadLen = kBufSize - kFrameOverhead;
 
     Crc& crc;
     RingBuffer<uint8_t, kBufSize> rx_buffer;

@@ -27,7 +27,7 @@ bool Pipeline::send(const PbCmd* msg, Usart& usart)
     // Note: we do CRC32 b/c the payload is variable length
     // and we want to avoid copying it into a separate buffer for crc calculation
 
-    size_t crc_input_len = kHeaderLen + static_cast<size_t>(payload_len);
+    uint16_t crc_input_len = kHeaderLen + static_cast<uint16_t>(payload_len);
     uint32_t crc_val = 0;
     if (!crc.compute(std::span<const uint8_t>(tx_buffer.data(), crc_input_len),
                      crc_val))
@@ -36,7 +36,7 @@ bool Pipeline::send(const PbCmd* msg, Usart& usart)
     }
 
     // Append CRC32 little-endian after payload
-    size_t crc_offset = crc_input_len;
+    uint16_t crc_offset = crc_input_len;
     tx_buffer[crc_offset + 0] = static_cast<uint8_t>(crc_val);
     tx_buffer[crc_offset + 1] = static_cast<uint8_t>(crc_val >> 8);
     tx_buffer[crc_offset + 2] = static_cast<uint8_t>(crc_val >> 16);
@@ -48,7 +48,7 @@ bool Pipeline::send(const PbCmd* msg, Usart& usart)
     tx_buffer[crc_offset + kCrcLen + 2] = static_cast<uint8_t>(kEof >> 8);
     tx_buffer[crc_offset + kCrcLen + 3] = static_cast<uint8_t>(kEof);
 
-    size_t frame_len = kFrameOverhead + static_cast<size_t>(payload_len);
+    uint16_t frame_len = kFrameOverhead + static_cast<uint16_t>(payload_len);
 
     return usart.send(std::span<const uint8_t>(tx_buffer.data(), frame_len));
 }
@@ -101,7 +101,7 @@ bool Pipeline::process_frame(PbCmd* msg)
     // LEN byte sits immediately after the 4-byte SOF
     uint8_t len_byte = 0;
     rx_buffer.peek(kSofLen, len_byte);
-    size_t payload_len = static_cast<size_t>(len_byte);
+    uint8_t payload_len = len_byte;
 
     // Reject payloads that would exceed our buffer
     if (payload_len > kMaxPayloadLen)
@@ -112,21 +112,26 @@ bool Pipeline::process_frame(PbCmd* msg)
     }
 
     // We need the full frame (header + payload + crc + eof) to proceed
-    size_t frame_len = kFrameOverhead + payload_len;
+    uint16_t frame_len = kFrameOverhead + payload_len;
     if (rx_buffer.size() < frame_len)
         return false;
 
     // Peek full frame into a linear buffer for validation and decode
     std::array<uint8_t, kBufSize> frame{};
-    for (size_t i = 0; i < frame_len; i++)
+    for (uint16_t i = 0; i < frame_len; i++)
     {
         rx_buffer.peek(i, frame[i]);
     }
 
-    // Validate EOF
-    if (frame[frame_len - 1] != kEof)
+    // Validate EOF (big-endian, last 4 bytes of frame)
+    uint32_t eof_candidate =
+        (static_cast<uint32_t>(frame[frame_len - 4]) << 24) |
+        (static_cast<uint32_t>(frame[frame_len - 3]) << 16) |
+        (static_cast<uint32_t>(frame[frame_len - 2]) << 8) |
+        static_cast<uint32_t>(frame[frame_len - 1]);
+    if (eof_candidate != kEof)
     {
-        for (size_t i = 0; i < frame_len; i++)
+        for (uint16_t i = 0; i < frame_len; i++)
         {
             uint8_t dummy = 0;
             rx_buffer.pop(dummy);
@@ -135,7 +140,7 @@ bool Pipeline::process_frame(PbCmd* msg)
     }
 
     // Consume the frame from the ring buffer
-    for (size_t i = 0; i < frame_len; i++)
+    for (uint16_t i = 0; i < frame_len; i++)
     {
         uint8_t dummy = 0;
         rx_buffer.pop(dummy);
