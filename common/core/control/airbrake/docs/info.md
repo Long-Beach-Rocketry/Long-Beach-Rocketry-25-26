@@ -22,3 +22,6 @@
  - Use time to hardcode transition states and servo motor angles if sensors fail?
 **NOTE** : Trust IMU for direction, Baro for height
  
+ --- 
+ 
+In summary airbrake logic + telemetry (sending data to telemetry board logic -- comprise of monitor_imu, monitor_baro, STATE of airbrake, STATE of etc...) into one single cli

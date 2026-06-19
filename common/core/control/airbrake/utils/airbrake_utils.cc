@@ -31,12 +31,20 @@ bool monitor_imu(Bno055& bno055)
     uint8_t self_test = 0;
     uint8_t sys_error = 0;
 
-    return bno055.get_chip_id(chip_id) && bno055.get_opr_mode(opr_mode) &&
-           bno055.get_sys_status(sys_status) && bno055.run_post(self_test) &&
-           bno055.get_sys_error(sys_error);
+    return (bno055.get_chip_id(chip_id) && bno055.get_opr_mode(opr_mode) &&
+            bno055.get_sys_status(sys_status) && bno055.run_post(self_test) &&
+            bno055.get_sys_error(sys_error));
 }
 
 bool monitor_baro(Bmp390& bmp390)
 {
     return true;
+}
+
+void foo()
+{
+}
+
+void sensor_health()
+{
 }

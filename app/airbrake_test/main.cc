@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
 
     // should probably pass this in the airbrake ye?
     monitor_imu(hw.imu);
-    monitor_imu(hw.bmp390);
+    monitor_baro(hw.bmp390);
 
     press = hw.bmp390.get_pressure();
 
@@ -22,13 +22,13 @@ int main(int argc, char* argv[])
     while (1)
     {
         hw.imu.read_all(data);
-        airbrake.fetchImuData(data);
+        airbrake.fetch_imu(data);
 
         press = hw.bmp390.get_pressure();
         temp = hw.bmp390.get_temperature();
 
-        airbrake.fetchPressData(press);
-        airbrake.fetchTempData(temp);
+        airbrake.fetch_press(press);
+        airbrake.fetch_temp(temp);
 
         airbrake.update();
     }

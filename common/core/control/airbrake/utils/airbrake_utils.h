@@ -58,3 +58,19 @@ bool monitor_imu(Bno055& bno055);
  * @return True if successful and healthy, False otherwise
  */
 bool monitor_baro(Bmp390& bmp390);
+
+/**
+ * @brief to handle the telemetry, we should implement a helper function in utils
+ * to dynamically calculate both the sea-level baseline altitude and real-time
+ * altitude changes.
+ * @param
+ * @return
+ */
+void foo();
+
+/**
+ * @brief we should log the temperature data to send back to the ground station 
+ * @param
+ * @return
+ */
+void sensor_health();

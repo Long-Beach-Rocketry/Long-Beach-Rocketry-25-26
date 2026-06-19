@@ -43,31 +43,26 @@ public:
      * @param void
      * @return AirBrakeState
      */
-    AirbrakeState getState(void) const;
+    AirbrakeState get_state(void) const;
 
     /**
      * @brief Simple setter that extracts needed info from the imu
      * @param Bno055Data 
      * @return None
      */
-    void fetchImuData(const LBR::Bno055Data& data);
+    void fetch_imu(const LBR::Bno055Data& data);
 
     /**
-     * @brief Simple setter for pressure data (hPA)
+     * @brief Simple setter extracts info from the barometer.
+     * Pressure data (hPA) and temperature data (Celsius).
      * @param float
      * @return None
      */
-    void fetchPressData(const float data);
+    void fetch_baro(const Bmp390& bmp390);
 
     /**
-     * @brief Simple setter for temperature data (Celsius)
-     * @param float
-     * @return None
-     */
-    void fetchTempData(const float data);
-
-    /**
-     * @brief Updates the state machine of the airbrake based on current state, velocity, and * altitude. Drives the servo motor to deploy and retract airbrakes. 
+     * @brief Updates the state machine of the airbrake based on current state, velocity,
+     * and altitude. Drives the servo motor to deploy and retract airbrakes. 
      * 
      * Velocity and altitude will be derived from the pressure, temperature, and imu data.
      * 

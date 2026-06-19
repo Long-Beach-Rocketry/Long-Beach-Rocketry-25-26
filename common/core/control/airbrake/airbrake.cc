@@ -20,24 +20,20 @@ bool AirBrake::init()
     return true;
 }
 
-AirbrakeState AirBrake::getState() const
+AirbrakeState AirBrake::get_state() const
 {
     return state;
 }
 
-void AirBrake::fetchImuData(const LBR::Bno055Data& data)
+void AirBrake::fetch_imu(const LBR::Bno055Data& data)
 {
     imu = data;
 }
 
-void AirBrake::fetchPressData(const float data)
+void AirBrake::fetch_baro(const LBR::Bmp390& bmp390)
 {
-    pressure = data;
-}
-
-void AirBrake::fetchTempData(const float data)
-{
-    temperature = data;
+    pressure = bmp390.get_pressure();
+    temperature = bmp390.get_temperature();
 }
 
 void AirBrake::update()
