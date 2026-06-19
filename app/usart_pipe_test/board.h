@@ -9,8 +9,9 @@
 #include "crc.h"
 #include "gpio.h"
 #include "usart.h"
+#include "usart_pipe.h"
 
-extern uint8_t rxb;
+inline uint8_t rxb = 0;
 
 namespace LBR
 {
@@ -21,8 +22,12 @@ struct Board
     Gpio& tx;
     // Rs485& rs485; // TODO: Add RS485 control pin if needed
     Crc& crc;
+    Pipeline& pipeline;
 };
 
 bool bsp_init();
 Board& get_board();
+
+// For testing purpose (remove when it's work)
+uint32_t get_us();
 }  // namespace LBR

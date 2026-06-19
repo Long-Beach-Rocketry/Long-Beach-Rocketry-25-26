@@ -9,5 +9,6 @@ target_include_directories(usart_pipe_test_bsp PUBLIC
 
 target_link_libraries(usart_pipe_test_bsp
     PUBLIC
-        driver
+    driver
+    pipeline
 )
