@@ -1,19 +1,17 @@
 {
     "description": "Airbrake configuration for SITL testing",
     "simulation_parameters": {
-        "time_step": 0.1,
-        "max_simulation_time": 120
+        "time_step": 1.0,
+        "max_simulation_time": 600.0
     },
     "variables": {
         "altitude_m": 0.0,
-        "velocity_mps": 250.0,
-        "acceleration_mps2": -9.81,
-        "airbrake_deployment": 0.0
+        "velocity_mps": 150.0,
+        "acceleration_mps2": -9.81
     },
-    "test_variables": {
-        "target_apogee_m": 3000.0,
-        "deploy_altitude_m": 800.0,
-        "kp": 0.001
+    "airbrake": {
+        "enabled": true,
+        "deploy_time_s": 6.0,
+        "retract_time_s": 20.0
     }
-
 }
