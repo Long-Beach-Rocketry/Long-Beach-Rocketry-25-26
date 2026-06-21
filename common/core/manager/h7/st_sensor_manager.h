@@ -16,10 +16,16 @@ namespace Stmh7
  * @brief Sensors that can be passed in managed by the Sensor Manager.
  * Ptr's because they may be optional or not exist.
  */
-struct StSensorMgrParams
+struct StSensorMgrSensors
 {
     Bno055* const bno055;
     Bmp390* const bmp390;
+};
+
+struct StSensorMgrParams
+{
+    // TODO: timebase
+    StSensorMgrSensors sensors;
 };
 
 class HwSensorMgr : public SensorMgr
@@ -47,7 +53,8 @@ public:
 
 private:
     SensorData data;
-    StSensorMgrParams sensors;
+    StSensorMgrSensors sensors;
+    // TODO: timer obj?
 };
 
 }  // namespace Stmh7

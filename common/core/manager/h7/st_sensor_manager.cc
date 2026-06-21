@@ -11,7 +11,8 @@ namespace LBR
 namespace Stmh7
 {
 
-HwSensorMgr::HwSensorMgr(const StSensorMgrParams& params_) : sensors{params_}
+// TODO: set timer obj
+HwSensorMgr::HwSensorMgr(const StSensorMgrParams& params_) : sensors{params_.sensors}
 {
 }
 
