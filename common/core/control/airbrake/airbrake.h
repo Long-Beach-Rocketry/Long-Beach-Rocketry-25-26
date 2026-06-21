@@ -10,6 +10,7 @@
 #include "bno055_imu.h"
 // #include "imu_math.h"
 // #include "kalman.h"
+#include "sensor_data.h"
 #include "servo_motor"
 
 namespace LBR
@@ -36,29 +37,12 @@ class AirBrake
 public:
     AirBrake(AirbrakeParams);
 
-    bool init();
-
     /**
      * @brief Returns the current state of the airbrake
      * @param void
      * @return AirBrakeState
      */
     AirbrakeState get_state(void) const;
-
-    /**
-     * @brief Simple setter that extracts needed info from the imu
-     * @param Bno055Data 
-     * @return None
-     */
-    void fetch_imu(const LBR::Bno055Data& data);
-
-    /**
-     * @brief Simple setter extracts info from the barometer.
-     * Pressure data (hPA) and temperature data (Celsius).
-     * @param float
-     * @return None
-     */
-    void fetch_baro(const Bmp390& bmp390);
 
     /**
      * @brief Updates the state machine of the airbrake based on current state, velocity,
@@ -69,13 +53,12 @@ public:
      * @param void
      * @return None
      */
-    void update(void);
+    void update(SensorData data);
 
 private:
     AirbrakeState state = AirbrakeState::PRELAUNCH;
 
-    // It appears that temperature is not used (yet).
-    float init_pressure, pressure, init_temperature, temperature, base_altitude;
+    float init_pressure, pressure, base_altitude;
     ServoMotor motor;
     LBR::Bno055Data imu;
 };

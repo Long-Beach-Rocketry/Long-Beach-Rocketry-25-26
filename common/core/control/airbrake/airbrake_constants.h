@@ -12,6 +12,7 @@ namespace LBR
 namespace AirbrakeConstants
 {
 
+constexpr float kSeaLevelTemp{288.15};  // Kelvin
 constexpr float kTempLapseRate{.0065};  // Kelvin / meters
 constexpr float kGravity{9.80655};      // meters / sec ^ 2
 constexpr float kAirMolarMass{.0289};   // kg / mol

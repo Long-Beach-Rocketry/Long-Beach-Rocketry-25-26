@@ -19,7 +19,7 @@ inline float celsius_to_kelvin(float temp);
  * @brief Helper function to calculate altitude from barometer information
  * @note Using the following formula:
  * altitude  = T_0 / L * [1 - (P / P_0)^(R * L / g / M)]
- * where T_0 = Initial temperature (celsius)
+ * where T_0 = Sea-level temperature (K)
  *       L   = ISA Temperature Lapse Rate (K / m)
  *       P   = pressure (hPa)
  *       P_0 = Initial pressure (hPa)
@@ -27,7 +27,6 @@ inline float celsius_to_kelvin(float temp);
  *       g   = gravity acceleration constant (m / s^2)
  *       M   = Molar mass for dry air (kg / mol)
  *       
- * @param init_temp The initial temperature read by the barometer (in celsius)
  * @param init_press The initial pressure read by the barometer
  * @param curr_press The current pressure reading by the barometer
  * @return The calculated altitude in meters

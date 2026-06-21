@@ -22,7 +22,7 @@ struct StSensorMgrParams
     Bmp390* const bmp390;
 };
 
-class HwSensorMgr : SensorMgr
+class HwSensorMgr : public SensorMgr
 {
 public:
     /**

@@ -11,41 +11,20 @@ AirBrake::AirBrake(AirbrakeParams params_)
 {
 }
 
-bool AirBrake::init()
-{
-    /**
-   * Maybe we could use the barometer to calculate altitude to set base_altitude.
-   * 
-   */
-    return true;
-}
-
 AirbrakeState AirBrake::get_state() const
 {
     return state;
 }
 
-void AirBrake::fetch_imu(const LBR::Bno055Data& data)
-{
-    imu = data;
-}
-
-void AirBrake::fetch_baro(const LBR::Bmp390& bmp390)
-{
-    pressure = bmp390.get_pressure();
-    temperature = bmp390.get_temperature();
-}
-
-void AirBrake::update()
+void AirBrake::update(SensorData data)
 {
     /**
-   * INPUT FOR :
-   * TARGET_TELEM
-   * LAUNCH_SIGNAL
-   */
+     * INPUT FOR :
+     * TARGET_TELEM
+     * LAUNCH_SIGNAL
+     */
 
-    float altitude = calc_altitude(init_temperature, init_pressure, pressure) -
-                     base_altitude;
+    float altitude = calc_altitude(init_pressure, pressure) - base_altitude;
     float time;          // temp placeholder for time from start
     bool launch_signal;  // temp placeholder
 
@@ -68,6 +47,11 @@ void AirBrake::update()
             if (launch_signal)
             {
                 state = AirbrakeState::LAUNCHED;
+            }
+            else
+            {
+                init_pressure = data.pressure;
+                base_altitude = calc_altitude();
             }
             break;
 
