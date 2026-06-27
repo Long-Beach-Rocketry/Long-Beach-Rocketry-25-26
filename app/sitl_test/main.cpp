@@ -52,7 +52,7 @@ class SITL : public AirbrakeApp {
         void run() {
             AirbrakeApp::init();
             // Run until rocket reaches ground or timeout occurs
-            while (altitude_m >= 0.0 && time_s <= max_simulation_time) {
+            while (time_s <= max_simulation_time) {
                 SensorData data{
                     time_s, altitude_m, velocity_mps, acceleration_mps2
                 };
@@ -73,12 +73,24 @@ class SITL : public AirbrakeApp {
 
                 double recovery_drag_accel = 0.0;
                 if (recovery.deployment && velocity_mps < 0.0) {
-                    recovery_drag_accel = 60.0; // Simplified drag effect of recovery system when descending
+                    recovery_drag_accel = 8.0; // Simplified drag effect of recovery system when descending
                 }
                 acceleration_mps2 = -9.81 + airbrake_drag_accel + recovery_drag_accel;
                 velocity_mps += acceleration_mps2 * time_step_s;
                 altitude_m += velocity_mps * time_step_s;
                 time_s += time_step_s;
+
+                if (altitude_m <= 0.0 && time_s > 0.0) {
+                    altitude_m = 0.0;
+                    velocity_mps = 0.0;
+                    acceleration_mps2 = 0.0;
+
+                    SensorData final_data{
+                        time_s, altitude_m, velocity_mps, acceleration_mps2
+                    };
+                    AirbrakeApp::update(final_data);
+                    break; // Rocket has landed
+                }
             }
             cout << "Simulation ended at time: " << time_s << " seconds." << endl;
         }

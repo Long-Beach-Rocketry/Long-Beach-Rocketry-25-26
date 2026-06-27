@@ -1,6 +1,6 @@
 #pragma once
 
-// Sensor data which'll be used in every application (airbrake, camera, telemtry)
+// Sensor data which'll be used in every application (airbrake, camera, telemetry)
 struct SensorData
 {
     double time_s;

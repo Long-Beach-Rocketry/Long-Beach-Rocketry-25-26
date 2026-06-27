@@ -95,6 +95,11 @@ public:
                 {
                     rocket_state = RocketState::BRAKES_DEPLOYING;
                 }
+                else if (!airbrakes_enabled && data.velocity_mps <= 0.0)
+                {
+                    recovery_command.deployment = true;
+                    rocket_state = RocketState::RECOVERY_POPPED;
+                }
                 break;
             }
             case RocketState::BRAKES_DEPLOYING:
