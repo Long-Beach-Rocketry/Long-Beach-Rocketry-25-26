@@ -3,10 +3,10 @@
 Guide on setting up the project with Docker.
 
 ## Prerequisites
-- WSL 2
+- [WSL 2]((https://learn.microsoft.com/en-us/windows/wsl/install)) and Ubuntu
 - Git (Link your GitHub account)
-- Docker Desktop
-- Visual Studio Code + Dev Containers Extension
+- [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
+- [Visual Studio Code](https://code.visualstudio.com/download?_exp_download=fb315fc982) + Dev Containers Extension
 
 ## Required Project Files
 **`.vscode/settings.json`**
