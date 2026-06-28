@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   gdb-multiarch \
   clang-format \
   clangd \
+  ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
 # Verify installations
@@ -24,8 +25,8 @@ RUN git --version && \
   openocd --version && \
   gdb-multiarch --version && \
   clang-format --version && \
-  clangd --version
-
+  clangd --version && \
+  update-ca-certificates
 
 # Set working directory
 WORKDIR /workspace
