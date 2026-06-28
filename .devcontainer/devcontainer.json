@@ -10,7 +10,8 @@
 	},
 	"runArgs": [
   "--device=/dev/bus/usb",
-  "--device-cgroup-rule=c 189:* rmw"
+  "--device-cgroup-rule=c 189:* rmw",
+	"--device=/dev/ttyACM0"
 	],
 	"mounts": [
 		"source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,readonly",
@@ -43,8 +44,7 @@
 				"ms-vscode.cpptools-extension-pack",
 				"marus25.cortex-debug",
 				"llvm-vs-code-extensions.vscode-clangd",
-				"ms-vscode.cmake-tools",
-				"ms-vscode.vscode-serial-monitor"
+				"ms-vscode.cmake-tools"
 			],
 			"settings": {
 				"C_Cpp.default.cStandard": "c11",

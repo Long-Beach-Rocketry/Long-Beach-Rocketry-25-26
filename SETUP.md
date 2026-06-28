@@ -153,3 +153,9 @@ You can verify WSL has access to the ST-Link by running the command in WSL: `lsu
 Once the usb is shared, you may have to reopen the project container.
 
 Select 'Run and Debug' on the sidebar (left) and select a preset. Click the green play button to begin the debug session.
+
+
+## Serial Monitor
+Want to debug uart? Serial monitor and putty will use Window's COM Ports and we just binded the ST-Link to WSL. To debug and see uart output, run `apt-install get minicom` in your WSL terminal.
+
+Run `ls /dev/tty*` to check which WSL port ST-LINK binded to (usually /dev/ttyACM0 or /dev/ttyUSB0). You can then run `minicom -D <port>` for example: `minicom -D /dev/ttyACM0`.
