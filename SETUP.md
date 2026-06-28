@@ -142,7 +142,7 @@ Builds are by default done in Debug mode, but Release mode can be selected with 
 
 ## Debugging
 First grant usb access to WSL by opening a windows terminal with admin - windows button + `x` and select Terminal (Admin). Run the following commands and take note of the ST-Link Bus ID.
-````
+```
 usbipd list
 usbipd bind --busid <BUSID>
 usbipd attach --wsl --busid <BUSID>
