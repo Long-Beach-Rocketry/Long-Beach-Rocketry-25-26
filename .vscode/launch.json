@@ -1,563 +1,620 @@
 {
-  "version": "0.2.0",
-  "projectName": "proj2",
-  "configurations": [
-    {
-      "cwd": "${workspaceFolder}",
-      "executable": "${workspaceRoot}/build/stm32f746/app/cli_app/cli_app",
-      "name": "DEBUG CLI F7",
-      "request": "launch",
-      "type": "cortex-debug",
-      "servertype": "openocd",
-      "device": "STM32F746",
-      "svdFile": "${workspaceRoot}/mcu_support/stm32/f7xx/f746/STM32F746.svd",
-      "searchDir": [
-        "${workspaceRoot}/mcu_support/stm32"
-      ],
-      "runToMain": true,
-      "configFiles": [
-        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
-        "${workspaceRoot}/mcu_support/stm32/f7xx/stm32f7x.cfg"
-      ],
-      "debuggerArgs": [
-        "-d",
-        "${workspaceRoot}"
-      ],
-      "preRestartCommands": [
-        "add-symbol-file /build/stm32f746/app/cli_app/cli_app",
-        "load",
-        "enable breakpoint",
-        "monitor reset"
-      ],
-      "showDevDebugOutput": true
-    },
-    {
-      "cwd": "${workspaceFolder}",
-      "executable": "${workspaceRoot}/build/stm32l476/app/blink/blink",
-      "name": "DEBUG BLINK L4",
-      "request": "launch",
-      "type": "cortex-debug",
-      "servertype": "openocd",
-      "device": "STM32L4",
-      "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
-      "searchDir": [
-        "${workspaceRoot}/mcu_support/stm32"
-      ],
-      "runToMain": true,
-      "configFiles": [
-        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
-        "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
-      ],
-      "debuggerArgs": [
-        "-d",
-        "${workspaceRoot}"
-      ],
-      "preRestartCommands": [
-        "add-symbol-file build/stm32l476/app/blink/blink",
-        "load",
-        "enable breakpoint",
-        "monitor reset"
-      ],
-      "showDevDebugOutput": true
-    },
-    {
-      "cwd": "${workspaceFolder}",
-      "executable": "${workspaceRoot}/build/stm32l476/app/spi_test/spi_test",
-      "name": "DEBUG SPI TEST",
-      "request": "launch",
-      "type": "cortex-debug",
-      "servertype": "openocd",
-      "device": "STM32L4",
-      "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
-      "searchDir": [
-        "${workspaceRoot}/mcu_support/stm32"
-      ],
-      "runToMain": true,
-      "configFiles": [
-        "stlink-dap.cfg",
-        "l4xx/stm32l4x.cfg"
-      ],
-      "debuggerArgs": [
-        "-d",
-        "${workspaceRoot}"
-      ],
-      "preRestartCommands": [
-        "add-symbol-file build/stm32l476/app/spi_test/spi_test",
-        "load",
-        "enable breakpoint",
-        "monitor reset"
-      ],
-      "showDevDebugOutput": true
-    },
-    {
-      "cwd": "${workspaceFolder}",
-      "executable": "${workspaceRoot}/build/stm32l476/app/i2c_test/i2c_test",
-      "name": "DEBUG I2C L4",
-      "request": "launch",
-      "type": "cortex-debug",
-      "servertype": "openocd",
-      "device": "STM32L4",
-      "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
-      "searchDir": [
-        "${workspaceRoot}/mcu_support/stm32"
-      ],
-      "runToMain": true,
-      "configFiles": [
-        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
-        "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
-      ],
-      "debuggerArgs": [
-        "-d",
-        "${workspaceRoot}"
-      ],
-      "preRestartCommands": [
-        "add-symbol-file build/stm32l476/app/i2c_test/i2c_test",
-        "load",
-        "enable breakpoint",
-        "monitor reset"
-      ],
-      "showDevDebugOutput": true
-    },
-    {
-      "cwd": "${workspaceFolder}",
-      "executable": "${workspaceRoot}/build/stm32l476/app/imu_test/imu_test",
-      "name": "DEBUG IMU BNO055",
-      "request": "launch",
-      "type": "cortex-debug",
-      "servertype": "openocd",
-      "device": "STM32L4",
-      "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
-      "searchDir": [
-        "${workspaceRoot}/mcu_support/stm32"
-      ],
-      "runToMain": true,
-      "configFiles": [
-        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
-        "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
-      ],
-      "debuggerArgs": [
-        "-d",
-        "${workspaceRoot}"
-      ],
-      "preRestartCommands": [
-        "add-symbol-file build/stm32l476/app/imu_test/imu_test",
-        "load",
-        "enable breakpoint",
-        "monitor reset"
-      ],
-      "showDevDebugOutput": true,
-      "liveWatch": {
-        "enabled": true
-      }
-    },
-    {
-      "cwd": "${workspaceFolder}",
-      "executable": "${workspaceRoot}/build/stm32l476/app/pwm_test/pwm_test",
-      "name": "DEBUG PWM L4",
-      "request": "launch",
-      "type": "cortex-debug",
-      "servertype": "openocd",
-      "device": "STM32L4",
-      "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
-      "searchDir": [
-        "${workspaceRoot}/mcu_support/stm32"
-      ],
-      "runToMain": true,
-      "configFiles": [
-        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
-        "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
-      ],
-      "debuggerArgs": [
-        "-d",
-        "${workspaceRoot}"
-      ],
-      "preRestartCommands": [
-        "add-symbol-file build/stm32l476/app/pwm_test/pwm_test",
-        "load",
-        "enable breakpoint",
-        "monitor reset"
-      ],
-      "showDevDebugOutput": true
-    },
-    {
-      "cwd": "${workspaceFolder}",
-      "executable": "${workspaceRoot}/build/stm32l476/app/bmp390_test/bmp390_test",
-      "name": "DEBUG BMP390 L4",
-      "request": "launch",
-      "type": "cortex-debug",
-      "servertype": "openocd",
-      "device": "STM32L4",
-      "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
-      "searchDir": [
-        "${workspaceRoot}/mcu_support/stm32"
-      ],
-      "runToMain": true,
-      "configFiles": [
-        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
-        "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
-      ],
-      "debuggerArgs": [
-        "-d",
-        "${workspaceRoot}"
-      ],
-      "preRestartCommands": [
-        "add-symbol-file build/stm32l476/app/bmp390_test/bmp390_test",
-        "load",
-        "enable breakpoint",
-        "monitor reset"
-      ],
-      "showDevDebugOutput": true
-    },
-    {
-      "cwd": "${workspaceFolder}",
-      "executable": "${workspaceRoot}/build/stm32l476/app/w25q_test/w25q_test",
-      "name": "DEBUG W25Q TEST",
-      "request": "launch",
-      "type": "cortex-debug",
-      "servertype": "openocd",
-      "device": "STM32L4",
-      "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
-      "searchDir": [
-        "${workspaceRoot}/mcu_support/stm32"
-      ],
-      "runToMain": true,
-      "configFiles": [
-        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
-        "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
-      ],
-      "debuggerArgs": [
-        "-d",
-        "${workspaceRoot}"
-      ],
-      "preRestartCommands": [
-        "add-symbol-file build/stm32l476/app/w25q_test/w25q_test",
-        "load",
-        "enable breakpoint",
-        "monitor reset"
-      ],
-      "showDevDebugOutput": "raw"
-    },
-    {
-      "cwd": "${workspaceFolder}",
-      "executable": "${workspaceRoot}/build/stm32l476/app/usart_app/usart_app",
-      "name": "DEBUG USART L4",
-      "request": "launch",
-      "type": "cortex-debug",
-      "servertype": "openocd",
-      "device": "STM32L4",
-      "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
-      "searchDir": [
-        "${workspaceRoot}/mcu_support/stm32"
-      ],
-      "runToMain": true,
-      "configFiles": [
-        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
-        "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
-      ],
-      "debuggerArgs": [
-        "-d",
-        "${workspaceRoot}"
-      ],
-      "preRestartCommands": [
-        "add-symbol-file build/stm32l476/app/usart_app/uasrt_app",
-        "load",
-        "enable breakpoint",
-        "monitor reset"
-      ],
-      "showDevDebugOutput": true
-    },
-    {
-      "cwd": "${workspaceFolder}",
-      "executable": "${workspaceRoot}/build/stm32h723/app/blink/blink",
-      "name": "DEBUG BLINK H7",
-      "request": "launch",
-      "type": "cortex-debug",
-      "servertype": "openocd",
-      "device": "STM32H7",
-      "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
-      "searchDir": [
-        "${workspaceRoot}/mcu_support/stm32"
-      ],
-      "runToMain": true,
-      "configFiles": [
-        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
-        "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
-      ],
-      "debuggerArgs": [
-        "-d",
-        "${workspaceRoot}"
-      ],
-      "preRestartCommands": [
-        "add-symbol-file build/stm32h723/app/blink/blink",
-        "load",
-        "enable breakpoint",
-        "monitor reset"
-      ],
-      "showDevDebugOutput": true
-    },
-    {
-      "cwd": "${workspaceFolder}",
-      "executable": "${workspaceRoot}/build/stm32h723/app/imu_test/imu_test",
-      "name": "DEBUG IMU H7",
-      "request": "launch",
-      "type": "cortex-debug",
-      "servertype": "openocd",
-      "device": "STM32H7",
-      "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
-      "searchDir": [
-        "${workspaceRoot}/mcu_support/stm32"
-      ],
-      "runToMain": true,
-      "configFiles": [
-        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
-        "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
-      ],
-      "debuggerArgs": [
-        "-d",
-        "${workspaceRoot}"
-      ],
-      "preRestartCommands": [
-        "add-symbol-file build/stm32h723/app/imu_test/imu_test",
-        "load",
-        "enable breakpoint",
-        "monitor reset"
-      ],
-      "showDevDebugOutput": true,
-      "liveWatch": {
-        "enabled": true,
-        "samplesPerSecond": 2
-      }
-    },
-    {
-      "cwd": "${workspaceFolder}",
-      "executable": "${workspaceRoot}/build/stm32h723/app/i2c_test/i2c_test",
-      "name": "DEBUG I2C TEST H7",
-      "request": "launch",
-      "type": "cortex-debug",
-      "servertype": "openocd",
-      "device": "STM32H7",
-      "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
-      "searchDir": [
-        "${workspaceRoot}/mcu_support/stm32"
-      ],
-      "runToMain": true,
-      "configFiles": [
-        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
-        "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
-      ],
-      "debuggerArgs": [
-        "-d",
-        "${workspaceRoot}"
-      ],
-      "preRestartCommands": [
-        "add-symbol-file build/stm32h723/app/i2c_test/i2c_test",
-        "load",
-        "enable breakpoint",
-        "monitor reset"
-      ],
-      "showDevDebugOutput": true
-    },
-    {
-      "cwd": "${workspaceFolder}",
-      "executable": "${workspaceRoot}/build/stm32h723/app/usart_app/usart_app",
-      "name": "DEBUG USART H7",
-      "request": "launch",
-      "type": "cortex-debug",
-      "servertype": "openocd",
-      "device": "STM32H7",
-      "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
-      "searchDir": [
-        "${workspaceRoot}/mcu_support/stm32"
-      ],
-      "runToMain": true,
-      "configFiles": [
-        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
-        "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
-      ],
-      "debuggerArgs": [
-        "-d",
-        "${workspaceRoot}"
-      ],
-      "preRestartCommands": [
-        "add-symbol-file build/stm32h723/app/usart_app/usart_app",
-        "load",
-        "enable breakpoint",
-        "monitor reset"
-      ],
-      "showDevDebugOutput": true
-    },
-    {
-      "cwd": "${workspaceFolder}",
-      "executable": "${workspaceRoot}/build/stm32h723/app/pwm_test/pwm_test",
-      "name": "DEBUG PWM TEST H7",
-      "request": "launch",
-      "type": "cortex-debug",
-      "servertype": "openocd",
-      "device": "STM32H7",
-      "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
-      "searchDir": [
-        "${workspaceRoot}/mcu_support/stm32"
-      ],
-      "runToMain": true,
-      "configFiles": [
-        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
-        "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
-      ],
-      "debuggerArgs": [
-        "-d",
-        "${workspaceRoot}"
-      ],
-      "preRestartCommands": [
-        "add-symbol-file build/stm32h723/app/pwm_test/pwm_test",
-        "load",
-        "enable breakpoint",
-        "monitor reset"
-      ],
-      "showDevDebugOutput": true
-    },
-    {
-      "cwd": "${workspaceFolder}",
-      "executable": "${workspaceRoot}/build/stm32h723/app/spi_test/spi_test",
-      "name": "DEBUG SPI TEST H7",
-      "request": "launch",
-      "type": "cortex-debug",
-      "servertype": "openocd",
-      "device": "STM32H723",
-      "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
-      "searchDir": [
-        "${workspaceRoot}/mcu_support/stm32"
-      ],
-      "runToMain": true,
-      "configFiles": [
-        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
-        "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
-      ],
-      "preRestartCommands": [
-        "add-symbol-file build/stm32h723/app/spi_test/spi_test",
-        "load",
-        "enable breakpoint",
-        "monitor reset"
-      ],
-      "showDevDebugOutput": true
-    },
-    {
-      "cwd": "${workspaceFolder}",
-      "executable": "${workspaceRoot}/build/stm32h723/app/w25q_test/w25q_test",
-      "name": "DEBUG W25Q TEST H7",
-      "request": "launch",
-      "type": "cortex-debug",
-      "servertype": "openocd",
-      "device": "STM32H723",
-      "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
-      "searchDir": [
-        "${workspaceRoot}/mcu_support/stm32"
-      ],
-      "runToMain": true,
-      "configFiles": [
-        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
-        "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
-      ],
-      "debuggerArgs": [
-        "-d",
-        "${workspaceRoot}"
-      ],
-      "preRestartCommands": [
-        "add-symbol-file build/stm32h723/app/w25q_test/w25q_test",
-        "load",
-        "enable breakpoint",
-        "monitor reset"
-      ],
-      "showDevDebugOutput": true
-    },
-    {
-      "cwd": "${workspaceFolder}",
-      "executable": "${workspaceRoot}/build/stm32h723/app/bmp390_test/bmp390_test",
-      "name": "DEBUG BMP390 H7",
-      "request": "launch",
-      "type": "cortex-debug",
-      "servertype": "openocd",
-      "device": "STM32H7",
-      "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
-      "searchDir": [
-        "${workspaceRoot}/mcu_support/stm32"
-      ],
-      "runToMain": true,
-      "configFiles": [
-        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
-        "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
-      ],
-      "debuggerArgs": [
-        "-d",
-        "${workspaceRoot}"
-      ],
-      "preRestartCommands": [
-        "add-symbol-file build/stm32h723/app/bmp390_test/bmp390_test",
-        "load",
-        "enable breakpoint",
-        "monitor reset"
-      ],
-      "showDevDebugOutput": true,
-      "liveWatch": {
-        "enabled": true,
-        "samplesPerSecond": 2
-      }
-    },
-    {
-      "cwd": "${workspaceFolder}",
-      "executable": "${workspaceRoot}/build/stm32h723/app/sysclk_test/sysclk_test",
-      "name": "DEBUG SYSCLK H7",
-      "request": "launch",
-      "type": "cortex-debug",
-      "servertype": "openocd",
-      "device": "STM32H7",
-      "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
-      "searchDir": [
-        "${workspaceRoot}/mcu_support/stm32"
-      ],
-      "runToMain": true,
-      "configFiles": [
-        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
-        "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
-      ],
-      "debuggerArgs": [
-        "-d",
-        "${workspaceRoot}"
-      ],
-      "preRestartCommands": [
-        "add-symbol-file build/stm32h723/app/sysclk_test/sysclk_test",
-        "load",
-        "enable breakpoint",
-        "monitor reset"
-      ],
-      "showDevDebugOutput": true,
-      "liveWatch": {
-        "enabled": true,
-        "samplesPerSecond": 2
-      }
-    },
-    {
-      "cwd": "${workspaceFolder}",
-      "executable": "${workspaceRoot}/build/stm32h723/app/crc_test/crc_test",
-      "name": "DEBUG CRC H7",
-      "request": "launch",
-      "type": "cortex-debug",
-      "servertype": "openocd",
-      "device": "STM32H7",
-      "svdFile": "${workspaceRoot}/mcu_support/h7xx/STM32H723.svd",
-      "searchDir": ["${workspaceRoot}/mcu_support/stm32"],
-      "runToMain": true,
-      "configFiles": [
-        "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
-        "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
-      ],
-      "debuggerArgs": ["-d", "${workspaceRoot}"],
-      "preRestartCommands": [
-        "add-symbol-file build/stm32h723/app/crc_test/crc_test",
-        "load",
-        "enable breakpoint",
-        "monitor reset"
-      ],
-      "showDevDebugOutput": true
-    }
-  ]
+    "version": "0.2.0",
+    "projectName": "proj2",
+    "configurations": [
+        {
+            "cwd": "${workspaceFolder}",
+            "executable":
+                "${workspaceRoot}/build/stm32f746/app/cli_app/cli_app",
+            "name": "DEBUG CLI F7",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32F746",
+            "svdFile":
+                "${workspaceRoot}/mcu_support/stm32/f7xx/f746/STM32F746.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/f7xx/stm32f7x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file /build/stm32f746/app/cli_app/cli_app",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceRoot}/build/stm32l476/app/blink/blink",
+            "name": "DEBUG BLINK L4",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32L4",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32l476/app/blink/blink",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable":
+                "${workspaceRoot}/build/stm32l476/app/spi_test/spi_test",
+            "name": "DEBUG SPI TEST",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32L4",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "stlink-dap.cfg",
+                "l4xx/stm32l4x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32l476/app/spi_test/spi_test",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable":
+                "${workspaceRoot}/build/stm32l476/app/i2c_test/i2c_test",
+            "name": "DEBUG I2C L4",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32L4",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32l476/app/i2c_test/i2c_test",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable":
+                "${workspaceRoot}/build/stm32l476/app/imu_test/imu_test",
+            "name": "DEBUG IMU BNO055",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32L4",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32l476/app/imu_test/imu_test",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true,
+            "liveWatch": {
+                "enabled": true
+            }
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable":
+                "${workspaceRoot}/build/stm32l476/app/pwm_test/pwm_test",
+            "name": "DEBUG PWM L4",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32L4",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32l476/app/pwm_test/pwm_test",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable":
+                "${workspaceRoot}/build/stm32l476/app/bmp390_test/bmp390_test",
+            "name": "DEBUG BMP390 L4",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32L4",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32l476/app/bmp390_test/bmp390_test",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable":
+                "${workspaceRoot}/build/stm32l476/app/w25q_test/w25q_test",
+            "name": "DEBUG W25Q TEST",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32L4",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32l476/app/w25q_test/w25q_test",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": "raw"
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable":
+                "${workspaceRoot}/build/stm32l476/app/usart_app/usart_app",
+            "name": "DEBUG USART L4",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32L4",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/l4xx/STM32L4x2.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/l4xx/stm32l4x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32l476/app/usart_app/uasrt_app",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceRoot}/build/stm32h723/app/blink/blink",
+            "name": "DEBUG BLINK H7",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32H7",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32h723/app/blink/blink",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable":
+                "${workspaceRoot}/build/stm32h723/app/imu_test/imu_test",
+            "name": "DEBUG IMU H7",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32H7",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32h723/app/imu_test/imu_test",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true,
+            "liveWatch": {
+                "enabled": true,
+                "samplesPerSecond": 2
+            }
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable":
+                "${workspaceRoot}/build/stm32h723/app/i2c_test/i2c_test",
+            "name": "DEBUG I2C TEST H7",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32H7",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32h723/app/i2c_test/i2c_test",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable":
+                "${workspaceRoot}/build/stm32h723/app/usart_app/usart_app",
+            "name": "DEBUG USART H7",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32H7",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32h723/app/usart_app/usart_app",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable":
+                "${workspaceRoot}/build/stm32h723/app/pwm_test/pwm_test",
+            "name": "DEBUG PWM TEST H7",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32H7",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32h723/app/pwm_test/pwm_test",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable":
+                "${workspaceRoot}/build/stm32h723/app/spi_test/spi_test",
+            "name": "DEBUG SPI TEST H7",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32H723",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32h723/app/spi_test/spi_test",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable":
+                "${workspaceRoot}/build/stm32h723/app/w25q_test/w25q_test",
+            "name": "DEBUG W25Q TEST H7",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32H723",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32h723/app/w25q_test/w25q_test",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable":
+                "${workspaceRoot}/build/stm32h723/app/bmp390_test/bmp390_test",
+            "name": "DEBUG BMP390 H7",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32H7",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32h723/app/bmp390_test/bmp390_test",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true,
+            "liveWatch": {
+                "enabled": true,
+                "samplesPerSecond": 2
+            }
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable":
+                "${workspaceRoot}/build/stm32h723/app/sysclk_test/sysclk_test",
+            "name": "DEBUG SYSCLK H7",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32H7",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32h723/app/sysclk_test/sysclk_test",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true,
+            "liveWatch": {
+                "enabled": true,
+                "samplesPerSecond": 2
+            }
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable":
+                "${workspaceRoot}/build/stm32h723/app/crc_test/crc_test",
+            "name": "DEBUG CRC H7",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32H7",
+            "svdFile": "${workspaceRoot}/mcu_support/h7xx/STM32H723.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32h723/app/crc_test/crc_test",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable":
+                "${workspaceRoot}/build/stm32h723/app/rs485_test/rs485_test",
+            "name": "DEBUG RS485 TEST H7",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32H723",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32h723/app/rs485_test/rs485_test",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true,
+            "liveWatch": {
+                "enabled": true,
+                "samplesPerSecond": 2
+            }
+        }
+    ]
 }
