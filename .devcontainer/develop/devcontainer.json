@@ -1,6 +1,5 @@
 {
 	"name": "LBR Develop",
-	"image": "lbr:latest",
 	"build": {
 		"dockerfile": "../../Dockerfile",
 		"context": "..",
@@ -9,8 +8,8 @@
 		}
 	},
 	"mounts": [
-		"source=${localEnv:HOME}/.ssh,target=/home/dev/.ssh,type=bind,readonly",
-		"source=${localEnv:HOME}/.gitconfig,target=/home/dev/.gitconfig,type=bind,readonly"
+		"source=${localEnv:HOME}/.ssh,target=/home/lbr/.ssh,type=bind,readonly",
+		"source=${localEnv:HOME}/.gitconfig,target=/home/lbr/.gitconfig,type=bind,readonly"
 	],
 	"forwardPorts": [
 		50000,
@@ -46,12 +45,11 @@
 				"ms-vscode.vscode-serial-monitor"
 			],
 			"settings": {
-				"C_Cpp.default.cStandard": "gnu17",
-				"C_Cpp.default.cppStandard": "gnu++20",
 				"clangd.arguments": [
+					"--background-index",
 					"--header-insertion=iwyu",
 					"--all-scopes-completion",
-					"--background-index"
+					"--compile-commands-dir=${workspaceFolder}/out/build/build"
 				],
 				"[c]": {
 					"editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
@@ -69,7 +67,9 @@
 				"cmake.showOutputOnError": true,
 				"cortex-debug.armToolchainPath": "/usr/local/bin",
 				"cortex-debug.gdbPath": "/usr/bin/gdb-multiarch",
-				"cortex-debug.openocdPath": "/usr/bin/openocd"
+				"cortex-debug.openocdPath": "/usr/bin/openocd",
+				"cmake.cmakePath": "/usr/bin/cmake",
+				"cmake.useCMakePresets": "always"
 			}
 		}
 	},
@@ -77,13 +77,13 @@
 		"--hostname=dev"
 	],
 	"remoteUser": "lbr",
-	"workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+	"updateRemoteUserUID": true,
 	"workspaceFolder": "/workspace",
+	"workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
 	"postStartCommand": "echo 'Container started. Run: make.sh -t <preset>'",
-	"postCreateCommand": "sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get clean",
+	"postCreateCommand": "echo 'Container ready.'",
 	"remoteEnv": {
 		"CMAKE_BUILD_PARALLEL_LEVEL": "4",
 		"NINJA_STATUS": "%p [%c/%t]"
-	},
-	"updateRemoteUserUID": true
+	}
 }

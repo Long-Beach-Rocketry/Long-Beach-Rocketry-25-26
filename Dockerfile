@@ -30,8 +30,10 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   usbutils \
   && rm -rf /var/lib/apt/lists/*
 
-# Create development user
-RUN useradd -ms /bin/bash lbr && \
+# Create team development user.
+RUN userdel -r ubuntu 2>/dev/null || true && \
+  groupadd --gid 1000 lbr && \
+  useradd --uid 1000 --gid 1000 -ms /bin/bash lbr && \
   usermod -aG sudo,dialout,plugdev lbr && \
   echo "lbr ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/lbr
 
@@ -47,8 +49,6 @@ RUN git --version && \
   clangd --version && \
   update-ca-certificates
 
-# Set working directory
 WORKDIR /workspace
 
-# Default command
 CMD ["/bin/bash"]
