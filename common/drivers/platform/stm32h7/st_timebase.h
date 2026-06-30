@@ -4,9 +4,12 @@
 * @author Bex Saw
 */
 
+<<<<<<< HEAD
 #include <chrono>
 #include <cstdint>
 #include "stm32h7xx.h"
+=======
+>>>>>>> bea3493 (skeleton for timebase)
 #include "timebase.h"
 
 namespace LBR
@@ -14,6 +17,7 @@ namespace LBR
 namespace Stmh7
 {
 
+<<<<<<< HEAD
 /**
 * @brief The StTimebaseParams struct contains the parameters needed to initialize the hardware timebase.
 * @param base_addr The base address of the timer peripheral (e.g., TIM2, TIM3, etc.)
@@ -28,10 +32,14 @@ struct StTimebaseParams
     uint32_t timer_input_hz;
     bool enable_irq;
 };
+=======
+    // enum definition for all of the timebase specific
+>>>>>>> bea3493 (skeleton for timebase)
 
 class HwTimebase : public Timebase
 {
 public:
+<<<<<<< HEAD
     explicit HwTimebase(const StTimebaseParams& params);
 
     /**
@@ -98,3 +106,16 @@ private:
 };
 }  // namespace Stmh7
 }  // namespace LBR
+=======
+    // explicit constructor 
+
+    // override the function given
+
+private:
+
+    // more variables coming up 
+    TIM_TypeDef* base_addr; 
+}
+}
+}
+>>>>>>> bea3493 (skeleton for timebase)
