@@ -3,7 +3,10 @@
 Guide on setting up the project with Docker.
 
 ## Prerequisites
-- [WSL 2]((https://learn.microsoft.com/en-us/windows/wsl/install)) and Ubuntu
+### Windows
+- [WSL 2]((https://learn.microsoft.com/en-us/windows/wsl/install)) and Ubuntu (Preferably Ubuntu 24.04 LTS)
+- [usbipd-win]((https://learn.microsoft.com/en-us/windows/wsl/connect-usb))
+### WSL
 - Git (Link your GitHub account)
 - [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
 - [Visual Studio Code](https://code.visualstudio.com/download?_exp_download=fb315fc982) + Dev Containers Extension
@@ -124,12 +127,21 @@ Guide on setting up the project with Docker.
     ShowAKA: true 
 
 ```
+## Cloning
+- In WSL, clone the LBR repo into the file path of your choice.
+  - ```$ git clone https://github.com/Long-Beach-Rocketry/Long-Beach-Rocketry-25-26.git```
+- After the repo is cloned, navigate inside of the cloned directory.
+  - ```$ cd ./Long-Beach-Rocketry-25-26```
+- Once inside the project repo, you can open VS Code and it will load with the LBR project opened.
+  - ```$ code .```
 
 ## Developing
 Open the project by selecting **'Dev Containers: Reopen in Container'**.
 Necessary packages and toolchains should automatically install; this may take some time. 
 
 VSCode extensions should also automatically be installed. However, some may not be enabled and you may be prompted to reload the workspace to enable them (do it).
+
+We currently have two Dev Containers. The container called **LBR Develop** is used when you want to develop and build without needing to attach your ST-Link prior to opening the container. The container called **LBR Hardware** is used when you want to develop, build, and flash onto hardware. This container can only be opened by attaching and binding your ST-Link to WSL using usbipd-win from your Windows environment prior to opening the container.
 
 ## Building
 Use the ```.sh``` script. The minimum parameters look like this: 
@@ -141,7 +153,7 @@ It's also possible to specify a target application rather than building all avai
 Builds are by default done in Debug mode, but Release mode can be selected with the -r parameter: ```./make.sh -t stm32h723 -r```
 
 ## Debugging
-First grant usb access to WSL by opening a windows terminal with admin - windows button + `x` and select Terminal (Admin). Run the following commands and take note of the ST-Link Bus ID.
+First grant usb access to WSL by opening a windows terminal (Powershell or Cmd Prompt) with admin - windows button + `x` and select Terminal (Admin). Run the following commands and take note of the ST-Link Bus ID.
 ```
 usbipd list
 usbipd bind --busid <BUSID>
@@ -150,7 +162,7 @@ usbipd attach --wsl --busid <BUSID>
 
 You can verify WSL has access to the ST-Link by running the command in WSL: `lsusb`
 
-Once the usb is shared, you may have to reopen the project container.
+Once the usb is shared, you can open the **LBR Hardware** docker container.
 
 Select 'Run and Debug' on the sidebar (left) and select a preset. Click the green play button to begin the debug session.
 
