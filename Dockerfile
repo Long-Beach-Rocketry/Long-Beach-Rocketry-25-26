@@ -1,4 +1,3 @@
-
 # Install build dependencies for WSL Ubuntu
 FROM ubuntu:24.04@sha256:786a8b558f7be160c6c8c4a54f9a57274f3b4fb1491cf65146521ae77ff1dc54
 
@@ -11,10 +10,30 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   libstdc++-arm-none-eabi-newlib \
   openocd \
   gdb-multiarch \
+  binutils-arm-none-eabi \
   clang-format \
+  elfutils \
+  less \
+  tree \
+  file \
+  zip \
+  unzip \
+  curl \
+  wget \
+  python3 \
+  python3-pip \
+  ccache \
   clangd \
+  minicom \
   ca-certificates \
+  sudo \
+  usbutils \
   && rm -rf /var/lib/apt/lists/*
+
+# Create development user
+RUN useradd -ms /bin/bash lbr && \
+  usermod -aG sudo,dialout,plugdev lbr && \
+  echo "lbr ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/lbr
 
 # Verify installations
 RUN git --version && \
@@ -33,5 +52,3 @@ WORKDIR /workspace
 
 # Default command
 CMD ["/bin/bash"]
-
-

@@ -1,21 +1,16 @@
 {
     "name": "LBR Hardware",
-    "image": "lbr-build:latest",
+    "image": "lbr:latest",
     "build": {
-        "dockerfile": "../Dockerfile",
+        "dockerfile": "../../Dockerfile",
         "context": "..",
         "args": {
             "BUILDKIT_INLINE_CACHE": "1"
         }
     },
-    "runArgs": [
-        "--device=/dev/bus/usb",
-        "--device-cgroup-rule=c 189:* rmw",
-        "--device=/dev/ttyACM0"
-    ],
     "mounts": [
-        "source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,readonly",
-        "source=${localEnv:HOME}/.gitconfig,target=/root/.gitconfig,type=bind,readonly"
+        "source=${localEnv:HOME}/.ssh,target=/home/dev/.ssh,type=bind,readonly",
+        "source=${localEnv:HOME}/.gitconfig,target=/home/dev/.gitconfig,type=bind,readonly"
     ],
     "forwardPorts": [
         50000,
@@ -40,15 +35,19 @@
         "vscode": {
             "extensions": [
                 "mcu-debug.debug-tracker-vscode",
-                "ms-vscode.cpptools",
-                "ms-vscode.cpptools-extension-pack",
                 "marus25.cortex-debug",
                 "llvm-vs-code-extensions.vscode-clangd",
-                "ms-vscode.cmake-tools"
+                "ms-vscode.cmake-tools",
+                "bbenoist.doxygen",
+                "ms-vscode.hexeditor",
+                "mcu-debug.memory-view",
+                "mcu-debug.rtos-views",
+                "mcu-debug.peripheral-viewer",
+                "ms-vscode.vscode-serial-monitor"
             ],
             "settings": {
-                "C_Cpp.default.cStandard": "c11",
-                "C_Cpp.default.cppStandard": "c++17",
+                "C_Cpp.default.cStandard": "gnu17",
+                "C_Cpp.default.cppStandard": "gnu++20",
                 "clangd.arguments": [
                     "--header-insertion=iwyu",
                     "--all-scopes-completion",
@@ -74,13 +73,20 @@
             }
         }
     },
-    "remoteUser": "root", // Required for USB and OpenOCD access
+    "runArgs": [
+        "--hostname=hw",
+        "--device=/dev/bus/usb",
+        "--device-cgroup-rule=c 189:* rmw",
+        "--device-cgroup-rule=c 166:* rmw"
+    ],
+    "remoteUser": "lbr",
     "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
     "workspaceFolder": "/workspace",
     "postStartCommand": "echo 'Container started. Run: make.sh -t <preset>'",
-    "postCreateCommand": "apt-get update && apt-get upgrade -y && apt-get clean",
+    "postCreateCommand": "sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get clean",
     "remoteEnv": {
         "CMAKE_BUILD_PARALLEL_LEVEL": "4",
         "NINJA_STATUS": "%p [%c/%t]"
-    }
+    },
+    "updateRemoteUserUID": true
 }
