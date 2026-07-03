@@ -1,173 +1,321 @@
-# LBR
+# LBR Setup Guide
 
-Guide on setting up the project with Docker.
+This guide is for new team members setting up the repository with our Docker + VS Code workflow.
 
-## Prerequisites
-### Windows
-- [WSL 2]((https://learn.microsoft.com/en-us/windows/wsl/install)) and Ubuntu (Preferably Ubuntu 24.04 LTS)
-- [usbipd-win]((https://learn.microsoft.com/en-us/windows/wsl/connect-usb))
-### WSL
-- Git (Link your GitHub account)
-- [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
-- [Visual Studio Code](https://code.visualstudio.com/download?_exp_download=fb315fc982) + Dev Containers Extension
+Start with the quick steps. The detailed config blocks are only needed if your workspace is missing them.
 
-## Required Project Files
-**`.vscode/settings.json`**
-```json
-  {
-    "C_Cpp.intelliSenseEngine": "disabled",
-    "C_Cpp.errorSquiggles": "disabled",
-    "C_Cpp.autocomplete": "disabled",
-    "C_Cpp.codeAnalysis.exclude": {
-      "**": true
-    },
-    "clangd.enable": true,
-    "clangd.path": "/usr/bin/clangd",
-    "clangd.arguments": [
-      "--compile-commands-dir=${workspaceFolder}/build/stm32h723",
-      "--query-driver=/usr/bin/*",
-      "--clang-tidy",
-      "--header-insertion=never"
-    ],
-    "cmake.cmakePath": "/usr/bin/cmake",
-    "cortex-debug.openocdPath": "/usr/bin/openocd",
-    "cortex-debug.armToolchainPath": "/usr/bin",
-    "cortex-debug.gdbPath": "/usr/bin/gdb-multiarch",
-  }
+## 1) Quick Start
+
+1. Install the prerequisites.
+2. Clone the repo and open it in VS Code from WSL.
+3. Reopen in the Dev Container.
+4. Create your branch and start working.
+5. Build the target you changed before pushing.
+
+What you get:
+
+- A reproducible development environment in a Dev Container.
+- Build, debug, and serial-monitor access.
+
+## 2) Prerequisites
+
+### Windows host
+
+- Install WSL 2 and Ubuntu (Ubuntu 24.04 LTS recommended):
+  - https://learn.microsoft.com/windows/wsl/install
+- Install usbipd-win:
+  - https://learn.microsoft.com/windows/wsl/connect-usb
+- Install Docker Desktop:
+  - https://docs.docker.com/desktop/setup/install/windows-install/
+
+After Docker Desktop is installed:
+
+- Open Docker Desktop settings.
+- Go to Resources -> WSL Integration.
+- Enable integration for your Ubuntu distro.
+
+### Inside WSL (Ubuntu)
+
+- Install Git and connect your GitHub identity:
+
+```bash
+sudo apt update
+sudo apt install -y git
+git config --global user.name "<First Last>"
+git config --global user.email "<you@example.com>"
 ```
 
-**`.clangd`**
-```.clangd
-  CompileFlags: 
+- Install VS Code on Windows:
+  - https://code.visualstudio.com/
+- From WSL, run `code .` at least once so VS Code installs the WSL server components.
+- Install the VS Code extension: Dev Containers.
+  - Install it in your VS Code (Windows side).
+  - If VS Code prompts to also install it in WSL or in the container, install it there too.
 
-    CompilationDatabase: build/stm32h723 
+## 3) Clone the Repository
 
-    Add: 
+From your WSL terminal:
 
-      - -std=c++20 
-
-      - --target=arm-none-eabi 
-
-      - -mcpu=cortex-m7 
-
-      - -mthumb 
-
-      - -mfpu=fpv5-d16 
-
-      - -mfloat-abi=hard 
-
-      - -DSTM32H723xx 
-
-      - -DSTM32H7 
-
-      - -DUSE_HAL_DRIVER 
-
-      - -D__cpp_lib_span=202002L 
-
-      - -DGNUC 
-
-      - -Darm 
-
-      - -DARM_ARCH_7EM 
-
-      - -Dthumb2 
-
-  
-
-      # Project include paths. These are relative to the workspace root. 
-
-      - -Icommon/drivers/bus 
-
-      - -Icommon/drivers/io 
-
-      - -Icommon/drivers/platform/stm32h7 
-
-      - -Icommon/drivers/time 
-
-      - -Icommon/core/periph 
-
-      - -Icommon/core/utils 
-
-      - -Imcu_support/stm32/h7xx 
-
-      - -Imcu_support/stm32/h7xx/HAL 
-
-      - -Imcu_support/CMSIS/include 
-
-  
-
-  Index: 
-
-    Background: Build 
-
-  
-
-  Diagnostics: 
-
-    ClangTidy: 
-
-      Add: 
-
-        - readability-* 
-
-        - performance-* 
-
-        - bugprone-* 
-
-      Remove: 
-
-        - readability-magic-numbers 
-
-        - readability-uppercase-literal-suffix 
-
-  
-
-  Hover: 
-
-    ShowAKA: true 
-
+```bash
+git clone https://github.com/Long-Beach-Rocketry/Long-Beach-Rocketry-25-26.git
+cd Long-Beach-Rocketry-25-26
+code .
 ```
-## Cloning
-- In WSL, clone the LBR repo into the file path of your choice.
-  - ```$ git clone https://github.com/Long-Beach-Rocketry/Long-Beach-Rocketry-25-26.git```
-- After the repo is cloned, navigate inside of the cloned directory.
-  - ```$ cd ./Long-Beach-Rocketry-25-26```
-- Once inside the project repo, you can open VS Code and it will load with the LBR project opened.
-  - ```$ code .```
 
-## Developing
-Open the project by selecting **'Dev Containers: Reopen in Container'**.
-Necessary packages and toolchains should automatically install; this may take some time. 
+## 4) Open in Dev Container
 
-VSCode extensions should also automatically be installed. However, some may not be enabled and you may be prompted to reload the workspace to enable them (do it).
+In VS Code:
 
-We currently have two Dev Containers. The container called **LBR Develop** is used when you want to develop and build without needing to attach your ST-Link prior to opening the container. The container called **LBR Hardware** is used when you want to develop, build, and flash onto hardware. This container can only be opened by attaching and binding your ST-Link to WSL using usbipd-win from your Windows environment prior to opening the container.
+- Run command: Dev Containers: Reopen in Container
 
-## Building
-Use the ```.sh``` script. The minimum parameters look like this: 
-```./make.sh -t <name of preset>```.
-For example, ```./make.sh -t stm32h723``` (see CMakePresets.json).
+First startup may take several minutes while toolchains and dependencies install.
 
-It's also possible to specify a target application rather than building all available apps (which is the default), by using the -a parameter: ```./make.sh -t stm32h723 -a blink```. 
+If prompted to enable or reload extensions, accept it.
 
-Builds are by default done in Debug mode, but Release mode can be selected with the -r parameter: ```./make.sh -t stm32h723 -r```
+## 5) Start a New Branch for Your Work
 
-## Debugging
-First grant usb access to WSL by opening a windows terminal (Powershell or Cmd Prompt) with admin - windows button + `x` and select Terminal (Admin). Run the following commands and take note of the ST-Link Bus ID.
+When you begin a feature or fix, create a new branch before making changes.
+
+Use a short, descriptive branch name like `<fi><li>-<feature>` where `<fi><li>` means your first and last initial.
+
+Example style: `ab-imu-fix` or `km-usart`.
+
+From your current branch:
+
+```bash
+git fetch origin
+git rebase origin/<default-branch>
+git checkout -b <feature-branch-name>
 ```
+
+If you already created a branch, switch to it with:
+
+```bash
+git checkout <feature-branch-name>
+```
+
+Keep the branch focused on one change.
+
+## 6) Workspace Configuration
+
+The Dev Container already applies recommended VS Code settings from .devcontainer/devcontainer.json.
+
+Only create the files below if your workspace does not already have them.
+
+<details>
+<summary>Create .vscode/settings.json</summary>
+
+```bash
+mkdir -p .vscode
+cat > .vscode/settings.json << 'EOF'
+{
+  "C_Cpp.intelliSenseEngine": "disabled",
+  "C_Cpp.errorSquiggles": "disabled",
+  "C_Cpp.autocomplete": "disabled",
+  "C_Cpp.codeAnalysis.exclude": {
+    "**": true
+  },
+  "clangd.enable": true,
+  "clangd.path": "/usr/bin/clangd",
+  "clangd.arguments": [
+    "--compile-commands-dir=${workspaceFolder}/build/stm32h723",
+    "--query-driver=/usr/bin/*",
+    "--clang-tidy",
+    "--header-insertion=never"
+  ],
+  "cmake.cmakePath": "/usr/bin/cmake",
+  "cortex-debug.openocdPath": "/usr/bin/openocd",
+  "cortex-debug.armToolchainPath": "/usr/bin",
+  "cortex-debug.gdbPath": "/usr/bin/gdb-multiarch"
+}
+EOF
+```
+
+</details>
+
+<details>
+<summary>Create .clangd</summary>
+
+```bash
+cat > .clangd << 'EOF'
+CompileFlags:
+  CompilationDatabase: build/stm32h723
+  Add:
+    - -std=c++20
+    - --target=arm-none-eabi
+    - -mcpu=cortex-m7
+    - -mthumb
+    - -mfpu=fpv5-d16
+    - -mfloat-abi=hard
+    - -DSTM32H723xx
+    - -DSTM32H7
+    - -DUSE_HAL_DRIVER
+    - -D__cpp_lib_span=202002L
+    - -DGNUC
+    - -Darm
+    - -DARM_ARCH_7EM
+    - -Dthumb2
+    # Project include paths (relative to workspace root)
+    - -Icommon/drivers/bus
+    - -Icommon/drivers/io
+    - -Icommon/drivers/platform/stm32h7
+    - -Icommon/drivers/time
+    - -Icommon/core/periph
+    - -Icommon/core/utils
+    - -Imcu_support/stm32/h7xx
+    - -Imcu_support/stm32/h7xx/HAL
+    - -Imcu_support/CMSIS/include
+
+Index:
+  Background: Build
+
+Diagnostics:
+  ClangTidy:
+    Add:
+      - readability-*
+      - performance-*
+      - bugprone-*
+    Remove:
+      - readability-magic-numbers
+      - readability-uppercase-literal-suffix
+
+Hover:
+  ShowAKA: true
+EOF
+```
+
+</details>
+
+After creating these files:
+
+1. Reopen the workspace in the Dev Container.
+2. Run Command Palette -> Developer: Reload Window.
+
+## 7) Build Firmware
+
+Use the helper scripts at the repo root.
+
+### Linux / WSL / Dev Container
+
+```bash
+./make.sh -t <preset>
+```
+
+Replace `<preset>` with the build preset you are using for your board or environment.
+
+Example presets: `stm32h723`, `stm32l476`, `native`.
+
+### Windows PowerShell
+
+```powershell
+./make.ps1 -t <preset>
+```
+
+### Useful options
+
+- Build only one app target:
+
+```bash
+./make.sh -t <preset> -a <app-name>
+```
+
+Example app names: `blink`, `imu_test`, `usart_app`.
+
+- Release build instead of Debug:
+
+```bash
+./make.sh -t <preset> -r
+```
+
+- Clean build:
+
+```bash
+./make.sh -t <preset> -c
+```
+
+Available presets are defined in CMakePresets.json.
+
+## 8) Debugging with ST-Link (Windows + WSL)
+
+1. Open Windows Terminal as Administrator.
+2. Run:
+
+```bash
 usbipd list
 usbipd bind --busid <BUSID>
 usbipd attach --wsl --busid <BUSID>
 ```
 
-You can verify WSL has access to the ST-Link by running the command in WSL: `lsusb`
+3. In WSL, confirm the device is visible:
 
-Once the usb is shared, you can open the **LBR Hardware** docker container.
+```bash
+lsusb
+```
 
-Select 'Run and Debug' on the sidebar (left) and select a preset. Click the green play button to begin the debug session.
+4. In VS Code, open Run and Debug, pick the appropriate launch configuration, then start debugging.
 
+Note: once attached to WSL, ST-Link is available to the Dev Container.
 
-## Serial Monitor
-Want to debug uart? Serial monitor and putty will use Window's COM Ports and we just binded the ST-Link to WSL. To debug and see uart output, run `apt-install get minicom` in your WSL terminal.
+## 9) UART Serial Monitor (Optional)
 
-Run `ls /dev/tty*` to check which WSL port ST-LINK binded to (usually /dev/ttyACM0 or /dev/ttyUSB0). You can then run `minicom -D <port>` for example: `minicom -D /dev/ttyACM0`.
+In WSL:
+
+```bash
+sudo apt install -y minicom
+ls /dev/tty*
+minicom -D <serial-port>
+```
+
+Use the serial device shown by `ls /dev/tty*`.
+
+## 10) Team Workflow Tips
+
+Use these habits to avoid merge issues and "works on my machine" problems.
+
+- Build inside the Dev Container so you match the team and CI.
+
+- At the start of work, and whenever main changes, fetch and rebase from your current branch.
+
+```bash
+git fetch origin
+git rebase origin/<default-branch>
+git checkout -b <feature-branch-name>
+```
+
+- If your branch stays open, do this again at least once a week.
+
+- Keep each branch scoped to one feature or one fix.
+
+- Before pushing, check what branch you are on so you do not push the wrong one.
+
+```bash
+git branch --show-current
+```
+
+- Before pushing, build the target you changed and run any relevant checks.
+
+```bash
+./make.sh -t <preset> -a <app-name>
+./make.sh -t native
+```
+
+- Commit in small, meaningful chunks.
+
+```bash
+git add .
+git commit -m "<short, descriptive commit message>"
+git push origin <feature-branch-name>
+```
+
+- Before opening a PR, make sure `git status` is clean except for intended changes.
+
+- If you hit conflicts, resolve them right away and rebase again.
+
+If rebase is not preferred for a specific situation, ask before using merge instead.
+
+## 11) Quick Troubleshooting
+
+- Docker container does not start: check Docker Desktop and WSL integration.
+- ST-Link not found: re-run the `usbipd` attach steps and verify with `lsusb`.
+- Build fails due to missing tools: reopen or rebuild the Dev Container.
+- VS Code looks wrong: confirm `.vscode/settings.json` and `.clangd` exist.
