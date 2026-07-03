@@ -1,7 +1,7 @@
 {
 	"name": "LBR Develop",
 	"build": {
-		"dockerfile": "../../Dockerfile",
+		"dockerfile": "../Dockerfile",
 		"context": "..",
 		"args": {
 			"BUILDKIT_INLINE_CACHE": "1"
@@ -74,7 +74,10 @@
 		}
 	},
 	"runArgs": [
-		"--hostname=dev"
+		"--hostname=dev",
+		"--privileged",
+		"--device-cgroup-rule=c 189:* rmw",
+		"--device-cgroup-rule=c 166:* rmw"
 	],
 	"remoteUser": "lbr",
 	"updateRemoteUserUID": true,
