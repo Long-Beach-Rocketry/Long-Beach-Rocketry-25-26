@@ -10,7 +10,7 @@ CMakeCache.txt
 **/.vscode/settings.json
 **/venv
 .venv*
-.clangd
 .cache
 compile_commands.json
 clangd
+devcontainer-lock.json
