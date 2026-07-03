@@ -51,6 +51,8 @@ bool bsp_init()
     RCC->AHB4ENR |= (RCC_AHB4ENR_GPIOAEN | RCC_AHB4ENR_GPIODEN);
     RCC->APB1LENR |= RCC_APB1LENR_USART3EN;
 
+    RCC->D2CCIP2R &= ~RCC_D2CCIP2R_USART28SEL;
+
     // Initialize all hardware blocks
     result &= Stmh7::de_gpio.init();
     result &= Stmh7::re_gpio.init();

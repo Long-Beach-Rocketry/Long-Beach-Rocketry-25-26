@@ -5,8 +5,7 @@
 
 using namespace LBR;
 
-std::array<uint8_t, 17> txb{'i', ' ', '<', '3', ' ',  'e',  'm', 'b', 'e',
-                            'd', 'd', 'e', 'd', '\r', '\n', 0,   0};
+std::array<uint8_t, 15> txb{'L', 'B', 'R', ' ', 'R', 'o', 'c', 'k', 'e', 't', 'r', 'y', '\r', '\n', 0};
 
 int main(int argc, char** argv)
 {
@@ -16,9 +15,11 @@ int main(int argc, char** argv)
 
     while (1)
     {
-        board.rs485.set_direction(
-            Rs485::Direction::LOOPBACK);  // PA4 goes HIGH, PA5 goes LOW
+        board.rs485.set_direction(Rs485::Direction::LOOPBACK);  // PA4 goes HIGH, PA5 goes LOW
         board.usart.send(txb);
+        
+        for (volatile uint32_t settle_delay = 0; settle_delay < 50000; settle_delay++);
+
         board.rs485.set_direction(Rs485::Direction::RECEIVE);
 
         for (volatile uint32_t delay = 0; delay < 2000; delay++);

@@ -597,7 +597,7 @@
             ],
             "runToMain": true,
             "configFiles": [
-                "${workspaceRoot}/mcu_support/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
                 "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
             ],
             "debuggerArgs": [
