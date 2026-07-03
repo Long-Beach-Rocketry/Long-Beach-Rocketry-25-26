@@ -33,6 +33,7 @@ After Docker Desktop is installed:
 - Open Docker Desktop settings.
 - Go to Resources -> WSL Integration.
 - Enable integration for your Ubuntu distro.
+- Make sure Docker Desktop is open in Windows every time you plan to develop using the docker container from WSL.
 
 ### Inside WSL (Ubuntu)
 
@@ -313,9 +314,11 @@ git push origin <feature-branch-name>
 
 If rebase is not preferred for a specific situation, ask before using merge instead.
 
+- Provide a brief description in the summary of your PR explaining what this PR hopes to achieve.
+
 ## 11) Quick Troubleshooting
 
 - Docker container does not start: check Docker Desktop and WSL integration.
 - ST-Link not found: re-run the `usbipd` attach steps and verify with `lsusb`.
 - Build fails due to missing tools: reopen or rebuild the Dev Container.
-- VS Code looks wrong: confirm `.vscode/settings.json` and `.clangd` exist.
+- VS Code throws a bunch of red syntax errors in the editor: confirm `.vscode/settings.json` and `.clangd` exist.
