@@ -111,8 +111,7 @@ public:
                 airbrake_command.deployment = true;
                 double time_since_launch = data.time_s - launch_time_s;
                 bool reached_apogee = (data.velocity_mps <= 0.0);
-                bool should_retract =
-                    (time_since_launch >= retract_time_s);
+                bool should_retract = (time_since_launch >= retract_time_s);
                 if (reached_apogee || should_retract)
                 {
                     rocket_state = RocketState::BRAKES_RETRACTING;
@@ -174,7 +173,8 @@ private:
     // Detect rocket launch based on acceleration and velocity thresholds
     bool detectLaunch(const SensorData& data) const
     {
-        return data.acceleration_mps2 > launch_acceleration_threshold_mps2 && data.velocity_mps > launch_velocity_threshold_mps;
+        return data.acceleration_mps2 > launch_acceleration_threshold_mps2 &&
+               data.velocity_mps > launch_velocity_threshold_mps;
     }
 
     // Convert RocketState enum to string for logging
