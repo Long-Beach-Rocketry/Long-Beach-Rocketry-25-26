@@ -30,7 +30,6 @@ private:
     double retract_time_s{20.0};
 
     // Threshold values for detecting rocket launch
-    const double launch_altitude_threshold_m{10.0};
     const double launch_velocity_threshold_mps{5.0};
     const double launch_acceleration_threshold_mps2{15.0};
 
@@ -48,6 +47,7 @@ public:
         json j;
         file >> j;
 
+        // Assigning values from JSON, with default values if not present
         airbrakes_enabled = j["airbrake"].value("enabled", true);
         deploy_time_s = j["airbrake"].value("deploy_time_s", 6.0);
         retract_time_s = j["airbrake"].value("retract_time_s", 20.0);
@@ -111,9 +111,9 @@ public:
                 airbrake_command.deployment = true;
                 double time_since_launch = data.time_s - launch_time_s;
                 bool reached_apogee = (data.velocity_mps <= 0.0);
-                bool reached_retract_time =
+                bool should_retract =
                     (time_since_launch >= retract_time_s);
-                if (reached_apogee || reached_retract_time)
+                if (reached_apogee || should_retract)
                 {
                     rocket_state = RocketState::BRAKES_RETRACTING;
                 }
@@ -171,13 +171,13 @@ public:
     }
 
 private:
+    // Detect rocket launch based on acceleration and velocity thresholds
     bool detectLaunch(const SensorData& data) const
     {
-        return (data.altitude_m > launch_altitude_threshold_m) ||
-               (data.velocity_mps > launch_velocity_threshold_mps) ||
-               (data.acceleration_mps2 > launch_acceleration_threshold_mps2);
+        return data.acceleration_mps2 > launch_acceleration_threshold_mps2 && data.velocity_mps > launch_velocity_threshold_mps;
     }
 
+    // Convert RocketState enum to string for logging
     string stateToString(RocketState state) const
     {
         switch (state)
