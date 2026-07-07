@@ -12,5 +12,6 @@ CMakeCache.txt
 .venv*
 .cache
 compile_commands.json
+.clangd
 clangd
 devcontainer-lock.json
