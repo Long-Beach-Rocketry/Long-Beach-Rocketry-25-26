@@ -38,18 +38,26 @@ public:
      * 
      * @return true transmit success, false otherwise
      */
-    bool transmit(std::span<const uint8_t>& buf);
+    bool transmit(const std::span<const uint8_t>& tx_buf);
 
     /**
      * @brief Receive bytes and store in buffer
      * 
      * @param buf 
-     * @return true 
-     * @return false 
+     * @return true Bytes received and stored in buffer successfully, false otherwise
      */
-    bool receive(std::span<uint8_t>& buf);
+    bool receive(const std::span<uint8_t>& rx_buf);
+
+    /**
+     * @brief Change settings within the SX1262 during runtime
+     * 
+     * @param new_settings 
+     * @return true Settings changed successfully, false otherwise
+     */
     bool set_settings(Sx1262Settings new_settings);
 
 private:
+    Sx1262Settings settings;
+    Spi& spi;
 };
 }  // namespace LBR
