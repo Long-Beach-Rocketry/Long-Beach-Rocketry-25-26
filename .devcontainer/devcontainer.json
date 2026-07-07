@@ -49,7 +49,7 @@
 					"--background-index",
 					"--header-insertion=iwyu",
 					"--all-scopes-completion",
-					"--compile-commands-dir=${workspaceFolder}/out/build/build"
+					"--compile-commands-dir=${workspaceFolder}"
 				],
 				"[c]": {
 					"editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
@@ -63,8 +63,9 @@
 					"build/": false,
 					".cache/": true
 				},
-				"cmake.configureOnOpen": true,
+				"cmake.configureOnOpen": false,
 				"cmake.showOutputOnError": true,
+				"cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json",
 				"cortex-debug.armToolchainPath": "/usr/local/bin",
 				"cortex-debug.gdbPath": "/usr/bin/gdb-multiarch",
 				"cortex-debug.openocdPath": "/usr/bin/openocd",
