@@ -6,6 +6,7 @@
  */
 
 #pragma once
+#include <cstdint>
 #include "gpio.h"
 
 namespace LBR
@@ -13,7 +14,7 @@ namespace LBR
 class Rs485
 {
 public:
-    enum class Direction
+    enum class Direction : uint8_t
     {
         RECEIVE = 0,  /**< DE=0 (Disable TX), RE=0 (Enable RX). */
         TRANSMIT = 1, /**< DE=1 (Enable TX), RE=1 (Disable RX). */
@@ -48,8 +49,7 @@ public:
 
         if (dir == Direction::TRANSMIT)
         {
-            success &= de_pin.set(
-                1);  // Turn Transmitter ON// 3. Inject both independent pin references directly into your updated constructor
+            success &= de_pin.set(1);  // Turn Transmitter ON
             success &=
                 re_pin.set(1);  // Turn Receiver OFF (RE high disables it)
         }

@@ -14,8 +14,8 @@ StGpioSettings tx_config = {GpioMode::ALT_FUNC, GpioOtype::PUSH_PULL,
 StGpioSettings rx_config = {GpioMode::ALT_FUNC, GpioOtype::PUSH_PULL,
                             GpioOspeed::LOW, GpioPupd::NO_PULL, 0x7};
 
-StGpioParams tx_params = {tx_config, (uint8_t)8, GPIOD};  // PD8
-StGpioParams rx_params = {rx_config, (uint8_t)9, GPIOD};  // PD9
+StGpioParams tx_params = {tx_config, (uint8_t)5, GPIOD};  // PD5
+StGpioParams rx_params = {rx_config, (uint8_t)6, GPIOD};  // PD6
 
 HwGpio tx_gpio(tx_params);
 HwGpio rx_gpio(rx_params);
@@ -34,7 +34,7 @@ HwGpio re_gpio(re_params);
 
 Rs485 rs485_driver(de_gpio, re_gpio);
 
-StUsartParams usart_params = {USART3, 64000000, 115200};
+StUsartParams usart_params = {USART2, 64000000, 115200};
 StUsart usart(usart_params);
 }  // namespace Stmh7
 
@@ -49,7 +49,7 @@ bool bsp_init()
 
     // Turn on the peripheral clock for Port A AND Port D
     RCC->AHB4ENR |= (RCC_AHB4ENR_GPIOAEN | RCC_AHB4ENR_GPIODEN);
-    RCC->APB1LENR |= RCC_APB1LENR_USART3EN;
+    RCC->APB1LENR |= RCC_APB1LENR_USART2EN;
 
     RCC->D2CCIP2R &= ~RCC_D2CCIP2R_USART28SEL;
 
