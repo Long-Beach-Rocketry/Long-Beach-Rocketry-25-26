@@ -94,19 +94,28 @@ bool Pipeline::process_frame(PbCmd* msg)
         uint8_t b0 = 0, b1 = 0, b2 = 0, b3 = 0;
         if (!rx_buffer.peek(0, b0) || !rx_buffer.peek(1, b1) ||
             !rx_buffer.peek(2, b2) || !rx_buffer.peek(3, b3))
-            return false;
+            {
+                return false;
+            }
+
         uint32_t candidate = (static_cast<uint32_t>(b0) << 24) |
                              (static_cast<uint32_t>(b1) << 16) |
                              (static_cast<uint32_t>(b2) << 8) |
                              static_cast<uint32_t>(b3);
+
         if (candidate == kSof)
-            break;
+        {
+            break;  // Found SOF, exit the loop
+        }
+
         rx_buffer.pop(b0);
     }
 
     // We need at least enough bytes for the header to know the payload length
     if (rx_buffer.size() < kHeaderLen)
+    {
         return false;
+    }
 
     // LEN byte sits immediately after the 4-byte SOF
     uint8_t len_byte = 0;
@@ -124,7 +133,9 @@ bool Pipeline::process_frame(PbCmd* msg)
     // We need the full frame (header + payload + crc + eof) to proceed
     uint16_t frame_len = kFrameOverhead + payload_len;
     if (rx_buffer.size() < frame_len)
+    {
         return false;
+    }
 
     // Peek full frame into a linear buffer for validation and decode
     std::array<uint8_t, kBufSize> frame{};
@@ -139,6 +150,7 @@ bool Pipeline::process_frame(PbCmd* msg)
         (static_cast<uint32_t>(frame[frame_len - 3]) << 16) |
         (static_cast<uint32_t>(frame[frame_len - 2]) << 8) |
         static_cast<uint32_t>(frame[frame_len - 1]);
+        
     if (eof_candidate != kEof)
     {
         for (uint16_t i = 0; i < frame_len; i++)
