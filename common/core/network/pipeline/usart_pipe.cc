@@ -94,9 +94,9 @@ bool Pipeline::process_frame(PbCmd* msg)
         uint8_t b0 = 0, b1 = 0, b2 = 0, b3 = 0;
         if (!rx_buffer.peek(0, b0) || !rx_buffer.peek(1, b1) ||
             !rx_buffer.peek(2, b2) || !rx_buffer.peek(3, b3))
-            {
-                return false;
-            }
+        {
+            return false;
+        }
 
         uint32_t candidate = (static_cast<uint32_t>(b0) << 24) |
                              (static_cast<uint32_t>(b1) << 16) |
@@ -150,7 +150,7 @@ bool Pipeline::process_frame(PbCmd* msg)
         (static_cast<uint32_t>(frame[frame_len - 3]) << 16) |
         (static_cast<uint32_t>(frame[frame_len - 2]) << 8) |
         static_cast<uint32_t>(frame[frame_len - 1]);
-        
+
     if (eof_candidate != kEof)
     {
         for (uint16_t i = 0; i < frame_len; i++)
