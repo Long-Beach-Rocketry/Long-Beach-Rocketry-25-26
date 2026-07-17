@@ -13,16 +13,16 @@
 #include "crc.h"
 #include "pb_cmd.h"
 #include "ring_buffer.h"
+#include "rs485.h"
 #include "usart.h"
 
 namespace LBR
 {
 class Pipeline
 {
+
 public:
-    explicit Pipeline(Crc& crc) : crc(crc)
-    {
-    }
+    explicit Pipeline(Crc& crc, Rs485& rs485);
 
     /**
     * @brief Sends a protobuf message over USART with framing and CRC.
@@ -53,6 +53,7 @@ private:
     static constexpr uint16_t kMaxPayloadLen = kBufSize - kFrameOverhead;
 
     Crc& crc;
+    Rs485& rs485;
     RingBuffer<uint8_t, kBufSize> rx_buffer;
     std::array<uint8_t, kBufSize> tx_buffer;
 

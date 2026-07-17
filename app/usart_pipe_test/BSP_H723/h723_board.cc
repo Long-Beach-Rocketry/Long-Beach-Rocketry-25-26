@@ -1,4 +1,5 @@
 #include "board.h"
+#include "rs485.h"
 #include "st_crc.h"
 #include "st_gpio.h"
 #include "st_usart.h"
@@ -29,16 +30,32 @@ StGpioParams rx_params = {rx_config, (uint8_t)9, GPIOD};
 HwGpio tx_gpio{tx_params};
 HwGpio rx_gpio{rx_params};
 
+StGpioSettings control_pin_config = {GpioMode::GPOUT, GpioOtype::PUSH_PULL,
+                                     GpioOspeed::LOW, GpioPupd::NO_PULL, 0x0};
+
+StGpioParams de_params = {control_pin_config, (uint8_t)4,
+                          GPIOA};  // PA4 tied to DE (Pin 3)
+StGpioParams re_params = {control_pin_config, (uint8_t)5,
+                          GPIOA};  // PA5 tied to RE (Pin 2)
+
+HwGpio de_gpio(de_params);
+HwGpio re_gpio(re_params);
+
 StUsartParams usart_params = {USART3, 64000000, 115200};
 StUsart usart{usart_params};
 
-Pipeline pipeline{crc};
+Rs485 rs485(tx_gpio, rx_gpio);
+
+Pipeline pipeline{crc, rs485};
 
 uint8_t rxb;
 
 Board board{.usart = usart,
             .rx = rx_gpio,
             .tx = tx_gpio,
+            .de = de_gpio,
+            .re = re_gpio,
+            .rs485 = rs485,
             .crc = crc,
             .pipeline = pipeline};
 
@@ -46,7 +63,8 @@ bool bsp_init()
 {
     bool ret = true;
 
-    RCC->AHB4ENR |= RCC_AHB4ENR_CRCEN | RCC_AHB4ENR_GPIODEN;
+    RCC->AHB4ENR |=
+        RCC_AHB4ENR_CRCEN | RCC_AHB4ENR_GPIODEN | RCC_AHB4ENR_GPIOAEN;
     RCC->APB1LENR |= RCC_APB1LENR_USART3EN;
 
     /* Timestamp in microsecond specific configs */
@@ -64,6 +82,9 @@ bool bsp_init()
     ret &= crc.init();
     ret &= tx_gpio.init();
     ret &= rx_gpio.init();
+    ret &= de_gpio.init();
+    ret &= re_gpio.init();
+    ret &= rs485.init();
     ret &= usart.init();
 
     // No NVIC for USART3 — pipeline.receive() polls the USART directly.

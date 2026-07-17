@@ -3,6 +3,10 @@
 namespace LBR
 {
 
+Pipeline::Pipeline(Crc& crc, Rs485& rs485) : crc(crc), rs485(rs485)
+{
+}
+
 bool Pipeline::send(const PbCmd* msg, Usart& usart)
 {
     if (msg == nullptr)
@@ -50,11 +54,17 @@ bool Pipeline::send(const PbCmd* msg, Usart& usart)
 
     uint16_t frame_len = kFrameOverhead + static_cast<uint16_t>(payload_len);
 
+    // Enable THVD to logic for RS485 transmit mode
+    rs485.set_direction(Rs485::Direction::TRANSMIT);
+
     return usart.send(std::span<const uint8_t>(tx_buffer.data(), frame_len));
 }
 
 bool Pipeline::receive(PbCmd* msg, Usart& usart)
 {
+    // Enable THVD to logic for RS485 receive mode
+    rs485.set_direction(Rs485::Direction::RECEIVE);
+
     if (msg == nullptr)
         return false;
 

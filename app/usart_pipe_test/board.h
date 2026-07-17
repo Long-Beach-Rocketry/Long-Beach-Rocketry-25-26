@@ -8,6 +8,7 @@
 #pragma once
 #include "crc.h"
 #include "gpio.h"
+#include "rs485.h"
 #include "usart.h"
 #include "usart_pipe.h"
 
@@ -20,7 +21,9 @@ struct Board
     Usart& usart;
     Gpio& rx;
     Gpio& tx;
-    // Rs485& rs485; // TODO: Add RS485 control pin if needed
+    Gpio& de;
+    Gpio& re;
+    Rs485& rs485;
     Crc& crc;
     Pipeline& pipeline;
 };
@@ -30,4 +33,5 @@ Board& get_board();
 
 // For testing purpose (remove when it's work)
 uint32_t get_us();
+
 }  // namespace LBR
