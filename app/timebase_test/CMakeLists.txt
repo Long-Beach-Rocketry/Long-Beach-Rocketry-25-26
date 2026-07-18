@@ -6,7 +6,7 @@ set(PREPROCESS_DEFS
     -DDEF_FLASH_SIZE=1024K
 )
 
-add_subdirectory_for(STM32H723 BSP_H723)
+add_subdirectory_for(STM32H723 bsp_h723) 
 
 if (TARGET timebase_bsp)
 
