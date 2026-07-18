@@ -16,14 +16,13 @@ class Timebase
 public:
     /**
     * @brief init the timebase with a specified tick period
-    * @param tick_period The period of the timebase ticks in microseconds
     */
-    virtual bool init(std::chrono::microseconds tick_period) = 0;
+    virtual bool init() = 0;
 
     /**
     * @brief start the timebase
     */
-    virtual void start() = 0;
+    virtual bool start() = 0;
 
     /**
     * @brief stop the timebase
@@ -34,14 +33,14 @@ public:
     * @brief get the current time in microseconds
     * @return The current time in microseconds
     */
-    virtual uint64_t now_us() const = 0;
+    virtual uint64_t uptime_us() const = 0;
 
     /**
-    * @brief get the elapsed time in microseconds since a given time
-    * @param since The starting time in microseconds
-    * @return The elapsed time in microseconds
+    * @brief Calculate the elapsed time since a previously captured uptime value.
+    * @param since_us A timestamp previously returned by uptime_us().
+    * @return The elapsed duration in microseconds.
     */
-    virtual uint32_t elapsed_us(uint32_t since) const = 0;
+    virtual uint64_t elapsed_since_us(uint64_t since_us) const = 0;
 
     /**
      * @brief Set the Timer Frequency
