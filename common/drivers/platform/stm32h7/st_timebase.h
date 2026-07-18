@@ -57,14 +57,13 @@ public:
 
     /**
     * @brief init the timebase with a specified tick period
-    * @param tick_period The period of the timebase ticks in microseconds
     */
-    bool init(std::chrono::microseconds tick_period) override;
+    bool init() override;
 
     /**
     * @brief start the timebase
     */
-    void start() override;
+    bool start() override;
 
     /**
     * @brief stop the timebase
@@ -75,14 +74,15 @@ public:
     * @brief get the current time in microseconds
     * @return The current time in microseconds
     */
-    uint64_t now_us() const override;
+    uint64_t uptime_us() const override;
 
     /**
-    * @brief get the elapsed time in microseconds since a given time
-    * @param since The starting time in microseconds
-    * @return The elapsed time in microseconds
+    * @brief Calculate the elapsed time since a previously captured uptime value.
+    *
+    * @param since_us A timestamp previously returned by uptime_us().
+    * @return The elapsed duration in microseconds.
     */
-    uint32_t elapsed_us(uint32_t since) const override;
+    uint64_t elapsed_since_us(uint64_t since_us) const override;
 
     /**
     * @brief Set the Frequency of the TIM
@@ -99,23 +99,20 @@ public:
     */
     bool set_period(std::chrono::microseconds period) override;
 
-private:
     /**
-    * @note TIM & IRQ for the timebase constructor init.
+    * @brief Handle the timer interrupt. This function should be called from the timer's IRQ handler.
     */
+    void handle_irq();
+
+private:
     TIM_TypeDef* base_addr;
     IRQn_Type irq;
-
-    /**
-    * @timer_input_hz: The input frequency of the timer in Hz. 
-    *                  This is used to calculate the timer period for the desired tick period.
-    * @enable_irq: Whether to enable the timer interrupt. If true, the timer interrupt will be 
-    *              enabled and the overflow count will be incremented on each overflow.
-    * @overflow_count: A volatile counter that keeps track of the number of times the timer has overflowed.
-    */
     uint32_t timer_input_hz;
     bool enable_irq;
-    volatile uint64_t overflow_count;
+
+    uint64_t required_ticks{0};
+    bool configured{false};
+    volatile uint64_t overflow_count{0};
 };
 }  // namespace Stmh7
 }  // namespace LBR
