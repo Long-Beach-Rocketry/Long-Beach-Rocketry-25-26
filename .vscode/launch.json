@@ -359,7 +359,7 @@
     },
     {
       "cwd": "${workspaceFolder}",
-      "executable": "${workspaceRoot}/build/stm32h723/app/usart_app/usart_app",
+      "executable": "${workspaceRoot}/build/stm32h723/app/usart_app/usart_test",
       "name": "DEBUG USART H7",
       "request": "launch",
       "type": "cortex-debug",
@@ -379,7 +379,7 @@
         "${workspaceRoot}"
       ],
       "preRestartCommands": [
-        "add-symbol-file build/stm32h723/app/usart_app/usart_app",
+        "add-symbol-file build/stm32h723/app/usart_app/usart_test",
         "load",
         "enable breakpoint",
         "monitor reset"

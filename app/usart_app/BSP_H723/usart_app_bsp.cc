@@ -1,6 +1,6 @@
 #include "board.h"
 #include "st_gpio.h"
-#include "st_usart.h"
+#include "st_usart_andrew.h"
 
 using namespace LBR::Stmh7;
 
@@ -22,9 +22,9 @@ HwGpio tx_gpio(tx_params);
 HwGpio rx_gpio(rx_params);
 
 // Default frequency for the H7 (HSI / 1), (per Datasheet 8.7.2)
-StUsartParams usart_params = {USART3, 64000000, 115200};
+StUsartAndrewParams usart_params = {USART3, 64000000, 115200};
 
-StUsart usart(usart_params);
+StUsartAndrew usart(usart_params);
 }  // namespace Stmh7
 
 Board board{.usart = Stmh7::usart, .rx = Stmh7::rx_gpio, .tx = Stmh7::tx_gpio};
@@ -68,7 +68,7 @@ extern "C" void USART3_IRQHandler(void)
         {
             // received 1 byte, echo back
             std::span<const uint8_t> tx_span(&rxb, 1);
-            board.usart.send(tx_span);
+            board.usart.transmit(tx_span);
         }
     }
 }

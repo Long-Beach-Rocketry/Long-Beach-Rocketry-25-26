@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 
     while (1)
     {
-        board.usart.send(txb);
+        board.usart.transmit(txb);
 
         // Busy wait
         for (volatile uint32_t i = 0; i < 1000000; i++)

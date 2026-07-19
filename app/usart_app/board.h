@@ -1,6 +1,6 @@
 #pragma once
 #include "gpio.h"
-#include "usart.h"
+#include "usart_andrew.h"
 
 extern uint8_t rxb;
 
@@ -8,7 +8,7 @@ namespace LBR
 {
 struct Board
 {
-    Usart& usart;
+    UsartAndrew& usart;
 
     Gpio& rx;
     Gpio& tx;
