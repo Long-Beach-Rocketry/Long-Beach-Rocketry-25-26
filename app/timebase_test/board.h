@@ -19,6 +19,7 @@ struct Board
     Usart& usart;
     Clock& clock;
     Timebase& timebase;
+    Gpio& led;
 };
 
 bool bsp_init();

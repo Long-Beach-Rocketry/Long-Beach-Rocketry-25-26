@@ -56,6 +56,12 @@ public:
     uint64_t uptime_us() const override;
 
     /**
+    * @brief get the raw elapsed counter ticks (not converted to microseconds)
+    * @return Total elapsed counter ticks since the timebase started.
+    */
+    uint64_t uptime_ticks() const override;
+
+    /**
     * @brief Calculate the elapsed time since a previously captured uptime value.
     *
     * @param since_us A timestamp previously returned by uptime_us().
@@ -64,12 +70,12 @@ public:
     uint64_t elapsed_since_us(uint64_t since_us) const override;
 
     /**
-    * @brief Set the Frequency of the TIM
-    * @param new_timer_freq The desired new timer frequency
-    * @param pclk The peripheral clock frequency in Hz
-    * @return true if the timer frequency was set successfully, false otherwise
+    * @brief Set the counter (tick) frequency of the TIM
+    * @param new_counter_freq The desired counter frequency in Hz. Must divide
+    * the fixed timer input clock (timer_input_hz) exactly.
+    * @return true if the counter frequency was set successfully, false otherwise
     */
-    bool set_freq(uint32_t new_timer_freq, uint32_t pclk) override;
+    bool set_freq(uint32_t new_counter_freq) override;
 
     /**
     * @brief Set the period of the desired timebase TIM channel
@@ -91,7 +97,7 @@ private:
 
     uint64_t required_ticks{0};
     bool configured{false};
-    volatile uint64_t overflow_count{0};
+    volatile uint32_t overflow_count{0};
 };
 }  // namespace Stmh7
 }  // namespace LBR
