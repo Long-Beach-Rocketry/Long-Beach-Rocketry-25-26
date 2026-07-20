@@ -1,37 +1,29 @@
 /**
  * @file main.cc
- * @brief Timebase driver test app (LED blink)
+ * @brief Timebase driver test: report ISR-driven overflows over UART.
  */
 
 #include "board.h"
-#include "delay.h"
 
 #include <cstdint>
+#include <cstdio>
+#include <span>
 
 using namespace LBR;
 
 /*
- * @note: Dynamic-frequency blink test for the timebase driver.
+ * @note Each counter overflow fires the timer update interrupt, whose ISR
+ * (HwTimebase::handle_irq) increments the driver's private overflow_count. We
+ * recover that same count here as uptime_ticks() / kPeriodTicks.
  *
- * The LED toggles every kBlink *raw counter ticks* (uptime_ticks), NOT
- * microseconds. Ticks accrue faster at a higher counter frequency, so the blink
- * rate scales with the timebase frequency the loop cycles through below.
- *
- * With kBlink = 50'000 ticks:
- *   counter freq   50'000 ticks   half period   blink
- *      1 MHz         50'000 us       50 ms       10 Hz
- *    500 kHz        100'000 us      100 ms        5 Hz
- *      2 MHz         25'000 us       25 ms       20 Hz
- *
- * (Blinking on uptime_us() instead would be frequency INDEPENDENT - real
- *  microseconds - so the rate would not change. This test uses ticks on purpose
- *  to make the frequency change visible.)
+ * TIM3 is 16-bit (ARR = 0xFFFF), so one overflow is 0xFFFF + 1 = 65536 ticks.
+ * With the counter pinned at 1 MHz (1 tick = 1 us), every overflow should take
+ * ~65536 us (~65.5 ms). A steady per-overflow time means the ISR is firing at
+ * the right rate; drift or jitter points at a bug.
  */
-static constexpr uint64_t kBlink{50'000};
-
-static constexpr uint64_t kOneMHz{1'000'000};
-static constexpr uint64_t kFiveHundredkHz{500'000};
-static constexpr uint64_t kTwoMHz{2'000'000};
+static constexpr uint64_t kPeriodTicks{
+    65'536};  // TIM3 (16-bit): ARR (0xFFFF) + 1
+char message[96];
 
 int main(int argc, char* argv[])
 {
@@ -39,65 +31,41 @@ int main(int argc, char* argv[])
     Board board = get_board();
 
     board.timebase.start();
-    board.timebase.set_freq(kOneMHz);
+    board.timebase.set_freq(1'000'000);
 
-    uint64_t last_toggle_ticks = board.timebase.uptime_ticks();
-    uint64_t last_freq_change_us = board.timebase.uptime_us();
-    uint32_t frequency_hz = kOneMHz;
+    uint64_t last_overflow = board.timebase.uptime_ticks() / kPeriodTicks;
+    uint64_t last_time_us = board.timebase.uptime_us();
 
     while (1)
     {
-        const uint64_t current_ticks = board.timebase.uptime_ticks();
+        const uint64_t overflows = board.timebase.uptime_ticks() / kPeriodTicks;
 
-        if ((current_ticks - last_toggle_ticks) >= kBlink)
+        // No new overflow yet: keep polling.
+        if (overflows == last_overflow)
         {
-            board.led.toggle();
-            last_toggle_ticks = current_ticks;
+            continue;
         }
 
-        // Change counter frequency every 5 real seconds.
-        if (board.timebase.elapsed_since_us(last_freq_change_us) >= 5'000'000)
+        const uint64_t now_us = board.timebase.uptime_us();
+
+        // Print 32-bit values with %lu: this target's newlib-nano snprintf has
+        // 64-bit (%llu) support compiled out, so %llu would render as literal
+        // "lu". The count and per-overflow time both fit comfortably in 32 bits.
+        const int length =
+            std::snprintf(message, sizeof(message),
+                          "overflow #%lu  took=%lu us  (expected ~%lu)\r\n",
+                          static_cast<unsigned long>(overflows),
+                          static_cast<unsigned long>(now_us - last_time_us),
+                          static_cast<unsigned long>(kPeriodTicks));
+
+        if (length > 0)
         {
-            if (frequency_hz == kOneMHz)
-            {
-                frequency_hz = kFiveHundredkHz;
-            }
-            else if (frequency_hz == kFiveHundredkHz)
-            {
-                frequency_hz = kTwoMHz;
-            }
-            else
-            {
-                frequency_hz = kOneMHz;
-            }
-
-            board.timebase.set_freq(frequency_hz);
-            last_freq_change_us = board.timebase.uptime_us();
-
-            // Reset after reconfiguring to avoid a false immediate toggle.
-            last_toggle_ticks = board.timebase.uptime_ticks();
+            board.usart.send(std::span<const uint8_t>{
+                reinterpret_cast<const uint8_t*>(message),
+                static_cast<std::size_t>(length)});
         }
+
+        last_overflow = overflows;
+        last_time_us = now_us;
     }
-
-    // Printing every 100ms test example
-    // const uint64_t uptime_us = board.timebase.uptime_us();
-    //
-    // // Print every 100 ms.
-    // if ((uptime_us - previous_us) >= kPrintIntervalUs)
-    // {
-    //     // Update previous_us and calculate elapsed time
-    //     const uint64_t elapsed_us = uptime_us - previous_us;
-    //     previous_us = uptime_us;
-    //
-    //     const int length = std::snprintf(
-    //         message, sizeof(message), "uptime_us=%llu elapsed_us=%llu\r\n",
-    //         static_cast<unsigned long long>(uptime_us),
-    //         static_cast<unsigned long long>(elapsed_us));
-    //
-    //     if (length > 0)
-    //     {
-    //         board.usart.send(std::span<const uint8_t>{
-    //             reinterpret_cast<const uint8_t*>(message),
-    //             static_cast<std::size_t>(length)});
-    //     }
 }
