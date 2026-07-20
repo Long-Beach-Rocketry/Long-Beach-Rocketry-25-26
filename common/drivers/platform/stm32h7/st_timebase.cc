@@ -12,6 +12,27 @@ static constexpr uint64_t kMaxArr64{0xFFFFFFFFFFFFFFFFULL};
 static constexpr uint32_t kMicrosecondsPerSecond{1'000'000U};
 static constexpr uint32_t kDefaultCounterHz{1'000'000U};
 
+/******************************************************************************
+ * STM32H723 Timers
+ *
+ * TIM1  - Advanced Timer,        16-bit, 4 Channels
+ * TIM2  - General-Purpose Timer, 32-bit, 4 Channels
+ * TIM3  - General-Purpose Timer, 16-bit, 4 Channels
+ * TIM4  - General-Purpose Timer, 16-bit, 4 Channels
+ * TIM5  - General-Purpose Timer, 32-bit, 4 Channels
+ * TIM6  - Basic Timer,           16-bit
+ * TIM7  - Basic Timer,           16-bit
+ * TIM8  - Advanced Timer,        16-bit, 4 Channels
+ * TIM12 - General-Purpose Timer, 16-bit, 2 Channels
+ * TIM13 - General-Purpose Timer, 16-bit, 1 Channel
+ * TIM14 - General-Purpose Timer, 16-bit, 1 Channel
+ * TIM15 - General-Purpose Timer, 16-bit, 2 Channels
+ * TIM16 - General-Purpose Timer, 16-bit, 1 Channel
+ * TIM17 - General-Purpose Timer, 16-bit, 1 Channel
+ * TIM23 - General-Purpose Timer, 32-bit, 4 Channels (if available)
+ * TIM24 - General-Purpose Timer, 32-bit, 4 Channels (if available)
+ ******************************************************************************/
+
 static inline bool is_supported_timer(const TIM_TypeDef* tim)
 {
     return tim == TIM1 || tim == TIM2 || tim == TIM3 || tim == TIM4 ||
@@ -76,10 +97,6 @@ bool HwTimebase::init()
     base_addr->CR1 &= ~TIM_CR1_CEN;
     base_addr->DIER &= ~TIM_DIER_UIE;
 
-    // Clear any pending interrupts and disable the NVIC interrupt for the timer
-    NVIC_DisableIRQ(irq);
-    NVIC_ClearPendingIRQ(irq);
-
     // Configure the timer in upcounting mode with no clock division
     base_addr->SMCR &= ~TIM_SMCR_SMS;
     base_addr->CR1 &= ~(TIM_CR1_DIR | TIM_CR1_CMS);
@@ -89,7 +106,7 @@ bool HwTimebase::init()
     base_addr->CR1 |= TIM_CR1_URS;
 
     // Set the prescaler and auto-reload register to achieve the desired counter frequency
-    base_addr->PSC = divider - 1U;
+    base_addr->PSC = static_cast<uint16_t>(divider - 1U);
     base_addr->ARR = max_arr(base_addr);
     base_addr->CNT = 0U;
 
@@ -99,13 +116,7 @@ bool HwTimebase::init()
     base_addr->EGR = TIM_EGR_UG;
     base_addr->SR &= ~TIM_SR_UIF;
 
-    // Enable the timer interrupt in the NVIC with a priority of 5 and clear any pending interrupts
-    NVIC_SetPriority(irq, 5U);
-    NVIC_ClearPendingIRQ(irq);
-
-    // Enable the timer interrupts
     base_addr->DIER |= TIM_DIER_UIE;
-    NVIC_EnableIRQ(irq);
 
     configured = true;
     return true;
@@ -119,6 +130,13 @@ bool HwTimebase::start()
         return false;
     }
 
+    // Ensure the timer is paused before (re)starting so we don't corrupt an
+    // already-running timebase
+    if ((base_addr->CR1 & TIM_CR1_CEN) != 0U)
+    {
+        return false;
+    }
+
     // Enable the timer by setting the CEN bit in the CR1 register
     base_addr->CR1 |= TIM_CR1_CEN;
     return true;
@@ -127,14 +145,14 @@ bool HwTimebase::start()
 void HwTimebase::stop()
 {
     // Check if the timer is configured and the base address is valid
-    if (base_addr != nullptr)
+    if (base_addr != nullptr && configured)
     {
         // Disable the timer by clearing the CEN bit in the CR1 register
         base_addr->CR1 &= ~TIM_CR1_CEN;
     }
 }
 
-bool HwTimebase::set_freq(uint32_t new_counter_freq, uint32_t timer_clk)
+bool HwTimebase::set_freq(uint32_t new_counter_freq)
 {
     // Check if the timer is configured and the base address is valid
     if (base_addr == nullptr || !configured)
@@ -142,27 +160,21 @@ bool HwTimebase::set_freq(uint32_t new_counter_freq, uint32_t timer_clk)
         return false;
     }
 
-    // Validate the new counter frequency and timer clock
-    if (new_counter_freq == 0U || timer_clk == 0U ||
-        new_counter_freq > timer_clk)
-    {
-        return false;
-    }
-
-    // Check if the timer clock matches the expected input frequency
-    if (timer_clk != timer_input_hz)
+    // The timer input clock is fixed at construction (timer_input_hz), so the
+    // requested counter frequency is validated directly against it.
+    if (new_counter_freq == 0U || new_counter_freq > timer_input_hz)
     {
         return false;
     }
 
     // Ensure that the new counter frequency is an exact integer divisor of the timer clock
-    if ((timer_clk % new_counter_freq) != 0U)
+    if ((timer_input_hz % new_counter_freq) != 0U)
     {
         return false;
     }
 
     // Calculate the divider to achieve the desired counter frequency
-    const uint32_t divider = timer_clk / new_counter_freq;
+    const uint32_t divider = timer_input_hz / new_counter_freq;
 
     // Check if the divider is within the valid range for the timer's prescaler
     if (divider == 0U || divider > (kMaxPsc + 1U))
@@ -174,10 +186,10 @@ bool HwTimebase::set_freq(uint32_t new_counter_freq, uint32_t timer_clk)
     const bool was_running = (base_addr->CR1 & TIM_CR1_CEN) != 0U;
 
     // Disable the timer before reconfiguration
-    base_addr->CR1 &= ~TIM_CR1_CEN;
+    stop();
 
     // Set the new prescaler value to achieve the desired counter frequency
-    base_addr->PSC = divider - 1U;
+    base_addr->PSC = static_cast<uint16_t>(divider - 1U);
     base_addr->CNT = 0U;
     overflow_count = 0U;
 
@@ -253,7 +265,7 @@ bool HwTimebase::set_period(std::chrono::microseconds period)
     const bool was_running = (base_addr->CR1 & TIM_CR1_CEN) != 0U;
 
     // Disable the timer before reconfiguration
-    base_addr->CR1 &= ~TIM_CR1_CEN;
+    stop();
 
     // Set the auto-reload register (ARR) to the calculated period in ticks, subtracting 1 since ARR is zero-based
     base_addr->ARR = static_cast<uint32_t>(period_ticks - 1U);
@@ -277,7 +289,7 @@ bool HwTimebase::set_period(std::chrono::microseconds period)
     return true;
 }
 
-uint64_t HwTimebase::uptime_us() const
+uint64_t HwTimebase::uptime_ticks() const
 {
     if (base_addr == nullptr || !configured)
     {
@@ -285,11 +297,13 @@ uint64_t HwTimebase::uptime_us() const
     }
 
     /*
-     * overflow_count should be uint32_t, not uint64_t.
-     * A 32-bit access is atomic on Cortex-M7.
+     * overflow_count is uint32_t so a read is a single atomic access on
+     * Cortex-M7 (a 64-bit read would tear and defeat this snapshot).
      *
-     * Read the overflow count before and after CNT. If the ISR ran between
-     * the reads, repeat the snapshot.
+     * Reading CNT does not modify overflow_count; only handle_irq() does.
+     * However the overflow ISR can fire *between* our reads, pairing a fresh
+     * overflow_count with a stale CNT. Re-snapshot until the two overflow
+     * reads agree so counter is guaranteed to belong to that interval.
      */
     uint32_t overflow_before;
     uint32_t overflow_after;
@@ -303,7 +317,15 @@ uint64_t HwTimebase::uptime_us() const
         overflow_after = overflow_count;
     } while (overflow_before != overflow_after);
 
-    // Check if an overflow occurred after reading the counter but before reading the overflow count
+    /*
+     * The snapshot above is only race-free against overflows the ISR has
+     * already serviced. There is still a window where the counter has just
+     * wrapped in hardware (UIF set) but handle_irq() has not yet run to bump
+     * overflow_count. If we see UIF set, account for that pending overflow
+     * ourselves (+1) and re-read CNT so counter reflects the post-wrap value
+     * that belongs to the incremented overflow interval. Without this, uptime
+     * would briefly jump backwards each time the timer rolls over.
+     */
     if ((base_addr->SR & TIM_SR_UIF) != 0U)
     {
         overflow_after += 1U;
@@ -312,9 +334,21 @@ uint64_t HwTimebase::uptime_us() const
 
     const uint64_t period_ticks = static_cast<uint64_t>(base_addr->ARR) + 1U;
 
-    const uint64_t total_ticks =
-        static_cast<uint64_t>(overflow_after) * period_ticks +
-        static_cast<uint64_t>(counter);
+    // Raw tick count. This scales with the counter frequency: doubling the
+    // counter frequency doubles how fast this grows.
+    return static_cast<uint64_t>(overflow_after) * period_ticks +
+           static_cast<uint64_t>(counter);
+}
+
+uint64_t HwTimebase::uptime_us() const
+{
+    // Take the raw tick snapshot (handles the null/unconfigured case too).
+    const uint64_t total_ticks = uptime_ticks();
+
+    if (base_addr == nullptr || !configured)
+    {
+        return 0U;
+    }
 
     const uint64_t counter_hz =
         timer_input_hz / (static_cast<uint64_t>(base_addr->PSC) + 1U);

@@ -36,6 +36,15 @@ public:
     virtual uint64_t uptime_us() const = 0;
 
     /**
+    * @brief get the raw elapsed counter ticks (not converted to microseconds)
+    * @return Total elapsed counter ticks since the timebase started.
+    * @note Unlike uptime_us(), this value scales with the configured counter
+    * frequency, so changing the frequency changes how fast it advances. Useful
+    * for observing frequency changes directly.
+    */
+    virtual uint64_t uptime_ticks() const = 0;
+
+    /**
     * @brief Calculate the elapsed time since a previously captured uptime value.
     * @param since_us A timestamp previously returned by uptime_us().
     * @return The elapsed duration in microseconds.
@@ -43,14 +52,14 @@ public:
     virtual uint64_t elapsed_since_us(uint64_t since_us) const = 0;
 
     /**
-     * @brief Set the Timer Frequency
-     * 
-     * @param timer_freq The desired new timer frequency
-     * @return true Timer Frequency set successfully, false otherwise
-     * @note The reason I expose the pclk & new_timer_freq it's b/c assume 
-     * different TIM you want different resolution it is possible to have this as a helper
+     * @brief Set the counter (tick) frequency of the timebase.
+     *
+     * @param new_counter_freq The desired counter frequency in Hz. The timer's
+     * input clock is fixed when the timebase is constructed, so it is not passed
+     * in here; the implementation validates the request against that clock.
+     * @return true if the counter frequency was set successfully, false otherwise
      */
-    virtual bool set_freq(uint32_t new_timer_freq, uint32_t pclk) = 0;
+    virtual bool set_freq(uint32_t new_counter_freq) = 0;
 
     /**
     * @brief Set the period of the desired timebase TIM channel
