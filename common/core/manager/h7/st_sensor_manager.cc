@@ -12,7 +12,8 @@ namespace Stmh7
 {
 
 // TODO: set timer obj
-HwSensorMgr::HwSensorMgr(const StSensorMgrParams& params_) : sensors{params_.sensors}
+HwSensorMgr::HwSensorMgr(const StSensorMgrParams& params_)
+    : sensors{params_.sensors}
 {
 }
 
@@ -22,6 +23,12 @@ SensorData HwSensorMgr::get_latest_sensors() const
 }
 bool HwSensorMgr::update_sensor_data()
 {
+    // TODO: Check if timer count has overflowed
+    if (1)
+    {
+        return false;
+    }
+
     /* Check if barometer exists and fetch data */
     if (sensors.bmp390)
     {

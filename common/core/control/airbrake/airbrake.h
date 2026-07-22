@@ -39,7 +39,7 @@ public:
 
     /**
      * @brief Returns the current state of the airbrake
-     * @param void
+     * @param None
      * @return AirBrakeState
      */
     AirbrakeState get_state(void) const;

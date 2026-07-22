@@ -7,7 +7,7 @@ namespace LBR
 {
 
 AirBrake::AirBrake(AirbrakeParams params_)
-    : motor{params_.motor}, state{AirbrakeState::PRELAUNCH}
+    : motor{params_.motor}, state{AirbrakeState::PRELAUNCH}, base_altitude{0}
 {
 }
 
@@ -24,6 +24,7 @@ void AirBrake::update(SensorData data)
      * LAUNCH_SIGNAL
      */
 
+    // Altitude units is in meters
     float altitude = calc_altitude(init_pressure, pressure) - base_altitude;
     float time;          // temp placeholder for time from start
     bool launch_signal;  // temp placeholder
@@ -51,7 +52,7 @@ void AirBrake::update(SensorData data)
             else
             {
                 init_pressure = data.pressure;
-                base_altitude = calc_altitude();
+                base_altitude = calc_altitude(init_pressure, data.pressure);
             }
             break;
 

@@ -31,7 +31,7 @@ inline float celsius_to_kelvin(float temp);
  * @param curr_press The current pressure reading by the barometer
  * @return The calculated altitude in meters
  */
-float calc_altitude(float init_temp, float init_press, float curr_press);
+float calc_altitude(float init_press, float curr_press);
 
 /**
  * @brief Helper function that calculates the current velocity
