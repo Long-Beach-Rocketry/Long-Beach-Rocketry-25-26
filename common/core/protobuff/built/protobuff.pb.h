@@ -31,9 +31,18 @@ typedef enum _RocketState
 
 typedef enum _AirbrakeStatus
 {
-    AirbrakeStatus_AIRBRAKE_STATUS_UNKNOWN = 0,
-    AirbrakeStatus_AIRBRAKE_STATUS_RETRACTED = 1,
-    AirbrakeStatus_AIRBRAKE_STATUS_DEPLOYED = 2
+    AirbrakeStatus_AIRBRAKE_STATUS_PRELAUNCH = 0, /* Not launched yet */
+    AirbrakeStatus_AIRBRAKE_STATUS_LAUNCHED =
+        1, /* 6 second interval from launch */
+    AirbrakeStatus_AIRBRAKE_STATUS_AIRBRAKES_DEPLOYING =
+        2, /* Deploy airbrakes after 6 seconds */
+    AirbrakeStatus_AIRBRAKE_STATUS_AIRBRAKES_FULLY_DEPLOYED =
+        3, /* When at 30 degrees; not sure when to know though */
+    AirbrakeStatus_AIRBRAKE_STATUS_AIRBRAKES_RETRACTING =
+        4, /* Should do before target apogee */
+    AirbrakeStatus_AIRBRAKE_STATUS_AIRBRAKES_FULLY_RETRACTED =
+        5, /* Again, dont know how to know if retracted */
+    AirbrakeStatus_AIRBRAKE_STATUS_RECOVERY_POPPED = 6 /* Job finished */
 } AirbrakeStatus;
 
 /* Struct definitions */
@@ -58,12 +67,17 @@ typedef struct _IMUData
     float linear_accel_x;
     float linear_accel_y;
     float linear_accel_z;
+    float quat_w;
+    float gravity_x;
+    float gravity_y;
+    float gravity_z;
 } IMUData;
 
 typedef struct _BaroData
 {
     float air_pressure; /* Pascals */
     float altitude;     /* Meters */
+    float temperature;  /* Celsius */
 } BaroData;
 
 typedef struct _RocketMessage
@@ -92,10 +106,10 @@ extern "C"
 #define _RocketState_ARRAYSIZE \
     ((RocketState)(RocketState_ROCKET_STATE_LANDED + 1))
 
-#define _AirbrakeStatus_MIN AirbrakeStatus_AIRBRAKE_STATUS_UNKNOWN
-#define _AirbrakeStatus_MAX AirbrakeStatus_AIRBRAKE_STATUS_DEPLOYED
+#define _AirbrakeStatus_MIN AirbrakeStatus_AIRBRAKE_STATUS_PRELAUNCH
+#define _AirbrakeStatus_MAX AirbrakeStatus_AIRBRAKE_STATUS_RECOVERY_POPPED
 #define _AirbrakeStatus_ARRAYSIZE \
-    ((AirbrakeStatus)(AirbrakeStatus_AIRBRAKE_STATUS_DEPLOYED + 1))
+    ((AirbrakeStatus)(AirbrakeStatus_AIRBRAKE_STATUS_RECOVERY_POPPED + 1))
 
 #define StatusData_fsw_status_ENUMTYPE FswStatus
 #define StatusData_rocket_state_ENUMTYPE RocketState
@@ -104,15 +118,15 @@ extern "C"
 /* Initializer values for message structs */
 #define StatusData_init_default \
     {_FswStatus_MIN, _RocketState_MIN, _AirbrakeStatus_MIN}
-#define IMUData_init_default {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-#define BaroData_init_default {0, 0}
+#define IMUData_init_default {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+#define BaroData_init_default {0, 0, 0}
 #define RocketMessage_init_default                                \
     {false, StatusData_init_default, false, IMUData_init_default, \
      false, BaroData_init_default,   0}
 #define StatusData_init_zero \
     {_FswStatus_MIN, _RocketState_MIN, _AirbrakeStatus_MIN}
-#define IMUData_init_zero {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-#define BaroData_init_zero {0, 0}
+#define IMUData_init_zero {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+#define BaroData_init_zero {0, 0, 0}
 #define RocketMessage_init_zero                             \
     {false, StatusData_init_zero, false, IMUData_init_zero, \
      false, BaroData_init_zero,   0}
@@ -133,8 +147,13 @@ extern "C"
 #define IMUData_linear_accel_x_tag 10
 #define IMUData_linear_accel_y_tag 11
 #define IMUData_linear_accel_z_tag 12
+#define IMUData_quat_w_tag 13
+#define IMUData_gravity_x_tag 14
+#define IMUData_gravity_y_tag 15
+#define IMUData_gravity_z_tag 16
 #define BaroData_air_pressure_tag 1
 #define BaroData_altitude_tag 2
+#define BaroData_temperature_tag 3
 #define RocketMessage_status_tag 1
 #define RocketMessage_imu_tag 2
 #define RocketMessage_baro_tag 3
@@ -160,13 +179,18 @@ extern "C"
     X(a, STATIC, SINGULAR, FLOAT, quat_z, 9)          \
     X(a, STATIC, SINGULAR, FLOAT, linear_accel_x, 10) \
     X(a, STATIC, SINGULAR, FLOAT, linear_accel_y, 11) \
-    X(a, STATIC, SINGULAR, FLOAT, linear_accel_z, 12)
+    X(a, STATIC, SINGULAR, FLOAT, linear_accel_z, 12) \
+    X(a, STATIC, SINGULAR, FLOAT, quat_w, 13)         \
+    X(a, STATIC, SINGULAR, FLOAT, gravity_x, 14)      \
+    X(a, STATIC, SINGULAR, FLOAT, gravity_y, 15)      \
+    X(a, STATIC, SINGULAR, FLOAT, gravity_z, 16)
 #define IMUData_CALLBACK NULL
 #define IMUData_DEFAULT NULL
 
 #define BaroData_FIELDLIST(X, a)                   \
     X(a, STATIC, SINGULAR, FLOAT, air_pressure, 1) \
-    X(a, STATIC, SINGULAR, FLOAT, altitude, 2)
+    X(a, STATIC, SINGULAR, FLOAT, altitude, 2)     \
+    X(a, STATIC, SINGULAR, FLOAT, temperature, 3)
 #define BaroData_CALLBACK NULL
 #define BaroData_DEFAULT NULL
 
@@ -193,10 +217,10 @@ extern "C"
 #define RocketMessage_fields &RocketMessage_msg
 
 /* Maximum encoded size of messages (where known) */
-#define BaroData_size 10
-#define IMUData_size 60
+#define BaroData_size 15
+#define IMUData_size 81
 #define PROTOBUFF_PB_H_MAX_SIZE RocketMessage_size
-#define RocketMessage_size 88
+#define RocketMessage_size 114
 #define StatusData_size 6
 
 #ifdef __cplusplus

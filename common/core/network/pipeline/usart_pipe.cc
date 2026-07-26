@@ -53,6 +53,7 @@ bool Pipeline::send(const PbCmd* msg, Usart& usart)
     tx_buffer[crc_offset + kCrcLen + 3] = static_cast<uint8_t>(kEof);
 
     uint16_t frame_len = kFrameOverhead + static_cast<uint16_t>(payload_len);
+    tx_frame_len = frame_len;
 
     // Enable THVD to logic for RS485 transmit mode
     rs485.set_direction(Rs485::Direction::TRANSMIT);
@@ -68,11 +69,28 @@ bool Pipeline::receive(PbCmd* msg, Usart& usart)
     if (msg == nullptr)
         return false;
 
-    // Poll the usart for new bytes from the ring buffer
-    poll_usart(usart);
+    /** 
+    * @note Poll the usart for new bytes from the ring buffer
+    * Not using it now assuming that polling process will cause stale data
+    * so we going to call usart.send() directly
+    * The only reason I have the poll_usart() function is in the sanario where
+    * we need to go back-n-forth between sending and receiving, but in our case we are only downlink 
+    * we don't need to poll the usart for new bytes, we can just call usart.receive() directly at the telemetry board end.
+    */
+
+    // poll_usart(usart);
 
     // Process the rx buffer to extract and validate a complete frame, then decode the protobuf message
     return process_frame(msg);
+}
+
+void Pipeline::push_rx(uint8_t byte)
+{
+    // Called from the USART RX ISR: stash the byte for receive() to decode later.
+    // FYI I cannot make the ISR touch the rx_buffer directly b/c the ringbuf have private
+    // members and the ISR is not a member of the Pipeline class so it cannot access the private members of the ringbuf class
+    //  So I have to call this function from the ISR to push the byte into the ring buffer
+    rx_buffer.push(byte);
 }
 
 void Pipeline::poll_usart(Usart& usart)
@@ -169,6 +187,7 @@ bool Pipeline::process_frame(PbCmd* msg)
     }
 
     // Decode the message if it's true that we got here with a valid frame
+    rx_frame_len = frame_len;
     return msg->decode(frame.data() + kHeaderLen, payload_len);
 }
 

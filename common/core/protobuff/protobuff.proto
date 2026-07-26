@@ -1,6 +1,8 @@
 syntax = "proto3";
 
-// mock enums — update when airbrake FSW is finalized
+// TODO: This is not finalized (Field could be changed)
+// According to AirBrakeApp & LoRa transciever maximum capabilities
+
 enum FswStatus {
     FSW_STATUS_UNKNOWN = 0;
     FSW_STATUS_IDLE    = 1;
@@ -18,9 +20,13 @@ enum RocketState {
 }
 
 enum AirbrakeStatus {
-    AIRBRAKE_STATUS_UNKNOWN   = 0;
-    AIRBRAKE_STATUS_RETRACTED = 1;
-    AIRBRAKE_STATUS_DEPLOYED  = 2;
+    AIRBRAKE_STATUS_PRELAUNCH                = 0;  // Not launched yet
+    AIRBRAKE_STATUS_LAUNCHED                 = 1;  // 6 second interval from launch
+    AIRBRAKE_STATUS_AIRBRAKES_DEPLOYING      = 2;  // Deploy airbrakes after 6 seconds
+    AIRBRAKE_STATUS_AIRBRAKES_FULLY_DEPLOYED = 3;  // When at 30 degrees; not sure when to know though
+    AIRBRAKE_STATUS_AIRBRAKES_RETRACTING     = 4;  // Should do before target apogee
+    AIRBRAKE_STATUS_AIRBRAKES_FULLY_RETRACTED = 5;  // Again, dont know how to know if retracted
+    AIRBRAKE_STATUS_RECOVERY_POPPED          = 6;  // Job finished
 }
 
 message StatusData {
@@ -39,14 +45,19 @@ message IMUData {
     float quat_x         = 7;
     float quat_y         = 8;
     float quat_z         = 9;
-    float linear_accel_x = 10;
-    float linear_accel_y = 11;
-    float linear_accel_z = 12;
+    float quat_w         = 10;
+    float linear_accel_x = 11;
+    float linear_accel_y = 12;
+    float linear_accel_z = 13;
+    float gravity_x      = 14;
+    float gravity_y      = 15;
+    float gravity_z      = 16;
 }
 
 message BaroData {
     float air_pressure = 1;  // Pascals
     float altitude     = 2;  // Meters
+    float temperature  = 3;  // Celsius
 }
 
 message RocketMessage {

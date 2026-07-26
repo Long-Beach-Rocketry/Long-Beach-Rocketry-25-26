@@ -40,6 +40,33 @@ public:
     */
     bool receive(PbCmd* msg, Usart& usart);
 
+    /**
+    * @brief Push one received byte into the RX ring buffer.
+    *        Call this from the USART RX interrupt handler so incoming bytes are
+    *        captured automatically without polling. receive() then decodes whole
+    *        frames out of the buffer the ISR has filled.
+    * @param byte The byte read from the USART data register in the ISR.
+    */
+    void push_rx(uint8_t byte);
+
+    /**
+    * @brief Total length (LEN + overhead) of the most recently transmitted frame.
+    * @return kFrameOverhead + payload_len for the last successful send(), or 0 if none yet.
+    */
+    uint16_t get_tx_frame_len() const
+    {
+        return tx_frame_len;
+    }
+
+    /**
+    * @brief Total length (LEN + overhead) of the most recently received frame.
+    * @return kFrameOverhead + payload_len for the last successfully decoded frame, or 0 if none yet.
+    */
+    uint16_t get_rx_frame_len() const
+    {
+        return rx_frame_len;
+    }
+
 private:
     // Format of the frame: [SOF:4][LEN:1][PAYLOAD:N][CRC32:4][EOF:4]
     static constexpr uint32_t kSof{0xAB6B0BAA};
@@ -56,6 +83,8 @@ private:
     Rs485& rs485;
     RingBuffer<uint8_t, kBufSize> rx_buffer;
     std::array<uint8_t, kBufSize> tx_buffer;
+    uint16_t tx_frame_len{0};
+    uint16_t rx_frame_len{0};
 
     /**
     * @brief Poll the USART for incoming bytes and push them into the RX ring buffer.

@@ -87,8 +87,10 @@ bool bsp_init()
     ret &= rs485.init();
     ret &= usart.init();
 
-    // No NVIC for USART3 — pipeline.receive() polls the USART directly.
-    // Enabling the ISR here would consume RX bytes before poll_usart() can see them.
+    // Interrupt-driven RX: the USART3 ISR grabs each incoming byte into the
+    // pipeline's ring buffer, so receive() just decodes whole frames and never polls.
+    NVIC_SetPriority(USART3_IRQn, 0);
+    NVIC_EnableIRQ(USART3_IRQn);
 
     return ret;
 }
@@ -111,6 +113,14 @@ extern "C" void IncDelayTicks(void);
 extern "C" void SysTick_Handler(void)
 {
     IncDelayTicks();
+}
+
+// USART3 RX interrupt: fires on each received byte, hands it to the pipeline's
+// ring buffer. This is the "init once and forget" RX path — no polling.
+extern "C" void USART3_IRQHandler(void)
+{
+    if (usart.receive(rxb))     // reading RDR clears the RXNE flag
+        pipeline.push_rx(rxb);  // stash the byte for receive() to decode
 }
 
 }  // namespace LBR
