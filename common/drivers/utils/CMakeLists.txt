@@ -6,11 +6,9 @@ target_include_directories(driver_utils PUBLIC
     .
 )
 
-# For embedded builds: include device + CMSIS headers
-if (TARGET_DEVICE MATCHES "STM32")
-    target_include_directories(driver_utils PRIVATE
-        ${CMAKE_SOURCE_DIR}/mcu_support/stm32/l4xx
-        ${CMAKE_SOURCE_DIR}/mcu_support/CMSIS/include
-    )
-    target_link_libraries(driver_utils PUBLIC cmsis)
+# For embedded builds: link the device support lib for DWT/SysTick register access
+if (TARGET_DEVICE MATCHES "^(STM32H7)[0-9]+")
+    target_link_libraries(driver_utils PRIVATE st_h7_support)
+elseif (TARGET_DEVICE MATCHES "^(STM32L4)[0-9]+")
+    target_link_libraries(driver_utils PRIVATE st_l4_support)
 endif()

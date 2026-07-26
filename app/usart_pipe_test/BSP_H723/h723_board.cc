@@ -1,4 +1,5 @@
 #include "board.h"
+#include "delay.h"
 #include "rs485.h"
 #include "st_crc.h"
 #include "st_gpio.h"
@@ -67,12 +68,8 @@ bool bsp_init()
         RCC_AHB4ENR_CRCEN | RCC_AHB4ENR_GPIODEN | RCC_AHB4ENR_GPIOAEN;
     RCC->APB1LENR |= RCC_APB1LENR_USART3EN;
 
-    /* Timestamp in microsecond specific configs */
-
-    // Enable DWT cycle counter for hardware microsecond timestamps
-    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-    DWT->CYCCNT = 0;
-    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+    // Enable DWT cycle counter for hardware microsecond timestamps (Utils::GetUs())
+    Utils::EnableUsTimer();
 
     // Configure SysTick for 1 ms timebase so Utils::DelayMs() works
     SysTick_Config(SystemCoreClock / 1000);
@@ -93,14 +90,6 @@ bool bsp_init()
     NVIC_EnableIRQ(USART3_IRQn);
 
     return ret;
-}
-
-/* I will make a helper and throw this in utils (delay.h) */
-/* The current function get timestamp in microseconds */
-uint32_t get_us()
-{
-    // DWT->CYCCNT wraps at ~67s @ 64 MHz — fine for loopback timing
-    return DWT->CYCCNT / (SystemCoreClock / 1000000UL);
 }
 
 Board& get_board()

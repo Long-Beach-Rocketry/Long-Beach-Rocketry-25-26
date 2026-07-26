@@ -1,4 +1,5 @@
 #include "usart_pipe.h"
+#include <algorithm>
 
 namespace LBR
 {
@@ -12,13 +13,20 @@ bool Pipeline::send(const PbCmd* msg, Usart& usart)
     if (msg == nullptr)
         return false;
 
-    /* Format of the frame: [SOF:4][LEN:1][PAYLOAD:N][CRC32:4][EOF:4] */
+    /* NEW: Format of the frame: [SOF:4][LEN:1][PAYLOAD:kMaxPayloadLen, zero-padded][CRC32:4][EOF:4] */
+    /* OLD: Format of the frame: [SOF:4][LEN:1][PAYLOAD:N][CRC32:4][EOF:4] */
 
     // Encode protobuf payload after the header slot
     int payload_len =
         msg->encode(tx_buffer.data() + kHeaderLen, kMaxPayloadLen);
     if (payload_len <= 0)
         return false;
+
+    // Zero-pad the unused tail of the payload region so every frame is the same
+    // size on the wire. LEN still carries the real encoded length below — the
+    // padding is only ever skipped over, never fed to decode().
+    std::fill(tx_buffer.begin() + kHeaderLen + payload_len,
+              tx_buffer.begin() + kHeaderLen + kMaxPayloadLen, uint8_t{0});
 
     // Build header — SOF big-endian, then LEN byte
     tx_buffer[0] = static_cast<uint8_t>(kSof >> 24);
@@ -27,11 +35,16 @@ bool Pipeline::send(const PbCmd* msg, Usart& usart)
     tx_buffer[3] = static_cast<uint8_t>(kSof);
     tx_buffer[kSofLen] = static_cast<uint8_t>(payload_len);
 
-    // Compute CRC32 over [SOF][LEN][PAYLOAD]
-    // Note: we do CRC32 b/c the payload is variable length
-    // and we want to avoid copying it into a separate buffer for crc calculation
+    // Old solution with dynamically change the SIZE OF THE LEN
+    // Pro: It dynamically change the LEN, Con: Inconsistent frame LEN size & waste bandwidth
+    // uint16_t crc_input_len = kHeaderLen + static_cast<uint16_t>(payload_len);
 
-    uint16_t crc_input_len = kHeaderLen + static_cast<uint16_t>(payload_len);
+    // NOTE: The current method that you saw uncommented was the fixed-sized lenght of the payload
+    // This is good when it comes from the Airbrake board and feed into the telemetry board (as well as write into the W25q)
+
+    // CRC32 covers [SOF][LEN][PAYLOAD:kMaxPayloadLen] — the fixed-size region,
+    // padding included — so CRC/EOF always land at the same offsets.
+    uint16_t crc_input_len = kHeaderLen + kMaxPayloadLen;
     uint32_t crc_val = 0;
     if (!crc.compute(std::span<const uint8_t>(tx_buffer.data(), crc_input_len),
                      crc_val))
@@ -52,7 +65,8 @@ bool Pipeline::send(const PbCmd* msg, Usart& usart)
     tx_buffer[crc_offset + kCrcLen + 2] = static_cast<uint8_t>(kEof >> 8);
     tx_buffer[crc_offset + kCrcLen + 3] = static_cast<uint8_t>(kEof);
 
-    uint16_t frame_len = kFrameOverhead + static_cast<uint16_t>(payload_len);
+    // Frame length is now fixed regardless of the real payload size.
+    uint16_t frame_len = kFrameOverhead + kMaxPayloadLen;
     tx_frame_len = frame_len;
 
     // Enable THVD to logic for RS485 transmit mode
@@ -135,7 +149,8 @@ bool Pipeline::process_frame(PbCmd* msg)
         return false;
     }
 
-    // LEN byte sits immediately after the 4-byte SOF
+    // LEN byte sits immediately after the 4-byte SOF. It's the *real* encoded
+    // length, used below only to bound decode() — framing itself is fixed-size.
     uint8_t len_byte = 0;
     rx_buffer.peek(kSofLen, len_byte);
     uint8_t payload_len = len_byte;
@@ -148,8 +163,13 @@ bool Pipeline::process_frame(PbCmd* msg)
         return false;
     }
 
+    // OLD METHOD:
     // We need the full frame (header + payload + crc + eof) to proceed
-    uint16_t frame_len = kFrameOverhead + payload_len;
+    // uint16_t frame_len = kFrameOverhead + payload_len;
+
+    // Every frame is the same fixed size on the wire (header + max payload +
+    // crc + eof), regardless of the real payload length in LEN.
+    uint16_t frame_len = kFrameOverhead + kMaxPayloadLen;
     if (rx_buffer.size() < frame_len)
     {
         return false;

@@ -31,7 +31,4 @@ struct Board
 bool bsp_init();
 Board& get_board();
 
-// For testing purpose (remove when it's work)
-uint32_t get_us();
-
 }  // namespace LBR

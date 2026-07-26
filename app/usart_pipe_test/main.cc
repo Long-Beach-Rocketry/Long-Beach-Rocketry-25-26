@@ -90,7 +90,7 @@ int main()
         tx.msg.baro.temperature = 20.0f + (count * 0.05f);
 
         // Stamp real hardware time right at send
-        tx.msg.timestamp_us = get_us();
+        tx.msg.timestamp_us = GetUs();
         bool sent = board.pipeline.send(&tx, board.usart);
 
         // Wait for all bytes to arrive back via loopback (~22ms at 115200 baud)

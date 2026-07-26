@@ -2,8 +2,15 @@
 * @file usart_pipe.h
 * @author Bex Saw
 * @brief Framer for board-to-board communication over USART→RS485→USART.
-*        Frame format: [SOF:4][LEN:1][PAYLOAD:N][CRC32:4][EOF:4]
-* @version 0.3
+*        NEW: Frame format: [SOF:4][LEN:1][PAYLOAD:kMaxPayloadLen, zero-padded][CRC32:4][EOF:4]
+*        Every frame is the same fixed size on the wire (so a future LoRa hop
+*        can rely on a constant packet size); LEN still carries the real
+*        encoded length so decode() knows how many payload bytes are real.
+* 
+*        OLD: Frame format: [SOF:4][LEN:1][PAYLOAD:N][CRC32:4][EOF:4]
+*        Every frame is variable size on the wire, so a future LoRa hop would
+*        need to know the real payload length to know how many bytes to read.
+* @version 0.4
 */
 #pragma once
 
@@ -50,8 +57,7 @@ public:
     void push_rx(uint8_t byte);
 
     /**
-    * @brief Total length (LEN + overhead) of the most recently transmitted frame.
-    * @return kFrameOverhead + payload_len for the last successful send(), or 0 if none yet.
+    * @brief Total length of the most recently transmitted frame.
     */
     uint16_t get_tx_frame_len() const
     {
@@ -59,8 +65,7 @@ public:
     }
 
     /**
-    * @brief Total length (LEN + overhead) of the most recently received frame.
-    * @return kFrameOverhead + payload_len for the last successfully decoded frame, or 0 if none yet.
+    * @brief Total length of the most recently received frame.
     */
     uint16_t get_rx_frame_len() const
     {
