@@ -44,7 +44,7 @@ HwGpio re_gpio(re_params);
 StUsartParams usart_params = {USART3, 64000000, 115200};
 StUsart usart{usart_params};
 
-Rs485 rs485(tx_gpio, rx_gpio);
+Rs485 rs485(de_gpio, re_gpio);
 
 Pipeline pipeline{crc, rs485};
 
