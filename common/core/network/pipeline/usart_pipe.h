@@ -48,6 +48,18 @@ public:
     bool receive(PbCmd* msg, Usart& usart);
 
     /**
+    * @brief Pull one validated raw frame out of the RX ring buffer without decoding
+    *        it, for boards that just relay bytes onward (e.g. to the SX1262 LoRa
+    *        driver) instead of consuming the protobuf message locally. Framing,
+    *        length, and CRC/EOF are still checked here so a desync on the RS485
+    *        hop doesn't burn LoRa airtime forwarding garbage.
+    * @param out_frame Buffer to copy the raw frame into (SOF..EOF, fixed frame size).
+    * @param out_len Set to the number of bytes copied into out_frame.
+    * @return True if a valid frame was found in the RX ring buffer and copied.
+    */
+    bool receive_raw(std::span<uint8_t> out_frame, uint16_t& out_len);
+
+    /**
     * @brief Push one received byte into the RX ring buffer.
     *        Call this from the USART RX interrupt handler so incoming bytes are
     *        captured automatically without polling. receive() then decodes whole
@@ -82,7 +94,7 @@ private:
     static constexpr uint8_t kEofLen{4};
     static constexpr uint16_t kBufSize{256};
     static constexpr uint8_t kFrameOverhead = kHeaderLen + kCrcLen + kEofLen;
-    static constexpr uint16_t kMaxPayloadLen = kBufSize - kFrameOverhead;
+    static constexpr uint16_t kPayloadLen = kBufSize - kFrameOverhead;
 
     Crc& crc;
     Rs485& rs485;
@@ -103,5 +115,17 @@ private:
     * @return True if a valid frame was processed and decoded, false otherwise.
     */
     bool process_frame(PbCmd* msg);
+
+    /**
+    * @brief Slide the RX ring buffer to the next SOF, validate LEN/CRC/EOF, and
+    *        copy the raw fixed-size frame out. Shared by process_frame() (which
+    *        decodes the result) and receive_raw() (which forwards it as-is).
+    * @param frame Buffer to receive the raw frame bytes (SOF..EOF).
+    * @param frame_len Set to the total frame length copied into frame.
+    * @param payload_len Set to the real encoded payload length from the LEN byte.
+    * @return True if a valid frame was found, validated, and consumed from rx_buffer.
+    */
+    bool extract_frame(std::array<uint8_t, kBufSize>& frame,
+                       uint16_t& frame_len, uint8_t& payload_len);
 };
 }  // namespace LBR

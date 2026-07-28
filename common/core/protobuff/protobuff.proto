@@ -4,9 +4,9 @@ syntax = "proto3";
 // According to AirBrakeApp & LoRa transciever maximum capabilities
 
 enum FswStatus {
-    FSW_STATUS_UNKNOWN = 0;
-    FSW_STATUS_IDLE    = 1;
-    FSW_STATUS_ACTIVE  = 2;
+    UNKNOWN = 0;
+    NOMINAL = 1;
+    ERROR   = 2;
 }
 
 enum RocketState {

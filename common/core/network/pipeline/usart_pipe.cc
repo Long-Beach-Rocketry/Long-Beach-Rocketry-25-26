@@ -17,16 +17,19 @@ bool Pipeline::send(const PbCmd* msg, Usart& usart)
     /* OLD: Format of the frame: [SOF:4][LEN:1][PAYLOAD:N][CRC32:4][EOF:4] */
 
     // Encode protobuf payload after the header slot
-    int payload_len =
-        msg->encode(tx_buffer.data() + kHeaderLen, kMaxPayloadLen);
-    if (payload_len <= 0)
+    int payload_len = msg->encode(tx_buffer.data() + kHeaderLen, kPayloadLen);
+
+    // If payload_len is not equal the fixed size of the payload, then we have a problem
+    if (payload_len <= 0 || payload_len > kPayloadLen)
+    {
         return false;
+    }
 
     // Zero-pad the unused tail of the payload region so every frame is the same
     // size on the wire. LEN still carries the real encoded length below — the
     // padding is only ever skipped over, never fed to decode().
     std::fill(tx_buffer.begin() + kHeaderLen + payload_len,
-              tx_buffer.begin() + kHeaderLen + kMaxPayloadLen, uint8_t{0});
+              tx_buffer.begin() + kHeaderLen + kPayloadLen, uint8_t{0});
 
     // Build header — SOF big-endian, then LEN byte
     tx_buffer[0] = static_cast<uint8_t>(kSof >> 24);
@@ -44,7 +47,7 @@ bool Pipeline::send(const PbCmd* msg, Usart& usart)
 
     // CRC32 covers [SOF][LEN][PAYLOAD:kMaxPayloadLen] — the fixed-size region,
     // padding included — so CRC/EOF always land at the same offsets.
-    uint16_t crc_input_len = kHeaderLen + kMaxPayloadLen;
+    uint16_t crc_input_len = kHeaderLen + kPayloadLen;
     uint32_t crc_val = 0;
     if (!crc.compute(std::span<const uint8_t>(tx_buffer.data(), crc_input_len),
                      crc_val))
@@ -53,11 +56,12 @@ bool Pipeline::send(const PbCmd* msg, Usart& usart)
     }
 
     // Append CRC32 little-endian after payload
+    // This is Big Endian, but the CRC32 is little-endian, so we need to reverse the order of the bytes
     uint16_t crc_offset = crc_input_len;
-    tx_buffer[crc_offset + 0] = static_cast<uint8_t>(crc_val);
-    tx_buffer[crc_offset + 1] = static_cast<uint8_t>(crc_val >> 8);
-    tx_buffer[crc_offset + 2] = static_cast<uint8_t>(crc_val >> 16);
-    tx_buffer[crc_offset + 3] = static_cast<uint8_t>(crc_val >> 24);
+    tx_buffer[crc_offset + 0] = static_cast<uint8_t>(crc_val >> 24);
+    tx_buffer[crc_offset + 1] = static_cast<uint8_t>(crc_val >> 16);
+    tx_buffer[crc_offset + 2] = static_cast<uint8_t>(crc_val >> 8);
+    tx_buffer[crc_offset + 3] = static_cast<uint8_t>(crc_val >> 0);
 
     // Append EOF big-endian
     tx_buffer[crc_offset + kCrcLen + 0] = static_cast<uint8_t>(kEof >> 24);
@@ -66,7 +70,7 @@ bool Pipeline::send(const PbCmd* msg, Usart& usart)
     tx_buffer[crc_offset + kCrcLen + 3] = static_cast<uint8_t>(kEof);
 
     // Frame length is now fixed regardless of the real payload size.
-    uint16_t frame_len = kFrameOverhead + kMaxPayloadLen;
+    uint16_t frame_len = kFrameOverhead + kPayloadLen;
     tx_frame_len = frame_len;
 
     // Enable THVD to logic for RS485 transmit mode
@@ -118,7 +122,8 @@ void Pipeline::poll_usart(Usart& usart)
     }
 }
 
-bool Pipeline::process_frame(PbCmd* msg)
+bool Pipeline::extract_frame(std::array<uint8_t, kBufSize>& frame,
+                             uint16_t& frame_len, uint8_t& payload_len)
 {
     // Slide one byte at a time until the 4-byte SOF pattern is at the head
     while (rx_buffer.size() >= kSofLen)
@@ -153,10 +158,10 @@ bool Pipeline::process_frame(PbCmd* msg)
     // length, used below only to bound decode() — framing itself is fixed-size.
     uint8_t len_byte = 0;
     rx_buffer.peek(kSofLen, len_byte);
-    uint8_t payload_len = len_byte;
+    payload_len = len_byte;
 
     // Reject payloads that would exceed our buffer
-    if (payload_len > kMaxPayloadLen)
+    if (payload_len <= 0 || payload_len > kPayloadLen)
     {
         uint8_t dummy = 0;
         rx_buffer.pop(dummy);
@@ -169,17 +174,37 @@ bool Pipeline::process_frame(PbCmd* msg)
 
     // Every frame is the same fixed size on the wire (header + max payload +
     // crc + eof), regardless of the real payload length in LEN.
-    uint16_t frame_len = kFrameOverhead + kMaxPayloadLen;
+    frame_len = kFrameOverhead + kPayloadLen;
     if (rx_buffer.size() < frame_len)
     {
         return false;
     }
 
     // Peek full frame into a linear buffer for validation and decode
-    std::array<uint8_t, kBufSize> frame{};
     for (uint16_t i = 0; i < frame_len; i++)
     {
         rx_buffer.peek(i, frame[i]);
+    }
+
+    // Validate CRC32 over [SOF][LEN][PAYLOAD:kPayloadLen] — the same fixed-size
+    // region send() computed it over — against the CRC32 field embedded in the
+    // frame (big-endian, right after the payload, matching send()'s byte order).
+    uint16_t crc_input_len = kHeaderLen + kPayloadLen;
+    uint32_t embedded_crc =
+        (static_cast<uint32_t>(frame[crc_input_len + 0]) << 24) |
+        (static_cast<uint32_t>(frame[crc_input_len + 1]) << 16) |
+        (static_cast<uint32_t>(frame[crc_input_len + 2]) << 8) |
+        static_cast<uint32_t>(frame[crc_input_len + 3]);
+
+    if (!crc.compare(std::span<const uint8_t>(frame.data(), crc_input_len),
+                     embedded_crc))
+    {
+        for (uint16_t i = 0; i < frame_len; i++)
+        {
+            uint8_t dummy = 0;
+            rx_buffer.pop(dummy);
+        }
+        return false;
     }
 
     // Validate EOF (big-endian, last 4 bytes of frame)
@@ -206,9 +231,50 @@ bool Pipeline::process_frame(PbCmd* msg)
         rx_buffer.pop(dummy);
     }
 
-    // Decode the message if it's true that we got here with a valid frame
+    return true;
+}
+
+bool Pipeline::process_frame(PbCmd* msg)
+{
+    std::array<uint8_t, kBufSize> frame{};
+    uint16_t frame_len = 0;
+    uint8_t payload_len = 0;
+
+    if (!extract_frame(frame, frame_len, payload_len))
+    {
+        return false;
+    }
+
     rx_frame_len = frame_len;
     return msg->decode(frame.data() + kHeaderLen, payload_len);
+}
+
+bool Pipeline::receive_raw(std::span<uint8_t> out_frame, uint16_t& out_len)
+{
+    // Enable THVD to logic for RS485 receive mode
+    rs485.set_direction(Rs485::Direction::RECEIVE);
+
+    std::array<uint8_t, kBufSize> frame{};
+    uint16_t frame_len = 0;
+    uint8_t payload_len = 0;
+
+    if (!extract_frame(frame, frame_len, payload_len))
+    {
+        return false;
+    }
+
+    // Caller (e.g. the SX1262 driver) must supply a buffer at least as big as
+    // the fixed frame size — the frame has already been consumed from
+    // rx_buffer at this point, so a short out_frame just drops it.
+    if (out_frame.size() < frame_len)
+    {
+        return false;
+    }
+
+    std::copy(frame.begin(), frame.begin() + frame_len, out_frame.begin());
+    rx_frame_len = frame_len;
+    out_len = frame_len;
+    return true;
 }
 
 }  // namespace LBR
