@@ -16,6 +16,11 @@ if (TARGET sysclk_bsp)
         ${STARTUP_FILE}
     )
 
+    target_link_options_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
+        --specs=nano.specs
+        -Wl,--gc-sections
+    )
+
     target_include_directories_for(${TARGET_DEVICE} ${EXECUTABLE} #test
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
     )

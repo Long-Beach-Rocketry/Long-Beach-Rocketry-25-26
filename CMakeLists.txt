@@ -27,6 +27,12 @@ enable_testing()
 
 include(cmake/build-util.cmake)
 
+# Optional build-time selector consumed by make/preset flows.
+set(FREERTOS_PORT "" CACHE STRING "Optional FreeRTOS port selector")
+if(NOT "${FREERTOS_PORT}" STREQUAL "")
+    message(STATUS "FREERTOS_PORT: ${FREERTOS_PORT}")
+endif()
+
 if(MCU_NAME MATCHES "^(STM32).*")
     message("Found STM32 Device!")
     add_compile_definitions(

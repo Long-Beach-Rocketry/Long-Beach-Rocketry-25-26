@@ -20,6 +20,11 @@ if (TARGET pwm_bsp)
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
     )
 
+    target_link_options_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
+        --specs=nano.specs
+        -Wl,--gc-sections
+    )
+
     target_link_libraries_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
         pwm_bsp
     )

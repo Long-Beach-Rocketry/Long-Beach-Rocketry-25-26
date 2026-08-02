@@ -1,4 +1,4 @@
-set(EXECUTABLE crc_test)
+set(EXECUTABLE rs485_test)
 set(LDF ${CMAKE_CURRENT_BINARY_DIR}/${EXECUTABLE}.ld)
 
 set(PREPROCESS_DEFS
@@ -6,26 +6,23 @@ set(PREPROCESS_DEFS
     -DDEF_FLASH_SIZE=1024K
 )
 
-add_subdirectory_for(STM32H723 bsp_h723)
+add_subdirectory_for(STM32H723 BSP_H723)  # add H723
 
-if (TARGET crc_bsp)
+if (TARGET rs485_app_bsp)
 
     add_executable_for(${TARGET_DEVICE} ${EXECUTABLE} ${LDF}
         main.cc
         ${STARTUP_FILE}
     )
 
-    target_include_directories_for(${TARGET_DEVICE} ${EXECUTABLE} #test
+    target_include_directories_for(STM32H723 ${EXECUTABLE}
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
-    )
-
-    target_link_options_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
-        --specs=nano.specs
-        -Wl,--gc-sections
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/BSP_H723
     )
 
     target_link_libraries_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
-        crc_bsp
+        rs485_app_bsp
+        rs485
     )
 
     target_preprocess_for(${TARGET_DEVICE} ${EXECUTABLE} ${LINKER_SCRIPT} ${LDF} ${PREPROCESS_DEFS})

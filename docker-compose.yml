@@ -1,0 +1,38 @@
+services:
+  build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lbr-build
+    image: lbr-build:latest
+    volumes:
+      - .:/workspace
+      - /workspace/build:/workspace/build
+      - ~/.ssh:/root/.ssh:ro
+    working_dir: /workspace
+    environment:
+      - CMAKE_BUILD_PARALLEL_LEVEL=${CMAKE_BUILD_PARALLEL_LEVEL:-4}
+      - NINJA_STATUS=%p [%c/%t]
+
+    stdin_open: true
+    tty: true
+    command: /bin/bash
+
+  flash:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lbr-flash
+    image: lbr-build:latest
+    volumes:
+      - .:/workspace
+      - /dev/bus/usb:/dev/bus/usb
+    working_dir: /workspace
+    ports:
+      - "50000:50000" # GDB port
+      - "50001:50001" # TCL port
+      - "50002:50002" # Telnet port
+
+    privileged: true  # For USB access to ST-Link
+    command: openocd -f mcu_support/stm32/stlink.cfg
+

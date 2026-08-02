@@ -1,0 +1,25 @@
+# Build artifacts
+build/
+.cache/
+
+# Git
+.git/
+
+# VSCode
+.vscode/
+
+# Docker files
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+*.env
+
+# Logs
+*.log

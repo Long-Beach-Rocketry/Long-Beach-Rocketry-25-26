@@ -1,13 +1,13 @@
-add_library(usart_app_bsp STATIC
+add_library(usart_bsp STATIC
     usart_app_bsp.cc
 )
 
-target_include_directories(usart_app_bsp PUBLIC
+target_include_directories(usart_bsp PUBLIC
     .
     ../
 )
 
-target_link_libraries(usart_app_bsp
+target_link_libraries(usart_bsp
     PUBLIC
         driver
 )

@@ -19,6 +19,11 @@ if (TARGET spi_app_bsp)
         set(BSP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/app/spi_test/BSP_L476)
     endif()
 
+    target_link_options_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
+        --specs=nano.specs
+        -Wl,--gc-sections
+    )
+
     target_include_directories_for(${TARGET_DEVICE} ${EXECUTABLE}
         PRIVATE ${CMAKE_SOURCE_DIR}/app/spi_test
         PRIVATE ${BSP_INCLUDE_DIR}
