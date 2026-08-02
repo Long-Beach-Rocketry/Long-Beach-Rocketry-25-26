@@ -18,13 +18,12 @@ namespace LBR
 
 enum class AirbrakeState : uint8_t
 {
-    PRELAUNCH = 0,             // Not launched yet
-    LAUNCHED,                  // 6 second interval from launch
-    AIRBRAKES_DEPLOYING,       // Deploy airbrakes after 6 seconds
-    AIRBRAKES_FULLY_DEPLOYED,  // When at 30 degrees; not sure when to know though
-    AIRBRAKES_RETRACTING,      // Should do before target apogee
-    AIRBRAKES_FULLY_RETRACTED,  // Again, dont know how to know if retracted
-    RECOVERY_POPPED,            // Job finished
+    PRELAUNCH = 0,         // Not launched yet
+    MOTOR_BURN,            // 6 second interval from launch
+    AIRBRAKES_DEPLOYED,    // From motor burn to apogee
+    AIRBRAKES_RETRACTING,  // Should do before target apogee
+    AIRBRAKES_RETRACTED,   // Again, dont know how to know if retracted
+    RECOVERY_POPPED,       // Job finished
 };
 
 struct AirbrakeParams

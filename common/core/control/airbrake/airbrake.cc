@@ -24,8 +24,10 @@ void AirBrake::update(SensorData data)
      * LAUNCH_SIGNAL
      */
 
+    /* TODO: replace these with actual values */
     // Altitude units is in meters
     float altitude = calc_altitude(init_pressure, pressure) - base_altitude;
+    float velocity;      // temp placeholder for velocity
     float time;          // temp placeholder for time from start
     bool launch_signal;  // temp placeholder
 
@@ -35,7 +37,7 @@ void AirBrake::update(SensorData data)
          * Either it's negative and the altitude calculation is bugging or
          * we hit the target apogee and should recover?
          * 
-         * Which state? AIRBRAKES_RETRACTING, AIRBRAKES_FULLY_RETRACTED, RECOVERY_POPPED
+         * Which state? AIRBRAKES_RETRACTING, AIRBRAKES_RETRACTED, RECOVERY_POPPED
          */
         motor.set_angle(0);
         state = AirbrakeState::RECOVERY_POPPED;
@@ -47,7 +49,7 @@ void AirBrake::update(SensorData data)
 
             if (launch_signal)
             {
-                state = AirbrakeState::LAUNCHED;
+                state = AirbrakeState::MOTOR_BURN;
             }
             else
             {
@@ -56,7 +58,7 @@ void AirBrake::update(SensorData data)
             }
             break;
 
-        case AirbrakeState::LAUNCHED:
+        case AirbrakeState::MOTOR_BURN:
 
             /**
              * Check if altitude is at motor burn altitude or 6 seconds passed
@@ -64,26 +66,23 @@ void AirBrake::update(SensorData data)
             if (time >= AirbrakeConstants::kMotorBurnTime ||
                 altitude >= AirbrakeConstants::kMotorBurnAlt)
             {
-                state = AirbrakeState::AIRBRAKES_DEPLOYING;
+                state = AirbrakeState::AIRBRAKES_DEPLOYED;
             }
             break;
 
-        case AirbrakeState::AIRBRAKES_DEPLOYING:
-            motor.set_angle(AirbrakeConstants::kMaxAngle);
+        case AirbrakeState::AIRBRAKES_DEPLOYED:
 
-            // Not sure how to transition to fully deployed state. Below is pseudocode
-            float current_angle = motor.get_angle();
-            if (current_angle >= AirbrakeConstants::kMaxAngle)
-            {
-                state = AirbrakeState::AIRBRAKES_FULLY_DEPLOYED;
-            }
-            break;
+            // Not sure how to transition to retracting state. What triggers it to even do it?
+            /* TODO: Get angle from PMC and set the servo motor angle */
+            float angle = mpc_get_angle();
 
-        case AirbrakeState::AIRBRAKES_FULLY_DEPLOYED:
-            if (altitude >=
-                AirbrakeConstants::kTargetApogee /* OR VELOCITY close to 0 */)
+            if (angle == 0)
             {
                 state = AirbrakeState::AIRBRAKES_RETRACTING;
+            }
+            else
+            {
+                motor.set_angle(angle);
             }
             break;
 
@@ -93,18 +92,17 @@ void AirBrake::update(SensorData data)
             float current_angle = motor.get_angle();
             if (current_angle <= 0)
             {
-                state = AirbrakeState::AIRBRAKES_FULLY_RETRACTED;
+                state = AirbrakeState::AIRBRAKES_RETRACTED;
             }
             break;
 
-        case AirbrakeState::AIRBRAKES_FULLY_RETRACTED:
+        case AirbrakeState::AIRBRAKES_RETRACTED:
             // Not sure what to do here
-            /**
-             * Maybe if acceleration or velocity downward, transition state
-             * 
-             * Or if receive signal for recovery popped but this not needed if so
-             */
-            state = AirbrakeState::RECOVERY_POPPED;
+
+            if (altitude >= AirbrakeConstants::kTargetApogee && velocity == 0)
+            {
+                state = AirbrakeState::RECOVERY_POPPED;
+            }
             break;
 
         case AirbrakeState::RECOVERY_POPPED:
