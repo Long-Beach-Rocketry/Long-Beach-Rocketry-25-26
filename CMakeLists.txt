@@ -14,7 +14,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 20)
 
 # Disable pthread for GoogleTest on MCU builds
-if(NOT "${TARGET_DEVICE}" STREQUAL "NATIVE")
+if(NOT "${TARGET_DEVICE}" MATCHES "^(NATIVE|SITL)$")
     set(gtest_disable_pthreads ON CACHE BOOL "" FORCE)
     add_compile_definitions(GTEST_HAS_PTHREAD=0)
     # Disable building GoogleTest for MCU Targets
@@ -51,3 +51,7 @@ endif()
 add_subdirectory(common)
 add_subdirectory(external)
 add_subdirectory(mcu_support)
+
+if("${TARGET_DEVICE}" MATCHES "SITL")
+    add_subdirectory(sitl)
+endif()

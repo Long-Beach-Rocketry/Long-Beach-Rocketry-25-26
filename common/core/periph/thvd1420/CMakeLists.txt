@@ -5,14 +5,14 @@ target_include_directories(rs485 INTERFACE
 )
 
 # Only link the embedded hardware driver binary layer if we aren't testing on host native
-if(NOT "${TARGET_DEVICE}" MATCHES "NATIVE")
+if(NOT "${TARGET_DEVICE}" MATCHES "^(NATIVE|SITL)$")
     target_link_libraries(rs485 INTERFACE
         driver
     )
 endif()
 
 # Host-native unit testing engine block
-if("${TARGET_DEVICE}" MATCHES "NATIVE")
+if("${TARGET_DEVICE}" MATCHES "^(NATIVE|SITL)$")
     add_executable(rs485_test
         rs485_test.cc
     )
