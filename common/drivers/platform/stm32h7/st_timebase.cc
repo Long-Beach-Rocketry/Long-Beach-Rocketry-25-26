@@ -297,46 +297,42 @@ uint64_t HwTimebase::uptime_ticks() const
     }
 
     /*
-     * overflow_count is uint32_t so a read is a single atomic access on
-     * Cortex-M7 (a 64-bit read would tear and defeat this snapshot).
+     * overflow_count and CNT must be read together as a single unit: if the
+     * overflow ISR fires between reading them, a fresh overflow_count could
+     * pair with a stale CNT (or vice versa). Rather than retrying until a
+     * torn read is detected, disable interrupts for the duration of the
+     * snapshot so the ISR simply cannot run in the middle of it.
      *
-     * Reading CNT does not modify overflow_count; only handle_irq() does.
-     * However the overflow ISR can fire *between* our reads, pairing a fresh
-     * overflow_count with a stale CNT. Re-snapshot until the two overflow
-     * reads agree so counter is guaranteed to belong to that interval.
-     */
-    uint32_t overflow_before;
-    uint32_t overflow_after;
-    uint32_t counter;
-
-    // Loop until a consistent snapshot of the overflow count and counter is obtained
-    do
-    {
-        overflow_before = overflow_count;
-        counter = base_addr->CNT;
-        overflow_after = overflow_count;
-    } while (overflow_before != overflow_after);
-
-    /*
-     * The snapshot above is only race-free against overflows the ISR has
-     * already serviced. There is still a window where the counter has just
-     * wrapped in hardware (UIF set) but handle_irq() has not yet run to bump
-     * overflow_count. If we see UIF set, account for that pending overflow
+     * Even with interrupts disabled, the hardware can still wrap CNT and set
+     * UIF on its own -- disabling interrupts blocks handle_irq() from
+     * running, not the timer from counting. If UIF is set, that wrap belongs
+     * to an overflow handle_irq() hasn't serviced yet, so account for it
      * ourselves (+1) and re-read CNT so counter reflects the post-wrap value
-     * that belongs to the incremented overflow interval. Without this, uptime
-     * would briefly jump backwards each time the timer rolls over.
+     * that belongs to the incremented overflow interval. Without this,
+     * uptime would briefly jump backwards each time the timer rolls over.
      */
+    const uint32_t primask = __get_PRIMASK();
+    __disable_irq();
+
+    uint32_t overflow = overflow_count;
+    uint32_t counter = base_addr->CNT;
+
     if ((base_addr->SR & TIM_SR_UIF) != 0U)
     {
-        overflow_after += 1U;
+        ++overflow;
         counter = base_addr->CNT;
+    }
+
+    if (primask == 0U)
+    {
+        __enable_irq();
     }
 
     const uint64_t period_ticks = static_cast<uint64_t>(base_addr->ARR) + 1U;
 
     // Raw tick count. This scales with the counter frequency: doubling the
     // counter frequency doubles how fast this grows.
-    return static_cast<uint64_t>(overflow_after) * period_ticks +
+    return static_cast<uint64_t>(overflow) * period_ticks +
            static_cast<uint64_t>(counter);
 }
 
