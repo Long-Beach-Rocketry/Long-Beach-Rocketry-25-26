@@ -17,6 +17,7 @@ bool InvBno055::process_read(const uint8_t reg_addr, uint8_t& data)
     {
         case Bno055_CHIP_ID_REG:
             data = CHIP_ID;
+            recent_reg_ = Bno055_CHIP_ID_REG;
             return true;
 
         default:
@@ -41,6 +42,8 @@ bool InvBno055::process_write(const uint8_t reg_addr, uint8_t data)
         case 0x3E:
             // This would be a global variable instead simulating a register.
             uint8_t Bno055_PWR_REG = data;
+            recent_reg_ = 0x3E;
+
             return true;
 
         default:

@@ -15,6 +15,7 @@ bool InvBmp390::process_read(const uint8_t reg_addr, uint8_t& data)
     {
         case Bmp390_CHIP_ID_REG:
             data = CHIP_ID;
+            recent_reg_ = Bmp390_CHIP_ID_REG;
             return true;
 
         default:
@@ -40,6 +41,7 @@ bool InvBmp390::process_write(const uint8_t reg_addr, uint8_t data)
         case Bmp390_PWR_CTRL_REG:
             // This would be a global variable instead simulating a register.
             uint8_t Bno055_PWR_REG = data;
+            recent_reg_ = Bmp390_PWR_CTRL_REG;
             return true;
 
         default:
