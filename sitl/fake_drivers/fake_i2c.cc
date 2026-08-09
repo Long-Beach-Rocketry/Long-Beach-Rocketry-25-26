@@ -103,7 +103,14 @@ bool FakeI2c::read(std::span<uint8_t> data, uint8_t dev_addr)
 
     for (int i = 0; i < data.size(); i++)
     {
-        if (!device->process_write(data[i]))
+        uint8_t result;
+        bool status = device->process_read(result);
+
+        if (status)
+        {
+            data[i] = result;
+        }
+        else
         {
             return false;
         }
