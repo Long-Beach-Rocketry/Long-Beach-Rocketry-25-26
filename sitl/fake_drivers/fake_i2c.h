@@ -1,17 +1,19 @@
 /**
- * @file fake_i2c.h
+ * @file fake_I2c.h
  * @author Kent Hong
- * @brief Fake I2C class that serves as a communication 
- *        medium with simulated I2C sensors (inverse drivers).
+ * @brief Fake I2c class that serves as a communication 
+ *        medium with simulated I2c sensors (inverse drivers).
  */
 #pragma once
 #include <cstdint>
 #include <span>
-#include "i2c.h"
+#include <unordered_map>
+#include "I2c.h"
+#include "inv_I2c_sensor.h"
 
 namespace LBR
 {
-class FakeI2C : public I2c
+class FakeI2c : public I2c
 {
 public:
     /**
@@ -59,7 +61,7 @@ public:
                    uint8_t dev_addr) override;
 
     /**
-     * @brief Read raw data from an I2C bus
+     * @brief Read raw data from an I2c bus
      * 
      * @param data block of memory to read data into from the bus
      * @param dev_addr address of target device
@@ -68,7 +70,7 @@ public:
     bool read(std::span<uint8_t> data, uint8_t dev_addr) override;
 
     /**
-     * @brief Write raw data to an I2C bus
+     * @brief Write raw data to an I2c bus
      * 
      * @param data block of memory to write data into the bus
      * @param dev_addr address of target device
@@ -76,6 +78,53 @@ public:
      */
     bool write(std::span<const uint8_t> data, uint8_t dev_addr) override;
 
-    ~FakeI2C() = default;
+    ~FakeI2c() = default;
+
+    /**
+     * @note The following are SITL specific methods.
+     */
+
+    /**
+     * @brief Adds the device address and devices to a lookup table to find the 
+     * sensor later.
+     * 
+     * @param dev_addr device address the I2c bus uses to find the device
+     * @param device the corresponding device
+     * @return true if the address does not exist, false otherwise
+     */
+    bool register_device(uint8_t dev_addr, InvI2cSensor* device);
+
+    /**
+     * @brief Adds the device address and devices to a lookup table to find the 
+     * sensor later.
+     * 
+     * @param dev_addr device address the I2c bus uses to find the device
+     * @param device the corresponding device
+     * @return true if the address does not exist, false otherwise
+     */
+    bool register_device(uint16_t dev_addr, InvI2cSensor* device);
+
+    /**
+     * @brief Finds the matching device given the device's address
+     * 
+     * @param dev_addr device address the I2c bus uses to find the device
+     * @return InvI2cSensor pointer if it exists, otherwise nullptr
+     */
+    InvI2cSensor* find_device(uint8_t dev_addr) const;
+
+    /**
+     * @brief Finds the matching device given the device's address
+     * 
+     * @param dev_addr device address the I2c bus uses to find the device
+     * @return InvI2cSensor pointer if it exists, otherwise nullptr
+     */
+    InvI2cSensor* find_device(uint16_t dev_addr) const;
+
+private:
+    /**
+     * @brief Look-up tables to find a sensor using the i2c bus given its address.
+     */
+    std::unordered_map<uint8_t, InvI2cSensor*> devices_8addr;
+    std::unordered_map<uint8_t, InvI2cSensor*> devices_16addr;
 };
 }  // namespace LBR

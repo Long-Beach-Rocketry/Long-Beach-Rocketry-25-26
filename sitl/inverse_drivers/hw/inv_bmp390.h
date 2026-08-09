@@ -8,14 +8,17 @@
 
 namespace LBR
 {
-class InvBmp390 : public InvI2CSensor
+
+class InvBmp390 : public InvI2cSensor
 {
 public:
     InvBmp390() = default;
     ~InvBmp390() = default;
 
-    bool process_read(uint8_t opcode, const uint8_t reg_addr,
-                      uint8_t dev_addr) override;
+    bool process_read(const uint8_t reg_addr, uint8_t& data) override;
+
+    bool process_write(const uint8_t reg_addr, uint8_t data) override;
+
     bool get_8bit_addr(uint8_t& addr) override;
 
 private:
