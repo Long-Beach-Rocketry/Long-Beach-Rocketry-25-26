@@ -8,6 +8,7 @@ namespace LBR
 // ^ Single source of truth
 
 constexpr uint8_t Bno055_CHIP_ID_REG = 0x00U;
+constexpr uint8_t Bn055_NULL_BYTE = 0x00U;
 
 class InvBno055 : public InvI2cSensor
 {
