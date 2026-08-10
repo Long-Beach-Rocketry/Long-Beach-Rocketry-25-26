@@ -13,9 +13,25 @@
 
 namespace LBR
 {
+
+struct FakeI2cSensors
+{
+    InvI2cSensor* bno055;
+    InvI2cSensor* bmp390;
+};
+
 class FakeI2c : public I2c
 {
 public:
+    explicit FakeI2c(FakeI2cSensors sensors_);
+
+    /**
+     * @brief Initializes the FakeI2c class by registering the I2c inverse drivers.
+     * 
+     * @return true
+     */
+    bool init(void);
+
     /**
      * @brief Read data from external device that uses 8-bit memory addresses
      * 
@@ -92,17 +108,7 @@ public:
      * @param device the corresponding device
      * @return true if the address does not exist, false otherwise
      */
-    bool register_device(uint8_t dev_addr, InvI2cSensor* device);
-
-    /**
-     * @brief Adds the device address and devices to a lookup table to find the 
-     * sensor later.
-     * 
-     * @param dev_addr device address the I2c bus uses to find the device
-     * @param device the corresponding device
-     * @return true if the address does not exist, false otherwise
-     */
-    bool register_device(uint16_t dev_addr, InvI2cSensor* device);
+    bool register_device(InvI2cSensor* device);
 
     /**
      * @brief Finds the matching device given the device's address
@@ -112,19 +118,18 @@ public:
      */
     InvI2cSensor* find_device(uint8_t dev_addr) const;
 
-    /**
-     * @brief Finds the matching device given the device's address
-     * 
-     * @param dev_addr device address the I2c bus uses to find the device
-     * @return InvI2cSensor pointer if it exists, otherwise nullptr
-     */
-    InvI2cSensor* find_device(uint16_t dev_addr) const;
-
 private:
     /**
-     * @brief Look-up tables to find a sensor using the i2c bus given its address.
+     * @brief Look-up table to find sensors with 8-bit memory address using
+     * the i2c bus given its address.
      */
     std::unordered_map<uint8_t, InvI2cSensor*> devices_8addr;
-    std::unordered_map<uint8_t, InvI2cSensor*> devices_16addr;
+
+    /**
+     * @brief Holds the sensors passed in constructor used to register
+     * devices in init()
+     * 
+     */
+    FakeI2cSensors sensors;
 };
 }  // namespace LBR
