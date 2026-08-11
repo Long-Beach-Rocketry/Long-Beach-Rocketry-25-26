@@ -9,14 +9,14 @@ FakeI2c::FakeI2c(FakeI2cSensors sensors_) : sensors{sensors_}
 
 bool FakeI2c::init()
 {
-    if (sensors.bno055)
+    if (sensors.imu)
     {
-        register_device(sensors.bno055);
+        register_device(sensors.imu);
     }
 
-    if (sensors.bmp390)
+    if (sensors.barometer)
     {
-        register_device(sensors.bmp390);
+        register_device(sensors.barometer);
     }
 }
 

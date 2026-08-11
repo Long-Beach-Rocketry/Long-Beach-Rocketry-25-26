@@ -16,8 +16,8 @@ namespace LBR
 
 struct FakeI2cSensors
 {
-    InvI2cSensor* bno055;
-    InvI2cSensor* bmp390;
+    InvI2cSensor* imu;
+    InvI2cSensor* barometer;
 };
 
 class FakeI2c : public I2c
