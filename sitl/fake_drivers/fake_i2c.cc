@@ -14,7 +14,7 @@ bool FakeI2c::init()
         register_device(sensors.bno055);
     }
 
-    if (sensors.bno055)
+    if (sensors.bmp390)
     {
         register_device(sensors.bmp390);
     }
