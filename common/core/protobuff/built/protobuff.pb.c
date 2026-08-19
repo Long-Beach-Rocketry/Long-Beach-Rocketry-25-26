@@ -8,20 +8,8 @@
 
 PB_BIND(StatusData, StatusData, AUTO)
 
-
 PB_BIND(IMUData, IMUData, AUTO)
-
 
 PB_BIND(BaroData, BaroData, AUTO)
 
-
 PB_BIND(RocketMessage, RocketMessage, AUTO)
-
-
-
-
-
-
-
-
-

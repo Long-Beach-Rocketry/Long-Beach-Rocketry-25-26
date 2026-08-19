@@ -61,7 +61,7 @@ int main()
         // writeup on why RocketMessage is already the "sensor data struct"
         // and how new sensors should be added to it.
         tx.msg.has_status = true;
-        tx.msg.status.fsw_status = FswStatus_FSW_STATUS_ACTIVE;
+        tx.msg.status.fsw_status = FswStatus_NOMINAL;
         tx.msg.status.rocket_state = RocketState_ROCKET_STATE_POWERED_FLIGHT;
         tx.msg.status.airbrake_status =
             AirbrakeStatus_AIRBRAKE_STATUS_PRELAUNCH;
