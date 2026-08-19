@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <span>
 #include "board.h"
+#include "delay.h"
 #include "i2c.h"
 
 using namespace LBR;
@@ -20,10 +21,7 @@ int main(int argc, char* argv[])
     while (1)
     {
         hw.i2c.mem_read(chip_id, reg_addr, dev_addr);
-
-        for (volatile size_t i = 0; i < 100000; i++)
-        {
-        }
+        Utils::DelayMs(1000);
     }
 
     return 0;

@@ -1,4 +1,4 @@
-set(EXECUTABLE sysclk_test)
+set(EXECUTABLE usart_pipe_test)
 set(LDF ${CMAKE_CURRENT_BINARY_DIR}/${EXECUTABLE}.ld)
 
 set(PREPROCESS_DEFS
@@ -6,26 +6,26 @@ set(PREPROCESS_DEFS
     -DDEF_FLASH_SIZE=1024K
 )
 
-add_subdirectory_for(STM32H723 bsp_h723)
+add_subdirectory_for(STM32H723 BSP_H723)
 
-if (TARGET sysclk_bsp)
+if (TARGET usart_pipe_test_bsp)
 
     add_executable_for(${TARGET_DEVICE} ${EXECUTABLE} ${LDF}
         main.cc
         ${STARTUP_FILE}
     )
 
-    target_link_options_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
-        --specs=nano.specs
-        -Wl,--gc-sections
-    )
-
-    target_include_directories_for(${TARGET_DEVICE} ${EXECUTABLE} #test
-        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+    target_include_directories_for(STM32H723 ${EXECUTABLE}
+            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/BSP_H723
     )
 
     target_link_libraries_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
-        sysclk_bsp
+            usart_pipe_test_bsp
+            core
+            network
+            protobuff
+            pb_cmd
     )
 
     target_preprocess_for(${TARGET_DEVICE} ${EXECUTABLE} ${LINKER_SCRIPT} ${LDF} ${PREPROCESS_DEFS})

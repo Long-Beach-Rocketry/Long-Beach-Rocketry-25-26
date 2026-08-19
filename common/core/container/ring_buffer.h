@@ -148,6 +148,23 @@ public:
         return write_index;
     }
 
+    /**
+     * @brief Read data at an offset from the read head without consuming it
+     *
+     * @param offset Distance from the current read head (0 = next byte to pop)
+     * @param out    Output value
+     * @return True if offset is within valid data. False otherwise.
+     */
+    bool peek(size_t offset, T& out) const
+    {
+        if (offset >= count)
+        {
+            return false;
+        }
+        out = (*this)[(read_index + offset) % N];
+        return true;
+    }
+
 private:
     size_t count = 0;
     size_t read_index = 0;

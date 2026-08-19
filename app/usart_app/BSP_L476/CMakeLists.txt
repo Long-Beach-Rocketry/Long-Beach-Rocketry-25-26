@@ -10,3 +10,4 @@ target_link_libraries(usart_app_bsp
     PUBLIC
         driver
 )
+
