@@ -1,6 +1,6 @@
-add_library(inverse_drivers INTERFACE)
+add_library(inverse INTERFACE)
 
-target_include_directories(inverse_drivers INTERFACE
+target_include_directories(inverse INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/interface
 )
 
