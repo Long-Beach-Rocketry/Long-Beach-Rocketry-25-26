@@ -17,7 +17,9 @@ struct Board
 {
     Pwm& pwm;
     Gpio& dir;
-    Drv8245 drv8245{Drv8245::DrvParams{dir, pwm}};
+    Gpio& nsleep;
+    Gpio& drvoff;
+    Drv8245 drv8245{Drv8245::DrvParams{dir, pwm, nsleep, drvoff}};
 };
 
 bool bsp_init(void);

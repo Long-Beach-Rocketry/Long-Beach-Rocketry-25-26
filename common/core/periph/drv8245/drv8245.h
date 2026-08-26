@@ -34,13 +34,15 @@ public:
 
     /**
     * @brief Struct to hold parameters for Drv8245 initialization
-    * @note This is enough for the DRV8245, which only requires a direction pin and a PWM pin
-    *       And motion control through PID controller loops to compensate for error gains
+    * @note dir/pwm drive PH/IN2 and EN/IN1. nsleep and drvoff are the device's mandatory
+    *       wake and output-enable control pins (HW variant) - see init()/sleep().
     */
     struct DrvParams
     {
         Gpio& dir;
         Pwm& pwm;
+        Gpio& nsleep;
+        Gpio& drvoff;
     };
 
     struct State
@@ -56,9 +58,22 @@ public:
     explicit Drv8245(const DrvParams& params);
 
     /**
-     * @brief Set the motor direction 
+     * @brief Wake the device from SLEEP and enable its outputs
+     * @note Must be called (and complete) before set_direction()/set_speed() have any effect.
+     *       Runs the mandatory nSLEEP wake + reset-pulse handshake required by the HW variant,
+     *       then drives DRVOFF low to bring the bridge into the ACTIVE state.
+     */
+    void init();
+
+    /**
+     * @brief Put the device into low-power SLEEP state (outputs Hi-Z)
+     */
+    void sleep();
+
+    /**
+     * @brief Set the motor direction
      * @param dir Direction of motor rotation
-     * @note Direction ENable 
+     * @note Direction ENable
      */
     void set_direction(Direction dir);
 
@@ -82,6 +97,8 @@ public:
 private:
     Gpio& dir_pin;
     Pwm& pwm_pin;
+    Gpio& nsleep_pin;
+    Gpio& drvoff_pin;
 
     // Store current speed since Pwm interface doesn't have a getter
     uint8_t current_speed = 0;
