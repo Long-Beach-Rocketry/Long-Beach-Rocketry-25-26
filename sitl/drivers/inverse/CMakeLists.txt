@@ -6,5 +6,5 @@ target_include_directories(inverse INTERFACE
 
 if(TARGET_DEVICE MATCHES "SITL")
     add_subdirectory(hw)
-    target_link_libraries(inverse_drivers INTERFACE inverse_drivers_hw)
+    target_link_libraries(inverse INTERFACE inverse_drivers_hw)
 endif()
