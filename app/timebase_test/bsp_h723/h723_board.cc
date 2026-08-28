@@ -6,7 +6,6 @@
 
 static constexpr uint32_t kSysclkHz{8'000'000};
 static constexpr uint32_t kBaudRate{115'200};
-static constexpr uint32_t kUsart3ClockHz{2'000'000};
 
 namespace LBR
 {
@@ -23,6 +22,8 @@ ClockFrequencies clk_freqs = hw_clk_cfg.get_clock_frequencies();
 // timer input clock freqs (PCLK1 = 4 MHz with the current clock config).
 uint32_t tim2_clk_hz = clk_freqs.apb1;
 uint32_t tim3_clk_hz = tim2_clk_hz;
+// USART3 is also on APB1, so it sees the same PCLK1 the timers do.
+uint32_t usart3_clk_hz = clk_freqs.apb1;
 
 namespace Stmh7
 {
@@ -36,7 +37,7 @@ HwGpio usart_tx{usart_tx_params};
 HwGpio usart_rx{usart_rx_params};
 
 // Create USART3 object
-StUsartParams usart_params{USART3, kUsart3ClockHz, kBaudRate};
+StUsartParams usart_params{USART3, usart3_clk_hz, kBaudRate};
 StUsart usart{usart_params};
 
 // User LED LD1 (green) on PB0 - toggled by the timebase blink test
