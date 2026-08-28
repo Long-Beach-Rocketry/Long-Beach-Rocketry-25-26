@@ -80,6 +80,6 @@ public:
      */
     virtual bool write(std::span<const uint8_t> data, uint8_t dev_addr) = 0;
 
-    ~I2c() = default;
+    virtual ~I2c() = default;
 };
 }  // namespace LBR

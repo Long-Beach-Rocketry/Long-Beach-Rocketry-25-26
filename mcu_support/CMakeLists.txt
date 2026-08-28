@@ -1,4 +1,4 @@
-if(NOT "${TARGET_DEVICE}" STREQUAL "NATIVE")
+if(NOT "${TARGET_DEVICE}" MATCHES "^(NATIVE|SITL)$")
     message("Including CMSIS subdirectory")
     add_subdirectory(CMSIS)
 endif()
