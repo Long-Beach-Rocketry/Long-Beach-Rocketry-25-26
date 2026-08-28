@@ -7,13 +7,23 @@
 static constexpr uint32_t kSysclkHz{8'000'000};
 static constexpr uint32_t kBaudRate{115'200};
 static constexpr uint32_t kUsart3ClockHz{2'000'000};
-// TIM2 (32-bit) and TIM3 (16-bit) are both on APB1, so both see the same
-// kernel clock (2 x PCLK1 = 4 MHz with the current clock config).
-static constexpr uint32_t kTim2ClockHz{4'000'000};
-static constexpr uint32_t kTim3ClockHz{4'000'000};
 
 namespace LBR
 {
+// Create Clock object (Sysclk = 8 MHz, HCLK = 4 MHz, PCLK1 = 4 MHz, PCLK2 = PCLK3 = PCLK4 = 2 MHz)
+Stmh7::ClockParams clock_params{
+    Stmh7::Source::HSE8_MHZ_BYPASS, kSysclkHz,
+    Stmh7::D1cprePrescaler::DIV1,   Stmh7::AhbPrescaler::DIV2,
+    Stmh7::Apb1Prescaler::DIV1,     Stmh7::Apb2Prescaler::DIV1,
+    Stmh7::Apb3Prescaler::DIV1,     Stmh7::Apb4Prescaler::DIV1};
+Stmh7::HwClock hw_clk_cfg{clock_params};
+bool clock_init_ok = hw_clk_cfg.init();
+ClockFrequencies clk_freqs = hw_clk_cfg.get_clock_frequencies();
+// TIM2 (32-bit) and TIM3 (16-bit) are both on APB1, so both see the same
+// timer input clock freqs (PCLK1 = 4 MHz with the current clock config).
+uint32_t tim2_clk_hz = clk_freqs.apb1;
+uint32_t tim3_clk_hz = tim2_clk_hz;
+
 namespace Stmh7
 {
 
@@ -29,26 +39,23 @@ HwGpio usart_rx{usart_rx_params};
 StUsartParams usart_params{USART3, kUsart3ClockHz, kBaudRate};
 StUsart usart{usart_params};
 
-// Create Clock object (Sysclk = 8 MHz, HCLK = 4 MHz, PCLK1 = PCLK2 = PCLK3 = PCLK4 = 2 MHz)
-ClockParams clock_params{Source::HSE8_MHZ_BYPASS, kSysclkHz,
-                         D1cprePrescaler::DIV1,   AhbPrescaler::DIV2,
-                         Apb1Prescaler::DIV2,     Apb2Prescaler::DIV2,
-                         Apb3Prescaler::DIV2,     Apb4Prescaler::DIV2};
-HwClock clock{clock_params};
-
 // User LED LD1 (green) on PB0 - toggled by the timebase blink test
 StGpioSettings led_settings{GpioMode::GPOUT, GpioOtype::PUSH_PULL,
                             GpioOspeed::LOW, GpioPupd::NO_PULL, 0};
 StGpioParams led_params{led_settings, 0, GPIOB};
 HwGpio led{led_params};
 
-StTimebaseParams timebase_params{TIM3, TIM3_IRQn, kTim3ClockHz, true};
+// TIM2 Obj
+// StTimebaseParams timebase_params{TIM2, TIM2_IRQn, tim2_clk_hz, true};
+
+// TIM3 Obj
+StTimebaseParams timebase_params{TIM3, TIM3_IRQn, tim3_clk_hz, true};
 HwTimebase timebase{timebase_params};
 
 }  // namespace Stmh7
 
 Board board{.usart = Stmh7::usart,
-            .clock = Stmh7::clock,
+            .clock = hw_clk_cfg,
             .timebase = Stmh7::timebase,
             .led = Stmh7::led};
 
@@ -64,11 +71,11 @@ bool bsp_init()
 
     bool ret = true;
 
-    ret &= Stmh7::clock.init();
     ret &= Stmh7::usart_tx.init();
     ret &= Stmh7::usart_rx.init();
     ret &= Stmh7::led.init();
     ret &= Stmh7::usart.init();
+    ret &= clock_init_ok;
 
     // NOTE:: 2 TIMER TESTS (check the correct IRQn_Type)
 
