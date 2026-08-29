@@ -4,7 +4,7 @@ target_include_directories(container INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}
 )
 
-if("${TARGET_DEVICE}" MATCHES "NATIVE")
+if("${TARGET_DEVICE}" MATCHES "^(NATIVE|SITL)$")
     add_executable(ring_buffer_test
         ring_buffer_test.cc
     )
