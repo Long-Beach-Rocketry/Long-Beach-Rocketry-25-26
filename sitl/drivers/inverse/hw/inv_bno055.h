@@ -77,7 +77,6 @@ public:
     bool get_8bit_addr(uint8_t& addr) override;
 
 private:
-    static constexpr uint8_t CHIP_ID = 0xA0U;
     uint8_t dev_addr_;
     uint8_t recent_reg_{Bno055_CHIP_ID_REG};
     std::unordered_map<uint8_t, uint8_t> register_map_;
