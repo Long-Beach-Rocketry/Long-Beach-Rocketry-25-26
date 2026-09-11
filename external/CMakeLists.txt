@@ -6,10 +6,6 @@ add_library(nanopb STATIC
 
 add_subdirectory(nanopb)
 
-if("${TARGET_DEVICE}" STREQUAL "NATIVE")
-    add_subdirectory(googletest)
-endif()
-
 # Disable pthread for embedded/STM32 environments
 if(NOT "${TARGET_DEVICE}" MATCHES "^(NATIVE|SITL)$")
     set(gtest_disable_pthreads ON CACHE BOOL "" FORCE)
