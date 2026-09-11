@@ -19,6 +19,14 @@
             }
         },
         {
+            "name": "sitl",
+            "inherits": "build",
+            "binaryDir": "${sourceDir}/build/sitl",
+            "cacheVariables": {
+                "TARGET_DEVICE": "SITL"
+            }
+        },
+        {
             "name": "stm32l4",
             "hidden": true,
             "inherits": "build",
