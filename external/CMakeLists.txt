@@ -1,3 +1,11 @@
+add_library(nanopb STATIC
+    nanopb/pb_encode.c
+    nanopb/pb_decode.c
+    nanopb/pb_common.c
+)
+
+add_subdirectory(nanopb)
+
 # Disable pthread for embedded/STM32 environments
 if(NOT "${TARGET_DEVICE}" MATCHES "^(NATIVE|SITL)$")
     set(gtest_disable_pthreads ON CACHE BOOL "" FORCE)
@@ -22,5 +30,3 @@ if("${TARGET_DEVICE}" MATCHES "^(NATIVE|SITL)$")
 
   add_subdirectory(googletest)
 endif()
-
-#add_subdirectory(nanopb)
