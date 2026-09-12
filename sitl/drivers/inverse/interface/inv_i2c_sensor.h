@@ -8,6 +8,13 @@
 #include <iostream>
 #include <span>
 
+struct RegisterDef
+{
+    uint8_t address;
+    uint8_t reset_value;
+    const char* name;
+};
+
 class InvI2cSensor
 {
 public:
