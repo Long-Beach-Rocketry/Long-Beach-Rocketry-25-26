@@ -12,7 +12,18 @@ struct RegisterDef
 {
     uint8_t address;
     uint8_t reset_value;
+    uint8_t data;
     const char* name;
+    bool read_only;
+};
+
+enum class I2cSensorStatus : uint8_t
+{
+    OK = 0,
+    ERROR_READ,
+    ERROR_WRITE,
+    ERROR_OPCODE,
+    ERROR_DEVICE_ADDRESS,
 };
 
 class InvI2cSensor
@@ -29,7 +40,7 @@ public:
      * @param data the buffer that will be written into from the device registers
      * @return true if the operation was successful, otherwise false
      */
-    virtual bool process_read(const uint8_t reg_addr, uint8_t& data)
+    virtual I2cSensorStatus process_read(const uint8_t reg_addr, uint8_t& data)
     {
         return_error_8bit();
     }
@@ -42,7 +53,7 @@ public:
      * @param data the buffer that will be written into from the device registers
      * @return true if the operation was successful, otherwise false
      */
-    virtual bool process_read(const uint16_t reg_addr, uint8_t& data)
+    virtual I2cSensorStatus process_read(const uint16_t reg_addr, uint8_t& data)
     {
         return return_error_16bit();
     }
@@ -54,7 +65,7 @@ public:
      * @param data the buffer that will be written into from the device registers
      * @return true if the operation was successful, otherwise false
      */
-    virtual bool process_read(uint8_t& data) = 0;
+    virtual I2cSensorStatus process_read(uint8_t& data) = 0;
 
     /**
      * @brief Write handler for inverse sensors with 8-bit memory addresses that 
@@ -64,7 +75,7 @@ public:
      * @param data the data that will be written the to device registers
      * @return false by default assuming no 8-bit address, otherwise true if successful
      */
-    virtual bool process_write(const uint8_t reg_addr, uint8_t data)
+    virtual I2cSensorStatus process_write(const uint8_t reg_addr, uint8_t data)
     {
         return_error_8bit();
     }
@@ -77,7 +88,7 @@ public:
      * @param data the data that will be written the to device registers
      * @return false assuming no 16-bit address, otherwise true if successful
      */
-    virtual bool process_write(const uint16_t reg_addr, uint8_t data)
+    virtual I2cSensorStatus process_write(const uint16_t reg_addr, uint8_t data)
     {
         return return_error_16bit();
     }
@@ -89,15 +100,15 @@ public:
      * @param data the data that will be written the to device registers
      * @return false assuming no 8-bit address, otherwise true if successful
      */
-    virtual bool process_write(const uint8_t data) = 0;
+    virtual I2cSensorStatus process_write(const uint8_t data) = 0;
 
     /**
      * @brief Simple address getters.
      * 
-     * @param addr to be set as the sensor address for the i2c bus
+     * @param I2cSensorStatus to be set as the sensor address for the i2c bus
      * @return true if the device has a valid address, false otherwise
      */
-    virtual bool get_8bit_addr(uint8_t& addr)
+    virtual I2cSensorStatus get_8bit_addr(uint8_t& addr)
     {
         return_error_8bit();
     }
@@ -107,10 +118,10 @@ public:
      * 
      * @return false 
      */
-    bool return_error_8bit(void)
+    I2cSensorStatus return_error_8bit(void)
     {
         std::cout << "This device does not have a 8-bit address.\n";
-        return false;
+        return I2cSensorStatus::ERROR_DEVICE_ADDRESS;
     }
 
     /**
@@ -118,9 +129,9 @@ public:
      * 
      * @return false
      */
-    bool return_error_16bit(void)
+    I2cSensorStatus return_error_16bit(void)
     {
         std::cout << "This device does not have a 16-bit address.\n";
-        return false;
+        return I2cSensorStatus::ERROR_DEVICE_ADDRESS;
     }
 };

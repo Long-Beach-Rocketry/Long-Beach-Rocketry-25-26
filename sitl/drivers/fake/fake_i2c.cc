@@ -39,10 +39,10 @@ bool FakeI2c::mem_read(std::span<uint8_t> data, const uint8_t reg_addr,
     for (int i = 0; i < data.size(); i++)
     {
         uint8_t result;
-        bool status = device->process_read(reg_addr + i, result);
+        I2cSensorStatus status = device->process_read(reg_addr + i, result);
 
         // If successful, store the read, otherwise return false
-        if (status)
+        if (status == I2cSensorStatus::OK)
         {
             data[i] = result;
         }
@@ -72,10 +72,10 @@ bool FakeI2c::mem_read(std::span<uint8_t> data, const uint16_t reg_addr,
     for (int i = 0; i < data.size(); i++)
     {
         uint8_t result;
-        bool status = device->process_read(reg_addr + i, result);
+        I2cSensorStatus status = device->process_read(reg_addr + i, result);
 
         // If the read was successful, store it. Otherwise return false
-        if (status)
+        if (I2cSensorStatus::OK == status)
         {
             data[i] = result;
         }
@@ -105,7 +105,8 @@ bool FakeI2c::mem_write(std::span<const uint8_t> data, const uint8_t reg_addr,
     for (int i = 0; i < data.size(); i++)
     {
         // Return false if the operation is not successful
-        if (!device->process_write(reg_addr + i, data[i]))
+        I2cSensorStatus status = device->process_write(reg_addr + i, data[i]);
+        if (status != I2cSensorStatus::OK)
         {
             return false;
         }
@@ -130,7 +131,8 @@ bool FakeI2c::mem_write(std::span<const uint8_t> data, const uint16_t reg_addr,
     for (int i = 0; i < data.size(); i++)
     {
         // Return false if the write was unsuccesful
-        if (!device->process_write(reg_addr + i, data[i]))
+        I2cSensorStatus status = device->process_write(reg_addr + i, data[i]);
+        if (status != I2cSensorStatus::OK)
         {
             return false;
         }
@@ -154,9 +156,9 @@ bool FakeI2c::read(std::span<uint8_t> data, uint8_t dev_addr)
     for (int i = 0; i < data.size(); i++)
     {
         uint8_t result;
-        bool status = device->process_read(result);
+        I2cSensorStatus status = device->process_read(result);
 
-        if (status)
+        if (status == I2cSensorStatus::OK)
         {
             data[i] = result;
         }
@@ -178,7 +180,8 @@ bool FakeI2c::write(std::span<const uint8_t> data, uint8_t dev_addr)
 
     for (int i = 0; i < data.size(); i++)
     {
-        if (!device->process_write(data[i]))
+        I2cSensorStatus status = device->process_write(data[i]);
+        if (I2cSensorStatus::OK != status)
         {
             return false;
         }
@@ -200,7 +203,7 @@ bool FakeI2c::register_device(InvI2cSensor* device)
 
     // Get the device's address.
     uint8_t dev_addr;
-    if (device->get_8bit_addr(dev_addr))
+    if (device->get_8bit_addr(dev_addr) == I2cSensorStatus::OK)
     {
         /*
             .insert() returns <iterator, bool> where
