@@ -7,6 +7,16 @@ namespace LBR
 {
 
 /* From inv_i2c_sensor in jc-fake-i2c which has not been merged yet*/
+
+// enum class I2cSensorStatus : uint8_t
+// {
+//     OK = 0,
+//     ERROR_READ,
+//     ERROR_WRITE,
+//     ERROR_OPCODE,
+//     ERROR_DEVICE_ADDRESS,
+// };
+//
 // struct RegisterDef
 // {
 //     uint8_t address;
@@ -41,7 +51,8 @@ public:
      * if the requested register address does not exist. 
      * Maybe we return false instead since this is SITL. Not sure yet.  
      */
-    bool process_read(const uint8_t reg_addr, uint8_t& data) override;
+    I2cSensorStatus process_read(const uint8_t reg_addr,
+                                 uint8_t& data) override;
 
     /**
      * @brief Processes the request to read from the fake i2c bus on the
@@ -54,7 +65,7 @@ public:
      * if the requested register address does not exist. 
      * Maybe we return false instead since this is SITL. Not sure yet.  
      */
-    bool process_read(uint8_t& data) override;
+    I2cSensorStatus process_read(uint8_t& data) override;
 
     /**
      * @brief Processes the request to write from the fake i2c bus.
@@ -67,7 +78,8 @@ public:
      * if the requested register address does not exist. 
      * Maybe we return false instead since this is SITL. Not sure yet.  
      */
-    bool process_write(const uint8_t reg_addr, uint8_t data) override;
+    I2cSensorStatus process_write(const uint8_t reg_addr,
+                                  uint8_t data) override;
 
     /**
      * @brief Processes the request to write from the fake i2c bus on the
@@ -80,12 +92,12 @@ public:
      * if the requested register address does not exist. 
      * Maybe we return false instead since this is SITL. Not sure yet.  
      */
-    bool process_write(uint8_t data) override;
+    I2cSensorStatus process_write(uint8_t data) override;
 
     /**
      * @brief Fetches the device address of the Bno055
      */
-    bool get_8bit_addr(uint8_t& addr) override;
+    I2cSensorStatus get_8bit_addr(uint8_t& addr) override;
 
 private:
     uint8_t dev_addr_;

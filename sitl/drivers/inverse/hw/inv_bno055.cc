@@ -89,7 +89,7 @@ bool InvBno055::init()
     };
 }
 
-bool InvBno055::process_read(const uint8_t reg_addr, uint8_t& data)
+I2cSensorStatus InvBno055::process_read(const uint8_t reg_addr, uint8_t& data)
 {
     recent_reg_ = reg_addr;
 
@@ -101,19 +101,19 @@ bool InvBno055::process_read(const uint8_t reg_addr, uint8_t& data)
     {
         /* It silently fails */
         data = Bn055_NULL_BYTE;
-        return true;
+        return I2cSensorStatus::ERROR_READ;
     }
 
     data = it->data;
-    return true;
+    return I2cSensorStatus::OK;
 }
 
-bool InvBno055::process_read(uint8_t& data)
+I2cSensorStatus InvBno055::process_read(uint8_t& data)
 {
     return process_read(recent_reg_, data);
 }
 
-bool InvBno055::process_write(const uint8_t reg_addr, uint8_t data)
+I2cSensorStatus InvBno055::process_write(const uint8_t reg_addr, uint8_t data)
 {
 
     recent_reg_ = reg_addr;
@@ -128,19 +128,20 @@ bool InvBno055::process_write(const uint8_t reg_addr, uint8_t data)
     }
     else
     { /* It silently fails */
+        return I2cSensorStatus::ERROR_WRITE;
     }
-    return true;
+    return I2cSensorStatus::OK;
 }
 
-bool InvBno055::process_write(uint8_t data)
+I2cSensorStatus InvBno055::process_write(uint8_t data)
 {
     return process_write(recent_reg_, data);
 }
 
-bool InvBno055::get_8bit_addr(uint8_t& addr)
+I2cSensorStatus InvBno055::get_8bit_addr(uint8_t& addr)
 {
     addr = dev_addr_;
-    return true;
+    return I2cSensorStatus::OK;
 }
 
 }  // namespace LBR
