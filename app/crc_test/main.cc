@@ -41,27 +41,27 @@ int main(int argc, char* argv[])
 
     hw.crc.compare(std::span(data8_1), kActualCrc_1);
     hw.usart.send(data8_1);
-    for (volatile uint32_t i = 0; i < 100000; i++);
+    LBR::Utils::DelayMs(100);
 
     hw.crc.compare(std::span(data8_2), kActualCrc_2);
     hw.usart.send(data8_2);
-    for (volatile uint32_t i = 0; i < 100000; i++);
+    LBR::Utils::DelayMs(100);
 
     /* uint16_t test */
 
     hw.crc.compare(std::span(data16_1), kActualCrc_1);
-    for (volatile uint32_t i = 0; i < 100000; i++);
+    LBR::Utils::DelayMs(100);
 
     hw.crc.compare(std::span(data16_2), kActualCrc_2);
-    for (volatile uint32_t i = 0; i < 100000; i++);
+    LBR::Utils::DelayMs(100);
 
     /* uint32_t test */
 
     hw.crc.compare(std::span(data32_1), kActualCrc_1);
-    for (volatile uint32_t i = 0; i < 100000; i++);
+    LBR::Utils::DelayMs(100);
 
     hw.crc.compare(std::span(data32_2), kActualCrc_2);
-    for (volatile uint32_t i = 0; i < 100000; i++);
+    LBR::Utils::DelayMs(100);
 
     while (1)
     {
@@ -76,13 +76,13 @@ int main(int argc, char* argv[])
             hw.usart.send(string);
 
             // Busy wait
-            for (volatile uint32_t i = 0; i < 1000000; i++);
+            Utils::DelayMs(100);
 
             std::array<uint8_t, 20> resultb{"\r\nCrc result: "};
             hw.usart.send(resultb);
 
             // Busy wait
-            for (volatile uint32_t i = 0; i < 1000000; i++);
+            Utils::DelayMs(100);
 
             std::array<uint8_t, 1> crcb{hw.crc.compare(string, crc_result) ? 'o'
                                                                            : 'x'
@@ -91,13 +91,13 @@ int main(int argc, char* argv[])
             hw.usart.send(crcb);
 
             // Busy wait
-            for (volatile uint32_t i = 0; i < 1000000; i++);
+            Utils::DelayMs(100);
 
             std::array<uint8_t, 4> endb{"\r\n"};
             hw.usart.send(endb);
 
             // Busy wait
-            for (volatile uint32_t i = 0; i < 1000000; i++);
+            Utils::DelayMs(100);
         }
     }
 
