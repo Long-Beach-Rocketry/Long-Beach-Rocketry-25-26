@@ -1,9 +1,20 @@
 #pragma once
+#include <algorithm>
 #include <unordered_map>
 #include "inv_i2c_sensor.h"
 
 namespace LBR
 {
+
+/* From inv_i2c_sensor in jc-fake-i2c which has not been merged yet*/
+// struct RegisterDef
+// {
+//     uint8_t address;
+//     uint8_t reset_value;
+//     uint8_t data;
+//     const char* name;
+//     bool read_only;
+// };
 
 constexpr uint8_t Bno055_CHIP_ID_REG{0x00U};
 constexpr uint8_t Bn055_NULL_BYTE{0x00U};
@@ -79,7 +90,7 @@ public:
 private:
     uint8_t dev_addr_;
     uint8_t recent_reg_{Bno055_CHIP_ID_REG};
-    std::unordered_map<uint8_t, uint8_t> register_map_;
+    std::vector<RegisterDef> register_map_;
 };
 
 }  // namespace LBR
