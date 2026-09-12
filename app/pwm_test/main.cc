@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include "board.h"
+#include "delay.h"
 #include "pwm.h"
 
 using namespace LBR;
