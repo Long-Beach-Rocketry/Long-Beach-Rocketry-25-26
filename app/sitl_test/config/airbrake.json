@@ -1,0 +1,28 @@
+{
+    "description": "Airbrake configuration for SITL testing",
+    "simulation_parameters": {
+        "time_step": 0.1,
+        "max_simulation_time": 600.0
+    },
+    "variables": {
+        "altitude_m": 0.0,
+        "velocity_mps": 150.0
+    },
+    "airbrake": {
+        "enabled": true,
+        "deploy_time_s": 6.0,
+        "retract_time_s": 20.0
+    },
+    "physics": {
+        "mass_kg": 20.0,
+        "air_density_kgpm3": 1.225,
+        "cd_flap": 1.2,
+        "cd_rocket": 0.75,
+        "flap_area_m2": 0.004,
+        "rocket_area_m2": 0.008,
+        "flap_angle_deg": 30.0,
+        "thrust_y_n": 500.0,
+        "motor_burn_time_s": 5.0,
+        "gravity_mps2": 9.81
+    }
+}
