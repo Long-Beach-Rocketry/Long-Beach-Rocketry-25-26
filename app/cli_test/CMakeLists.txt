@@ -23,9 +23,10 @@ if (TARGET cli_bsp)
         --specs=nano.specs
         -Wl,--gc-sections
     )
+    
 
     target_link_libraries_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
-        cli_bsp
+        cli_bsp container
     )
 
     target_preprocess_for(${TARGET_DEVICE} ${EXECUTABLE} ${LINKER_SCRIPT} ${LDF} ${PREPROCESS_DEFS})

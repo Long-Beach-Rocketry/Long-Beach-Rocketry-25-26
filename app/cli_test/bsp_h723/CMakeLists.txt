@@ -9,4 +9,5 @@ target_include_directories(cli_bsp PUBLIC
 
 target_link_libraries(cli_bsp PUBLIC
     driver
+    container
 )

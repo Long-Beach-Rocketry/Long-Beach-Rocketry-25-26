@@ -1,4 +1,3 @@
-// TODO: Replace busy-waits with timer interrupts
 #include <array>
 #include <cstddef>
 #include <functional>
@@ -6,6 +5,9 @@
 #include "delay.h"
 
 using namespace LBR;
+
+LBR::RingBuffer<char, 128> rxBuffer;
+uint8_t rxb;
 
 int main(int argc, char* argv[])
 {
@@ -25,9 +27,7 @@ int main(int argc, char* argv[])
         // Forward
         for (size_t i = 0; i < leds.size() - 1; i++)
         {
-            for (volatile size_t j = 0; j < 800000; j++)
-            {
-            }
+            Utils::DelayMs(10);
             leds[i].get().set(0);
             leds[i + 1].get().set(1);
         }
@@ -35,18 +35,15 @@ int main(int argc, char* argv[])
         // Backward
         for (int i = leds.size() - 1; i > 0; i--)
         {
-            for (volatile size_t j = 0; j < 800000; j++)
-            {
-            }
+
+            Utils::DelayMs(10);
             leds[i].get().set(0);
             leds[i - 1].get().set(1);
         }
 #endif
 #ifdef STM32L476xx
         hw.led1.toggle();
-        for (volatile size_t i = 0; i < 300000; i++)
-        {
-        }
+        Utils::DelayMs(10);
 #endif
     }
 
