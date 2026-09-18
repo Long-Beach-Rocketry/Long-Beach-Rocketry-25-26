@@ -29,6 +29,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   sudo \
   usbutils \
   udev \
+  protobuf-compiler \
   && rm -rf /var/lib/apt/lists/*
 
 # Create team development user.
@@ -48,6 +49,7 @@ RUN git --version && \
   gdb-multiarch --version && \
   clang-format --version && \
   clangd --version && \
+  protoc --version
   update-ca-certificates
 
 WORKDIR /workspace
