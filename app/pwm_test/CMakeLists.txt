@@ -7,6 +7,7 @@ set(PREPROCESS_DEFS
 )
 
 add_subdirectory_for(STM32L476 bsp_l476)
+add_subdirectory_for(STM32H723 bsp_h723)
 
 if (TARGET pwm_bsp)
 
@@ -17,6 +18,11 @@ if (TARGET pwm_bsp)
 
     target_include_directories_for(${TARGET_DEVICE} ${EXECUTABLE}
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+    )
+
+    target_link_options_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
+        --specs=nano.specs
+        -Wl,--gc-sections
     )
 
     target_link_libraries_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE

@@ -43,11 +43,16 @@ jobs:
         run: |
           git submodule update --init --recursive
 
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y protobuf-compiler
+
       - name: Install Arm GNU Toolchain (arm-none-eabi-gcc)
         uses: carlosperate/arm-none-eabi-gcc-action@v1
         with:
-          release: '15.2.Rel1' # <-- The compiler release to use
-          
+          release: "15.2.Rel1" # <-- The compiler release to use
+
       # - name: Configure CMake for F401
       #   run: |
       #     cmake --preset=stm32f401 -DTARGET_APP="" -DCMAKE_BUILD_TYPE="Debug"
@@ -76,12 +81,19 @@ jobs:
       # - name: Build for L412
       #   run: cd build/stm32l412 && cmake --build .
 
-      - name: Configure CMake for L476
-        run: |
-          cmake --preset=stm32l476 -DTARGET_APP="" -DCMAKE_BUILD_TYPE="Debug"
+      # - name: Configure CMake for L476
+      #   run: |
+      #     cmake --preset=stm32l476 -DTARGET_APP="" -DCMAKE_BUILD_TYPE="Debug"
 
-      - name: Build for L476
-        run: cd build/stm32l476 && cmake --build .
+      # - name: Build for L476
+      #   run: cd build/stm32l476 && cmake --build .
+
+      - name: Configure CMake for H723
+        run: |
+          cmake --preset=stm32h723 -DTARGET_APP="" -DCMAKE_BUILD_TYPE="Debug"
+
+      - name: Build for H723
+        run: cd build/stm32h723 && cmake --build .
 
   # This runs native unit tests that verify functionality of non-HW specific code.
   unit_test:
@@ -100,6 +112,11 @@ jobs:
       - name: Pull git submodules
         run: |
           git submodule update --init --recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y protobuf-compiler
 
       - name: Configure CMake for testing
         run: |

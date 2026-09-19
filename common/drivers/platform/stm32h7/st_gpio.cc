@@ -40,17 +40,21 @@ bool HwGpio::init()
     uint8_t afr_section = pin_num / 8u;
     uint8_t af_index = (afr_section == 1) ? pin_num - 8 : pin_num;
 
-    // Set fields
+    // Set AFR before MODER to avoid briefly driving the wrong alternate function
+    set_field(&base_addr->AFR[afr_section], static_cast<uint32_t>(settings.af),
+              static_cast<uint32_t>(af_index), 4);
+
+    // Set mode (activates alternate function after AFR is already configured)
     set_field(&base_addr->MODER, static_cast<uint32_t>(settings.mode),
               static_cast<uint32_t>(pin_num), 2);
+
+    // Set output type, speed, and pull-up/pull-down
     set_field(&base_addr->OTYPER, static_cast<uint32_t>(settings.otype),
               static_cast<uint32_t>(pin_num), 1);
     set_field(&base_addr->OSPEEDR, static_cast<uint32_t>(settings.ospeed),
               static_cast<uint32_t>(pin_num), 2);
     set_field(&base_addr->PUPDR, static_cast<uint32_t>(settings.pupd),
               static_cast<uint32_t>(pin_num), 2);
-    set_field(&base_addr->AFR[afr_section], static_cast<uint32_t>(settings.af),
-              static_cast<uint32_t>(af_index), 4);
 
     return true;
 }

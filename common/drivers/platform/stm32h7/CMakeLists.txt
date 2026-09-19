@@ -1,5 +1,12 @@
 add_library(hal STATIC
     st_gpio.cc
+    st_i2c.cc
+    st_pwm.cc
+    st_usart.cc
+    st_crc.cc
+    st_spi.cc
+    st_sysclk.cc
+    st_timebase.cc
 )
 
 target_include_directories(hal PUBLIC

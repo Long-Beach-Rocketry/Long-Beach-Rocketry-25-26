@@ -9,14 +9,16 @@ int main(int argc, char** argv)
 {
     bsp_init();
 
-    Board board = get_board();
+    Board hw = get_board();
 
     while (1)
     {
-        board.usart.send(txb);
+        hw.usart.send(txb);
 
         // Busy wait
-        for (volatile uint32_t i = 0; i < 1000000; i++);
+        for (volatile uint32_t i = 0; i < 1000000; i++)
+        {
+        }
     }
 
     return 0;
