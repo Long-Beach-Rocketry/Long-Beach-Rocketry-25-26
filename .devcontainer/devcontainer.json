@@ -77,6 +77,8 @@
 	"runArgs": [
 		"--hostname=dev",
 		"--privileged",
+		"-v",
+		"/dev:/dev",
 		"--device-cgroup-rule=c 189:* rmw",
 		"--device-cgroup-rule=c 166:* rmw"
 	],
