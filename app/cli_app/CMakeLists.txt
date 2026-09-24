@@ -7,6 +7,7 @@ set(PREPROCESS_DEFS
 )
 
 add_subdirectory_for(STM32H723 bsp_h723)
+add_subdirectory(config)
 
 if (TARGET cli_bsp)
 

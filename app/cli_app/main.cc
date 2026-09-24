@@ -9,6 +9,7 @@ using namespace LBR;
 // LBR::RingBuffer<char, 128> rxBuffer;
 uint8_t rxb;
 bool update_flag{false};
+Cli cli;
 
 int main(int argc, char* argv[])
 {
@@ -16,8 +17,7 @@ int main(int argc, char* argv[])
     Board& hw = get_board();
 
     //  Gpio* ld1 = &hw.led1;
-    //  CliParams params{ld1, nullptr, nullptr, nullptr, nullptr};
-    //  Cli cli(params);
+    //   CliParams params{ld1, nullptr, nullptr, nullptr, nullptr};
     //  cli.init();
 
     while (1)
@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
         if (update_flag)
         {
             update_flag = false;
-            // cli.update(rxb);
+            cli.process(rxb);
         }
     }
 

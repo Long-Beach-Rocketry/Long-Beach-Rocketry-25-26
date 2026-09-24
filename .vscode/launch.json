@@ -681,17 +681,21 @@
                 "-d",
                 "${workspaceRoot}"
             ],
-            "preRestartCommands": [
+            "overrideRestartCommands": [
                 "monitor reset halt",
-                "load"
+                "load",
+                "monitor reset halt"
             ],
-            "postRestartCommands": [
-                "enable breakpoint"
+            "overrideLaunchCommands": [
+                "monitor targets stm32h7x.cpu0",
+                "monitor reset halt",
+                "load",
+                "monitor reset halt"
             ],
             "showDevDebugOutput": "vscode",
             "liveWatch": {
                 "enabled": true,
-                "samplesPerSecond": 2
+                "samplesPerSecond": 1
             }
         }
     ]

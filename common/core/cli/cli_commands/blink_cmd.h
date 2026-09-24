@@ -10,7 +10,8 @@ namespace BlinkCmd
 {
 
 void init(Gpio* led);
+bool blink_cmd_handler(CmdArgs& args);
 
-}
+}  // namespace BlinkCmd
 
 }  // namespace LBR

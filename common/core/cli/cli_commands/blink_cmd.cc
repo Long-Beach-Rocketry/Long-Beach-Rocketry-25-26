@@ -13,7 +13,7 @@ void init(Gpio* led)
     gpio = led;
 }
 
-bool blink_cmd_handler()
+bool blink_cmd_handler(const CmdArgs& args)
 {
     if (gpio)
     {
@@ -21,6 +21,11 @@ bool blink_cmd_handler()
     }
     return false;
 }
+
+// const Cmd blinkCmd = {.name = "blink",
+//                       .desc = "Toggles the assigned status GPIO pin",
+//                       .invoke = BlinkCmd::blink_cmd_handler};
+
 }  // namespace BlinkCmd
 
 }  // namespace LBR
