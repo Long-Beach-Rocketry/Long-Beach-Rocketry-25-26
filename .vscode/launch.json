@@ -658,6 +658,41 @@
                 "enabled": true,
                 "samplesPerSecond": 2
             }
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceRoot}/build/stm32h723/app/cli_app/cli_app",
+            "name": "DEBUG CLI H7",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "interface": "swd",
+            "device": "STM32H723",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToEntryPoint": "main",
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "monitor reset halt",
+                "load"
+            ],
+            "postRestartCommands": [
+                "enable breakpoint"
+            ],
+            "showDevDebugOutput": "vscode",
+            "liveWatch": {
+                "enabled": true,
+                "samplesPerSecond": 2
+            }
         }
     ]
 }

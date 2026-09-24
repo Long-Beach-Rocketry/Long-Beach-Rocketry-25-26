@@ -3,7 +3,7 @@
 
 namespace LBR
 {
-Gpio* gpio{nullptr};
+static Gpio* gpio{nullptr};
 
 namespace BlinkCmd
 {
