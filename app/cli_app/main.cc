@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
         if (update_flag)
         {
             update_flag = false;
-            cli.process(rxb);
+            cli.process();
         }
     }
 

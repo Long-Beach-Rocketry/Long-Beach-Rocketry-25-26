@@ -112,10 +112,16 @@ extern "C" void USART3_IRQHandler(void)
     {
         if (board.usart.receive(rxb))
         {
-            update_flag = true;
             // received 1 byte, echo back
             std::span<const uint8_t> tx_span(&rxb, 1);
             board.usart.send(tx_span);
+
+            update_flag = cli.take_input(rxb);
+            if (update_flag)
+            {
+                std::array<uint8_t, 3> newLine{"\r\n"};
+                board.usart.send(newLine);
+            }
         }
     }
 }

@@ -4,6 +4,7 @@
  */
 
 #pragma once
+#include "cli.h"
 #include "gpio.h"
 #include "ring_buffer.h"
 #include "sys_clock.h"
@@ -11,6 +12,7 @@
 
 extern LBR::RingBuffer<char, 128> rxBuffer;
 extern uint8_t rxb;
+extern LBR::Cli cli;
 extern bool update_flag;
 
 namespace LBR

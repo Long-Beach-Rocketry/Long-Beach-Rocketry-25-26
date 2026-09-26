@@ -6,10 +6,10 @@ set(PREPROCESS_DEFS
     -DDEF_FLASH_SIZE=1024K
 )
 
-add_subdirectory(config)
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/config
 )
+add_subdirectory(config)
 
 add_subdirectory_for(STM32H723 bsp_h723)
 

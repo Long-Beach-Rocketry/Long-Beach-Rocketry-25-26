@@ -42,21 +42,9 @@ bool Cli::register_cmd(Cmd command)
     return true;
 }
 
-bool Cli::process(uint8_t rx)
+bool Cli::process()
 {
-    switch (rx)
-    {
-        case '\177':
-            rxBuffer.pop(rx);
-            break;
-        default:
-            rxBuffer.push(rx);
-    }
-    if (rx != '\r' && rx != '\n')
-    {
-        return true;
-    }
-
+    uint8_t rx{};
     uint8_t argc{0};
     static char tmp[kMaxInputLen]{};
     size_t idx{0};
@@ -101,53 +89,52 @@ bool Cli::process(uint8_t rx)
         }
     }
 
+    rxBuffer.reset();
+
     if (argc > 0)
     {
         std::string_view input(argv[0]);
         CmdArgs cmdArgs{.argc = --argc,
                         .argv = (argc > 0) ? &argv[1] : nullptr};
-        rxBuffer.reset();
         return invoke(input, cmdArgs);
     }
-
     return false;
 }
 
 bool Cli::invoke(std::string_view input, CmdArgs cmdArgs)
 {
+    bool ret{false};
     for (auto cmd : commands)
     {
         if (cmd.name == input)
         {
-            return cmd.invoke(cmdArgs);
+            std::array<uint8_t, kMaxInputLen> txOut{};
+            ret = cmd.invoke(cmdArgs, txOut);
+            if (!txOut.empty())
+            {
+                usart->send(txOut);
+            }
+            return ret;
         }
     }
     return false;
 }
 
-void Cli::tokenize(CmdArgs& args)
+bool Cli::take_input(uint8_t rx)
 {
-    return;
-    //  uint8_t data{};
-    //  uint8_t argc{0};
-    //  uint8_t tokenIdx{0};
-    //  while (!rxBuffer.empty())
-    //  {
-    //      rxBuffer.pop(data);
-    //      if (data == ' ' && tokenIdx == 0)
-    //      {
-    //          continue;
-    //      }
-    //      else if (data == ' ')
-    //      {
-    //          ++argc;
-    //          tokenIdx = 0;
-    //      }
-    //      else
-    //      {
-    //          args.argv[argc][tokenIdx] = data;
-    //      }
-    //  }
+    bool ret{false};
+    switch (rx)
+    {
+        case '\177':  // backspace
+            rxBuffer.pop(rx);
+            return ret;
+        case '\r':
+        case '\n':
+            ret = true;
+        default:
+            return rxBuffer.push(rx) && ret;
+    }
+    return false;
 }
 
 }  // namespace LBR
