@@ -46,6 +46,11 @@ void AirBrake::update(SensorData data)
         motor.set_angle(0);
         state = AirbrakeState::RECOVERY_POPPED;
     }
+    if (sensor_manager.timebase.time_since_launch >=
+        AirbrakeConstants::kRetractTime)
+    {
+        state = AirbrakeState::AIRBRAKES_RETRACTING;
+    }
 
     switch (state)
     {
