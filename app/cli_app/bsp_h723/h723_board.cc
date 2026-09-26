@@ -119,7 +119,7 @@ extern "C" void USART3_IRQHandler(void)
             update_flag = cli.take_input(rxb);
             if (update_flag)
             {
-                std::array<uint8_t, 3> newLine{"\r\n"};
+                std::array<uint8_t, 4> newLine{"\r\n\n"};
                 board.usart.send(newLine);
             }
         }

@@ -5,6 +5,11 @@
 
 namespace LBR
 {
+constexpr std::string_view kCmdErrorNotFound = "ERROR: Command not found\r\n\n";
+constexpr std::string_view kCmdErrorArgs = "ERROR: Invalid arguments\r\n\n";
+constexpr std::string_view kCmdSuccess =
+    "SUCCESS: Command ran successfully\r\n\n";
+
 struct CmdArgs
 {
     uint8_t argc;

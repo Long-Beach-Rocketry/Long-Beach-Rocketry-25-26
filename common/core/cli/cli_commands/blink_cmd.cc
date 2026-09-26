@@ -1,6 +1,7 @@
 #include "blink_cmd.h"
 #include <algorithm>
 #include <array>
+#include <cstring>
 #include "gpio.h"
 #include "string_span.h"
 
@@ -20,6 +21,12 @@ void init(Gpio* led1, Gpio* led2, Gpio* led3)
 
 bool blink_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
 {
+    std::span<const uint8_t> error = sv_to_span(kCmdErrorArgs);
+    std::copy(error.begin(), error.end(),
+              txOut.subspan(0, error.size()).begin());
+
+    std::span<const uint8_t> success = sv_to_span(kCmdSuccess);
+    bool ret{false};
 
     if (args.argc > 0)
     {
@@ -31,33 +38,58 @@ bool blink_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                       txOut.subspan(0, desc.size()).begin());
             return true;
         }
-        else if ((op1 == "-o" || op1 == "--option") && args.argc == 2)
+        else if ((op1 == "-o" || op1 == "--option"))
         {
+            if (args.argc > 2)
+            {
+                return false;
+            }
             std::string_view op2(args.argv[1]);
             if (op2 == "1" && gpios[0])
             {
-                return gpios[0]->toggle();
+                ret = gpios[0]->toggle();
+                if (ret)
+                {
+                    std::copy(success.begin(), success.end(),
+                              txOut.subspan(0, success.size()).begin());
+                }
+                return ret;
             }
             else if (op2 == "2" && gpios[1])
             {
-                return gpios[1]->toggle();
+                ret = gpios[1]->toggle();
+                if (ret)
+                {
+                    std::copy(success.begin(), success.end(),
+                              txOut.subspan(0, success.size()).begin());
+                }
             }
             else if (op2 == "3" && gpios[2])
             {
-                return gpios[2]->toggle();
+                ret = gpios[2]->toggle();
+                if (ret)
+                {
+                    std::copy(success.begin(), success.end(),
+                              txOut.subspan(0, success.size()).begin());
+                }
             }
         }
+        return ret;
     }
     else
     {
 
-        bool ret{false};
         for (auto gpio : gpios)
         {
             if (gpio)
             {
                 ret |= gpio->toggle();
             }
+        }
+        if (ret)
+        {
+            std::copy(success.begin(), success.end(),
+                      txOut.subspan(0, success.size()).begin());
         }
         return ret;
     }

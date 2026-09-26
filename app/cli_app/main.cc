@@ -10,7 +10,7 @@ using namespace LBR;
 // LBR::RingBuffer<char, 128> rxBuffer;
 uint8_t rxb;
 bool update_flag{false};
-Cli cli;
+Cli cli("Cli app> ");
 
 int main(int argc, char* argv[])
 {
@@ -25,7 +25,8 @@ int main(int argc, char* argv[])
 
 #endif
 
-    cli.help();
+    cli.list_commands();
+    hw.usart.send(cli.get_prompt());
 
     while (1)
     {
@@ -35,6 +36,7 @@ int main(int argc, char* argv[])
         {
             update_flag = false;
             cli.process();
+            hw.usart.send(cli.get_prompt());
         }
     }
 
