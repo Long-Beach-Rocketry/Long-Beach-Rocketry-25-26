@@ -14,7 +14,7 @@ struct Cmd
 {
     std::string_view name;
     std::string_view desc;
-    void*(invoke)(const CmdArgs& args);
+    bool (*invoke)(const CmdArgs& args);
 };
 
 }  // namespace LBR

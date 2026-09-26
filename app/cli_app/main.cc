@@ -2,6 +2,7 @@
 #include <cstddef>
 #include "board.h"
 #include "cli.h"
+#include "cli_config.h"
 #include "delay.h"
 
 using namespace LBR;
@@ -16,14 +17,20 @@ int main(int argc, char* argv[])
     board_init();
     Board& hw = get_board();
 
-    //  Gpio* ld1 = &hw.led1;
-    //   CliParams params{ld1, nullptr, nullptr, nullptr, nullptr};
-    //  cli.init();
+#ifdef STM32H723xx
+    cli_init(cli, &hw.usart, hw.led1, hw.led2, hw.led3);
+
+#elif defined(STM32L476xx)
+    cli_init(cli, &hw.usart, hw.led1);
+
+#endif
+
+    cli.help();
 
     while (1)
     {
-        hw.led1.toggle();
-        Utils::DelayMs(1000);
+        // hw.led1.toggle();
+        // Utils::DelayMs(1000);
         if (update_flag)
         {
             update_flag = false;
