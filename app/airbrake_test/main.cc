@@ -21,14 +21,14 @@ int main(int argc, char* argv[])
 
     while (1)
     {
-        hw.imu.read_all(data);
-        airbrake.fetch_imu(data);
+        // hw.imu.read_all(data);
+        // airbrake.fetch_imu(data);
 
-        press = hw.bmp390.get_pressure();
-        temp = hw.bmp390.get_temperature();
+        // press = hw.bmp390.get_pressure();
+        // temp = hw.bmp390.get_temperature();
 
-        airbrake.fetch_press(press);
-        airbrake.fetch_temp(temp);
+        // airbrake.fetch_press(press);
+        // airbrake.fetch_temp(temp);
 
         airbrake.update();
     }

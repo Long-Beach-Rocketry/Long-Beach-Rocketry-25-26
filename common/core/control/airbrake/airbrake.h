@@ -58,8 +58,11 @@ private:
     AirbrakeState state = AirbrakeState::PRELAUNCH;
 
     float init_pressure, pressure, base_altitude;
+    // ^ should be replaced by sensor manager
     ServoMotor motor;
     LBR::Bno055Data imu;
+    // kalman filter
+    // model predictive controller
 };
 
 }  // namespace LBR

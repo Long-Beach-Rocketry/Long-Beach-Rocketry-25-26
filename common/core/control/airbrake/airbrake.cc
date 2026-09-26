@@ -24,6 +24,10 @@ void AirBrake::update(SensorData data)
      * LAUNCH_SIGNAL
      */
 
+    // Sensor manager fetches all values
+
+    // Pass values into kalman filter to get corrected
+
     /* TODO: replace these with actual values */
     // Altitude units is in meters
     float altitude = calc_altitude(init_pressure, pressure) - base_altitude;
@@ -72,8 +76,8 @@ void AirBrake::update(SensorData data)
 
         case AirbrakeState::AIRBRAKES_DEPLOYED:
 
-            // Not sure how to transition to retracting state. What triggers it to even do it?
-            /* TODO: Get angle from PMC and set the servo motor angle */
+            // pass filtered sensor values into mpc to get angle
+
             float angle = mpc_get_angle();
 
             if (angle == 0)
