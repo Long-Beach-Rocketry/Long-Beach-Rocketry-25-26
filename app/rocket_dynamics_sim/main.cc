@@ -247,12 +247,12 @@ int main() {
 
     // Print results in terminal
     std::cout << "=== Airbrake effectiveness summary ===\n"
-              << "Apogee without airbrakes: " << apogee_without_ft << " ft\n"
-              << "Apogee with airbrakes:    " << apogee_with_ft << " ft\n"
-              << "Altitude reduction:       " << delta_ft << " ft "
-              << "(target: approx. -1000 ft)\n"
-              << "Target apogee w/ airbrakes: 7500 ft "
-              << "(actual: " << apogee_with_ft << " ft)\n";
+          << "Apogee without airbrakes: " << apogee_without_ft << " ft "
+          << "(First Flight target: approx. 6500 ft)\n"
+          << "Apogee with airbrakes:    " << apogee_with_ft << " ft "
+          << "(Second Flight target: approx. 6000 ft)\n"
+          << "Altitude reduction:       " << delta_ft << " ft "
+          << "(target: approx. -500 ft)\n";
 
     return 0;
 }
