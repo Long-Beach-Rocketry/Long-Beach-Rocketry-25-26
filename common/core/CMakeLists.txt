@@ -5,6 +5,8 @@ add_subdirectory(protobuff)
 add_subdirectory(network)
 add_subdirectory(logger)
 add_subdirectory(cli)
+add_subdirectory(rocket_dynamics)
+add_subdirectory(atmosphere)
 
 # Make core consumers also get utils and chip_select by adding them to the INTERFACE core target
 # `core` is defined in the parent `common/CMakeLists.txt` as an INTERFACE target.
