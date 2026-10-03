@@ -29,7 +29,6 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
               txOut.subspan(0, error.size()).begin());
 
     std::span<const uint8_t> success = sv_to_span(kCmdSuccess);
-    bool ret{false};
 
     if (args.argc > 0)
     {
@@ -132,6 +131,7 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                     {
                         return false;
                     }
+                    return true;
                 }
             }
             else
@@ -150,6 +150,7 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                                  "\tTemperature:\t {} C\r\n"
                                  "\tPressure   :\t {} Pa\r\n\n",
                                  temperature, pressure);
+                return true;
             }
             else
             {
@@ -172,9 +173,10 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                 {
                     return false;
                 }
+                return true;
             }
         }
-        return ret;
+        return false;
     }
 
     return false;
