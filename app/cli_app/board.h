@@ -1,9 +1,11 @@
 /**
  * @file board.h
  * @brief CLI Board Interface
+ * @author Joseph Chang
  */
 
 #pragma once
+#include "bmp390.h"
 #include "cli.h"
 #include "gpio.h"
 #include "ring_buffer.h"
@@ -27,6 +29,8 @@ struct Board
     Gpio& led2;
     Gpio& led3;
 #endif
+
+    Bmp390& bmp390;
 };
 
 bool board_init(void);

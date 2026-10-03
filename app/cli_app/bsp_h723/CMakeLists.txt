@@ -11,4 +11,5 @@ target_link_libraries(cli_bsp PUBLIC
     driver
     container
     cli
+    core
 )

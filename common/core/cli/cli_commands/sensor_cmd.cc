@@ -42,8 +42,8 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
         }
         else if ((op1 == "-i" || op1 == "--imu") && imu)
         {
-            Bno055Data imuData{};
-            if (imu->read_all(imuData))
+            Bno055Data imu_data{};
+            if (imu->read_all(imu_data))
             {
                 if (args.argc == 1)
                 {
@@ -55,12 +55,12 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                         "\tLinear Accel (x,y,z):\t{},{},{}\r\n"
                         "\tGravity      (x,y,z):\t{},{},{}\r\n"
                         "\tQuaternion (w,x,y,z):\t{},{},{},{}\r\n\n",
-                        imuData.accel.x, imuData.accel.y, imuData.accel.z,
-                        imuData.gyro.x, imuData.gyro.y, imuData.gyro.z,
-                        imuData.linear_accel.x, imuData.linear_accel.y,
-                        imuData.linear_accel.z, imuData.gravity.x,
-                        imuData.gravity.y, imuData.gravity.z, imuData.quat.w,
-                        imuData.quat.x, imuData.quat.y, imuData.quat.z);
+                        imu_data.accel.x, imu_data.accel.y, imu_data.accel.z,
+                        imu_data.gyro.x, imu_data.gyro.y, imu_data.gyro.z,
+                        imu_data.linear_accel.x, imu_data.linear_accel.y,
+                        imu_data.linear_accel.z, imu_data.gravity.x,
+                        imu_data.gravity.y, imu_data.gravity.z, imu_data.quat.w,
+                        imu_data.quat.x, imu_data.quat.y, imu_data.quat.z);
                     return true;
                 }
                 else
@@ -76,13 +76,13 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                             "\tLinear Accel (x,y,z):\t{},{},{}\r\n"
                             "\tGravity      (x,y,z):\t{},{},{}\r\n"
                             "\tQuaternion (w,x,y,z):\t{},{},{},{}\r\n\n",
-                            imuData.accel.x, imuData.accel.y, imuData.accel.z,
-                            imuData.gyro.x, imuData.gyro.y, imuData.gyro.z,
-                            imuData.linear_accel.x, imuData.linear_accel.y,
-                            imuData.linear_accel.z, imuData.gravity.x,
-                            imuData.gravity.y, imuData.gravity.z,
-                            imuData.quat.w, imuData.quat.x, imuData.quat.y,
-                            imuData.quat.z);
+                            imu_data.accel.x, imu_data.accel.y,
+                            imu_data.accel.z, imu_data.gyro.x, imu_data.gyro.y,
+                            imu_data.gyro.z, imu_data.linear_accel.x,
+                            imu_data.linear_accel.y, imu_data.linear_accel.z,
+                            imu_data.gravity.x, imu_data.gravity.y,
+                            imu_data.gravity.z, imu_data.quat.w,
+                            imu_data.quat.x, imu_data.quat.y, imu_data.quat.z);
                     }
                     else if (op2 == "a" || op2 == "acc")
                     {
@@ -90,7 +90,7 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                             txOut.data(), txOut.size() - 1,
                             "Imu Data\r\n"
                             "\tAcceleration (x,y,z):\t{},{},{}\r\n",
-                            imuData.accel.x, imuData.accel.y, imuData.accel.z;
+                            imu_data.accel.x, imu_data.accel.y, imu_data.accel.z;
                     }
                     else if (op2 == "g" || op2 == "grav")
                     {
@@ -98,8 +98,8 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                             txOut.data(), txOut.size() - 1,
                             "Imu Data\r\n"
                             "\tGravity      (x,y,z):\t{},{},{}\r\n",
-                            imuData.gravity.x, imuData.gravity.y,
-                            imuData.gravity.z);
+                            imu_data.gravity.x, imu_data.gravity.y,
+                            imu_data.gravity.z);
                     }
                     else if (op2 == "y" || op2 == "gyro")
                     {
@@ -107,7 +107,7 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                             txOut.data(), txOut.size() - 1,
                             "Imu Data\r\n"
                             "\tGyroscope    (x,y,z):\t{},{},{}\r\n",
-                            imuData.gyro.x, imuData.gyro.y, imuData.gyro.z);
+                            imu_data.gyro.x, imu_data.gyro.y, imu_data.gyro.z);
                     }
                     else if (op2 == "l" || op2 == "lacc")
                     {
@@ -115,8 +115,8 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                             txOut.data(), txOut.size() - 1,
                             "Imu Data\r\n"
                             "\tLinear Accel (x,y,z):\t{},{},{}\r\n",
-                            imuData.linear_accel.x, imuData.linear_accel.y,
-                            imuData.linear_accel.z);
+                            imu_data.linear_accel.x, imu_data.linear_accel.y,
+                            imu_data.linear_accel.z);
                     }
                     else if (op2 == "q" || op2 == "quat")
                     {
@@ -124,8 +124,8 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                             txOut.data(), txOut.size() - 1,
                             "Imu Data\r\n"
                             "\tQuaternion (w,x,y,z):\t{},{},{},{}\r\n\n",
-                            imuData.quat.w, imuData.quat.x, imuData.quat.y,
-                            imuData.quat.z);
+                            imu_data.quat.w, imu_data.quat.x, imu_data.quat.y,
+                            imu_data.quat.z);
                     }
                     else
                     {
