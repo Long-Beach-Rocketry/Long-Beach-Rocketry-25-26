@@ -11,15 +11,16 @@
 namespace LBR
 {
 
-class Gpio;
+class Bno055;
+class Bmp390;
 
-namespace BlinkCmd
+namespace SensorCmd
 {
-extern const Cmd blinkCmd;
+extern const Cmd sensorCmd;
 
-void init(Gpio* led1, Gpio* led2, Gpio* led3);
+void init(Bno055* imu_, Bmp390* baro_);
 bool blink_cmd_handler(CmdArgs& args, std::span<uint8_t> txOut);
 
-}  // namespace BlinkCmd
+}  // namespace SensorCmd
 
 }  // namespace LBR

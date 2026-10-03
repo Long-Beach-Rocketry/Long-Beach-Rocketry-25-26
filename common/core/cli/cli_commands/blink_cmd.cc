@@ -53,7 +53,6 @@ bool blink_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                     std::copy(success.begin(), success.end(),
                               txOut.subspan(0, success.size()).begin());
                 }
-                return ret;
             }
             else if (op2 == "2" && gpios[1])
             {

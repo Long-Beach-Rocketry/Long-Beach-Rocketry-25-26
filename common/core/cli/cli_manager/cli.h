@@ -13,7 +13,6 @@ namespace LBR
 {
 constexpr uint8_t kMaxCommands{10};
 constexpr uint8_t kMaxArgs{8};
-constexpr uint8_t kMaxInputLen{255};
 
 class Cli
 {
