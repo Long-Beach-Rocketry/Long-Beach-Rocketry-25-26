@@ -6,7 +6,6 @@ set(PREPROCESS_DEFS
     -DDEF_FLASH_SIZE=1024K
 )
 
-add_subdirectory_for(STM32L476 bsp_l476)
 add_subdirectory_for(STM32H723 bsp_h723)
 
 if (TARGET sysclk_bsp)

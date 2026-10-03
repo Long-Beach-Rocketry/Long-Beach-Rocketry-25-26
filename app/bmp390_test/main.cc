@@ -3,6 +3,7 @@
 #include <span>
 #include "bmp390.h"
 #include "board.h"
+#include "delay.h"
 
 using namespace LBR;
 
@@ -19,9 +20,7 @@ int main(int argc, char* argv[])
 
         printf("Pressure: %f\nTemperature: %f\n", press, temp);
 
-        for (volatile size_t i = 0; i < 100000; i++)
-        {
-        }
+        Utils::DelayMs(800);
     }
 
     return 0;

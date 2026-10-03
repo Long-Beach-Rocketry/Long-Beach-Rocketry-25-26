@@ -43,6 +43,11 @@ jobs:
         run: |
           git submodule update --init --recursive
 
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y protobuf-compiler
+
       - name: Install Arm GNU Toolchain (arm-none-eabi-gcc)
         uses: carlosperate/arm-none-eabi-gcc-action@v1
         with:
@@ -107,6 +112,11 @@ jobs:
       - name: Pull git submodules
         run: |
           git submodule update --init --recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y protobuf-compiler
 
       - name: Configure CMake for testing
         run: |

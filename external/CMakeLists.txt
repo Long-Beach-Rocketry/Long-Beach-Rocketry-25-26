@@ -1,12 +1,20 @@
+add_library(nanopb STATIC
+    nanopb/pb_encode.c
+    nanopb/pb_decode.c
+    nanopb/pb_common.c
+)
+
+add_subdirectory(nanopb)
+
 # Disable pthread for embedded/STM32 environments
-if(NOT "${TARGET_DEVICE}" STREQUAL "NATIVE")
+if(NOT "${TARGET_DEVICE}" MATCHES "^(NATIVE|SITL)$")
     set(gtest_disable_pthreads ON CACHE BOOL "" FORCE)
     set(GTEST_HAS_PTHREAD 0 CACHE BOOL "" FORCE)
 else()
     find_package(Threads REQUIRED)
 endif()
 
-if("${TARGET_DEVICE}" MATCHES "NATIVE")
+if("${TARGET_DEVICE}" MATCHES "^(NATIVE|SITL)$")
   # For Windows: Prevent overriding the parent project's compiler/linker settings
   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
@@ -22,5 +30,3 @@ if("${TARGET_DEVICE}" MATCHES "NATIVE")
 
   add_subdirectory(googletest)
 endif()
-
-#add_subdirectory(nanopb)

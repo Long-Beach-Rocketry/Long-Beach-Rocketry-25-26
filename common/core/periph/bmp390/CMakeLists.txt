@@ -10,4 +10,5 @@ target_include_directories(bmp390 INTERFACE
 
 target_link_libraries(bmp390 INTERFACE
     driver
+    utils
 )
