@@ -129,6 +129,8 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                     }
                     else
                     {
+                        std::format_to_n(txOut.data(), txOut.size() - 1,
+                                         "ERROR: Invalid argument\r\n\n");
                         return false;
                     }
                     return true;
@@ -136,6 +138,9 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
             }
             else
             {
+                std::format_to_n(txOut.data(), txOut.size() - 1,
+                                 "ERROR: Could not read IMU data!\r\n\n");
+
                 return false;
             }
         }
@@ -171,13 +176,20 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                 }
                 else
                 {
+                    std::format_to_n(txOut.data(), txOut.size() - 1,
+                                     "ERROR: Invalid argument\r\n\n");
                     return false;
                 }
                 return true;
             }
         }
+        std::format_to_n(txOut.data(), txOut.size() - 1,
+                         "ERROR: Invalid argument\r\n\n");
+
         return false;
     }
+    std::format_to_n(txOut.data(), txOut.size() - 1,
+                     "ERROR: No arguments specified\r\n\n");
 
     return false;
 }
