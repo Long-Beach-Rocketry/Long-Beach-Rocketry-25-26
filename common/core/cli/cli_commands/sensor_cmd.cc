@@ -40,8 +40,14 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                       txOut.subspan(0, desc.size()).begin());
             return true;
         }
-        else if ((op1 == "-i" || op1 == "--imu") && imu)
+        else if (op1 == "-i" || op1 == "--imu")
         {
+            if (!imu)
+            {
+                std::format_to_n(txOut.data(), txOut.size() - 1,
+                                 "ERROR: IMU not found!\r\n\n");
+                return false;
+            }
             Bno055Data imu_data{};
             if (imu->read_all(imu_data))
             {
@@ -144,8 +150,14 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                 return false;
             }
         }
-        else if ((op1 == "-b" || op1 == "--baro") && baro)
+        else if (op1 == "-b" || op1 == "--baro")
         {
+            if (!baro)
+            {
+                std::format_to_n(txOut.data(), txOut.size() - 1,
+                                 "ERROR: Barometer not found!\r\n\n");
+                return false;
+            }
             float pressure = baro->get_pressure();
             float temperature = baro->get_temperature();
             if (args.argc == 1)
