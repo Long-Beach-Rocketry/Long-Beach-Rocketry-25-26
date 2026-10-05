@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
     Board& hw = get_board();
 
 #ifdef STM32H723xx
-    cli_init(cli, &hw.usart, hw.led1, hw.led2, hw.led3);
+    cli_init(cli, &hw.usart, hw.led1, hw.led2, hw.led3, nullptr);
 
 #elif defined(STM32L476xx)
     cli_init(cli, &hw.usart, hw.led1);

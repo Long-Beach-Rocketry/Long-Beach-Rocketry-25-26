@@ -96,7 +96,8 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                             txOut.data(), txOut.size() - 1,
                             "Imu Data\r\n"
                             "\tAcceleration (x,y,z):\t{},{},{}\r\n",
-                            imu_data.accel.x, imu_data.accel.y, imu_data.accel.z;
+                            imu_data.accel.x, imu_data.accel.y,
+                            imu_data.accel.z);
                     }
                     else if (op2 == "g" || op2 == "grav")
                     {
