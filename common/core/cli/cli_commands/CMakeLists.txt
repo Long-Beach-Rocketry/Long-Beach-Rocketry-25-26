@@ -11,4 +11,5 @@ target_include_directories(cli_commands PUBLIC
 target_link_libraries(cli_commands PUBLIC
    driver
    utils
+   core
 )
