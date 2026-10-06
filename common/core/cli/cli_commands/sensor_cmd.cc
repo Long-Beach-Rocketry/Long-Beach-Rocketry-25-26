@@ -28,8 +28,6 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
     std::copy(error.begin(), error.end(),
               txOut.subspan(0, error.size()).begin());
 
-    std::span<const uint8_t> success = sv_to_span(kCmdSuccess);
-
     if (args.argc > 0)
     {
         std::string_view op1(args.argv[0]);

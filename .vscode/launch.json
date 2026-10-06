@@ -692,11 +692,7 @@
                 "load",
                 "monitor reset halt"
             ],
-            "showDevDebugOutput": "vscode",
-            "liveWatch": {
-                "enabled": true,
-                "samplesPerSecond": 1
-            }
+            "showDevDebugOutput": "raw",
         }
     ]
 }
