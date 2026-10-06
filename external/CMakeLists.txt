@@ -4,6 +4,13 @@ add_library(nanopb STATIC
     nanopb/pb_common.c
 )
 
+# On Unix, prefer the packaged protoc binary over nanopb's wrapper script.
+# Windows Git checkouts can give that script CRLF line endings, which makes its
+# /usr/bin/env shebang fail when the workspace is mounted into Linux.
+if(CMAKE_HOST_UNIX)
+    find_program(LBR_SYSTEM_PROTOC protoc PATHS /usr/bin /usr/local/bin NO_DEFAULT_PATH REQUIRED)
+    set(nanopb_PROTOC_PATH "${LBR_SYSTEM_PROTOC}" CACHE FILEPATH "System protoc executable" FORCE)
+endif()
 add_subdirectory(nanopb)
 
 # Disable pthread for embedded/STM32 environments

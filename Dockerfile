@@ -22,6 +22,9 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   wget \
   python3 \
   python3-pip \
+  python3-protobuf \
+  python3-venv \
+  protobuf-compiler \
   ccache \
   clangd \
   minicom \
@@ -48,6 +51,8 @@ RUN git --version && \
   gdb-multiarch --version && \
   clang-format --version && \
   clangd --version && \
+  protoc --version && \
+  python3 -c "import google.protobuf; print(google.protobuf.__version__)" && \
   update-ca-certificates
 
 WORKDIR /workspace
