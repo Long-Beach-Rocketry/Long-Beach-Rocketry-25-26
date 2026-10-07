@@ -32,7 +32,7 @@ public:
      * @param raw_data The raw sensor data to filter
      * @return The filtered sensor data struct
      */
-    virtual FilteredSensorData filter_data(RawSensorData raw_data) = 0;
+    virtual FilteredSensorData filter_data(RawSensorData raw_data) const = 0;
 
     ~SensorMgr() = default;
 };

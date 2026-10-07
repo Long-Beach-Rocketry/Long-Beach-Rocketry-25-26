@@ -26,7 +26,7 @@ struct StSensorMgrSensors
 
 struct StSensorMgrParams
 {
-    Timebase timebase;
+    Timebase* timebase;
     StSensorMgrSensors sensors;
     Ekf* ekf;
 };
@@ -65,7 +65,7 @@ private:
     RawSensorData raw_data;
     FilteredSensorData filtered_data;
     StSensorMgrSensors sensors;
-    Timebase timebase;
+    Timebase* timebase;
     Ekf* ekf;
 };
 

@@ -13,6 +13,7 @@ struct Board
     Bno055& imu;
     Timebase& timebase;
     I2c& i2c;
+    SensorMgr& sensor_mgr;
 };
 
 bool bsp_init();
