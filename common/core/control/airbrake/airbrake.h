@@ -11,7 +11,7 @@
 // #include "imu_math.h"
 // #include "kalman.h"
 #include "sensor_data.h"
-// #include "servo_motor"
+#include "servo_motor"
 
 namespace LBR
 {

@@ -1,7 +1,7 @@
 #include "airbrake.h"
 #include <cstdint>
 #include "airbrake_constants.h"
-#include "airbrake_math.h"
+#include "airbrake_utils.h"
 
 namespace LBR
 {
