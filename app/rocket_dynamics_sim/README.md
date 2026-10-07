@@ -4,11 +4,13 @@ Simulates one rocket flight, with and without airbrakes, and prints the results 
 
 ## Running main.cc
 From the repo root:
+```bash
 git submodule update --init --recursive   # one-time setup
 cmake --preset native
 cd build/native
 ninja rocket_dynamics_sim
 ./app/rocket_dynamics_sim/rocket_dynamics_sim
+```
 
 ## Folders
 common/core/rocket_dynamics/    Rocket Dynamics Model (library)
