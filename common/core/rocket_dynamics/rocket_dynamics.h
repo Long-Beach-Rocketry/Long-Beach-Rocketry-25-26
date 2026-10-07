@@ -9,12 +9,13 @@
 #define ROCKET_DYNAMICS_H
 
 // Named reference values for airbrake retraction and deployment degrees
-// In SITL pipeline, flap angle arrives already resolves from Actuator Model
+// In SITL pipeline, flap angle arrives already resolved from Actuator Model
 #define AIRBRAKE_RETRACTED_DEG 0.0
 #define AIRBRAKE_DEPLOYED_DEG 30.0
 
 // Rocket's variables (time, position, mass, etc) at any given instant
-typedef struct {
+typedef struct
+{
     double time_s;
     double x_m;
     double y_m;
@@ -28,18 +29,20 @@ typedef struct {
 // Rocket's physical characteristics that remain constant during simulation
 // The flap angle is controlled separately and may change during simulation
 // Referenced as Static Properties in LBR Airbrake Simulation Testing Pipeline
-typedef struct {
+typedef struct
+{
     double rocket_coefficient_of_drag;
     double rocket_reference_area_m2;
     double flap_coefficient_of_drag;
     double flap_reference_area_m2;
     int number_of_flaps;
-    double flap_angle_deg;              // Flap angle does change
+    double flap_angle_deg;  // Flap angle does change
 } RocketStaticProperties;
 
 // Rocket properties that may change during simulation.
 // Referenced as Dynamic Properties in LBR Airbrake Simulation Testing Pipeline
-typedef struct {
+typedef struct
+{
     double dt_s;
     double thrust_n;
     double body_angle_deg;
@@ -48,15 +51,14 @@ typedef struct {
 } RocketDynamicProperties;
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-// Updates the rocket's dynamic states in one simulation time step
-RocketVariables update_rocket_dynamics(
-    const RocketVariables* current,
-    const RocketStaticProperties* property,
-    const RocketDynamicProperties* sim
-);
+    // Updates the rocket's dynamic states in one simulation time step
+    RocketVariables update_rocket_dynamics(
+        const RocketVariables* current, const RocketStaticProperties* property,
+        const RocketDynamicProperties* sim);
 
 #ifdef __cplusplus
 }

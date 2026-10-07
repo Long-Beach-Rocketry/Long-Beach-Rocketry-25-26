@@ -1,5 +1,5 @@
 /* 
-* @file atmosphere.h
+* @file atmosphere_model.h
 * @author Mario Cruz
 * @brief Data structure and function declared for Atmosphere Model specific to SITL pipeline
 * @date 9-30-2026
@@ -10,21 +10,21 @@
 
 #include "atmosphere.h"
 
-// True pressure and temperature at given altitude
-typedef struct {
+// True (noise-free) pressure and temperature at a given altitude
+typedef struct
+{
     double pressure_pa;
     double temperature_k;
-} BarometerRawValues;       // BTW not literal sensor data
+} BarometerRawValues;  // BTW not literal data pulled from a sensor
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-// Returns barometer readings for a given altitude
-BarometerRawValues compute_barometer_raw_values(
-    double true_altitude_above_ground_m,
-    const GroundConditions* ground
-);
+    // Returns barometer readings for a given altitude
+    BarometerRawValues compute_barometer_raw_values(
+        double true_altitude_above_ground_m, const GroundConditions* ground);
 
 #ifdef __cplusplus
 }
