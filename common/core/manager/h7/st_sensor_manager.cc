@@ -3,8 +3,6 @@
  * @brief Implementation for the H7 Sensor Manager
  * @author Joseph Chang, Alex Pulido
  */
-
-#pragma once
 #include "st_sensor_manager.h"
 
 namespace LBR

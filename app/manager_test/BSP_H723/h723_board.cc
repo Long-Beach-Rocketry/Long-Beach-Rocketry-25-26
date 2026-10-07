@@ -73,11 +73,26 @@ Bno055 imu(static_cast<LBR::I2c&>(i2c), Bno055::ADDR_PRIMARY);
 const Stmh7::StTimebaseParams timebase_params{TIM3, TIM3_IRQn, kTim3ClkHz, true};
 Stmh7::HwTimebase timebase(timebase_params);
 
+// Sensors managed by the sensor manager
+const Stmh7::StSensorMgrSensors sensor_mgr_sensors{
+    .bno055 = &imu,
+    .bmp390 = &bmp390,
+};
+
+const Stmh7::StSensorMgrParams sensor_mgr_params{
+    .timebase = timebase,
+    .sensors = sensor_mgr_sensors,
+    .ekf = nullptr,  // TODO: no EKF instance yet, add once implemented
+};
+
+Stmh7::HwSensorMgr sensor_mgr(sensor_mgr_params);
+
 Board board{
     .bmp390 = bmp390,
     .imu = imu,
     .timebase = timebase,
     .i2c = i2c,
+    .sensor_mgr = sensor_mgr,
 };
 
 bool bsp_init()
