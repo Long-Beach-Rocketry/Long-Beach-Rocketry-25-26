@@ -1,8 +1,7 @@
-# Atmosphere: shared ISA physics (atmosphere.cc) + the Atmosphere Model
-# pipeline box (atmosphere_model.cc, true altitude -> true barometer raw
-# values). Pure math, no I/O, no hardware dependency -- unconditional
-# library, same reasoning as rocket_dynamics/CMakeLists.txt. Only the unit
-# test below is NATIVE-only.
+# Atmosphere: generic ISA physics (atmosphere.cc) + the Atmosphere Model
+# pipeline box (atmosphere_model.cc, true altitude -> true barometer values).
+# Pure math, no I/O, no hardware dependency, so this library is built for
+# every target, same reasoning as common/core/rocket_dynamics.
 
 add_library(atmosphere STATIC
     atmosphere.cc
@@ -12,18 +11,3 @@ add_library(atmosphere STATIC
 target_include_directories(atmosphere PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
 )
-
-if("${TARGET_DEVICE}" MATCHES "NATIVE")
-    add_executable(atmosphere_test
-        atmosphere_test.cc
-    )
-
-    target_link_libraries(atmosphere_test
-        PRIVATE
-            atmosphere
-            GTest::gtest_main
-            pthread
-    )
-
-    add_test(NAME atmosphere_test COMMAND atmosphere_test)
-endif()
