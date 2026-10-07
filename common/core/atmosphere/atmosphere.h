@@ -11,43 +11,39 @@
 
 // Ground-level temperature and pressure measured at the launch pad
 // Used as the starting point for all altitude calculations below
-typedef struct {
+typedef struct
+{
     double temperature_k;
     double pressure_pa;
 } GroundConditions;
 
 // Standard sea-level reference conditions, used only as placeholders
-// When real ground conditions haven't been measured yet
+// While real ground conditions haven't been measured yet
 #define ISA_SEA_LEVEL_TEMPERATURE_K 288.15  // 15°C, standard day
 #define ISA_SEA_LEVEL_PRESSURE_PA 101325.0  // 1 atmosphere
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-// Returns temperature at given height above gound level
-double atmosphere_temperature_k (
-    double height_above_ground_m,
-    const GroundConditions* ground
-);
+    // Returns temperature at given height above ground level
+    double atmosphere_temperature_k(double height_above_ground_m,
+                                    const GroundConditions* ground);
 
-// Returns pressure at given height above ground level
-double atmosphere_pressure_pa (
-    double height_above_ground_m,
-    const GroundConditions* ground
-);
+    // Returns pressure at given height above ground level
+    double atmosphere_pressure_pa(double height_above_ground_m,
+                                  const GroundConditions* ground);
 
-// Returns air density at a given height above ground level
-double atmosphere_density_kgm3 (
-    double height_above_ground_m,
-    const GroundConditions* ground
-);
+    // Returns air density at a given height above ground level
+    double atmosphere_density_kgm3(double height_above_ground_m,
+                                   const GroundConditions* ground);
 
-// Returns ground conditions for a given site elevation
-// Placeholder until real measured conditions are available
-GroundConditions ground_conditions_for_elevation_m (double elevation_m);
+    // Returns ground conditions for a given site elevation
+    // Placeholder until real measured conditions are available
+    GroundConditions ground_conditions_for_elevation_m(double elevation_m);
 
 #ifdef __cplusplus
-};
+}
 #endif
 #endif
