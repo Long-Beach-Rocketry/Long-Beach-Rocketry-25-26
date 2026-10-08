@@ -18,39 +18,39 @@ HwSensorMgr::HwSensorMgr(const StSensorMgrParams& params_)
 {
 }
 
-RawSensorData HwSensorMgr::get_latest_sensors() const
+bool HwSensorMgr::update(RawSensorData& out)
 {
-    return raw_data;
+    bool any_ok = false;    // Tracks if at least one sensor read was successful
+
+    if (sensors.bno055 && sensors.bno055->read_all(raw_data.imu))
+    {
+        any_ok = true;
+    }
+
+    // Bmp390 reads have no failure signal, so presence is treated as success
+    if (sensors.bmp390)
+    {
+        raw_data.baro.press = sensors.bmp390->get_pressure();
+        raw_data.baro.temp = sensors.bmp390->get_temperature();
+        any_ok = true;
+    }
+
+    if (!any_ok)
+    {
+        return false;
+    }
+
+    out = raw_data;
+    return true;
 }
 
 FilteredSensorData HwSensorMgr::filter_data(RawSensorData raw_data) const
 {
-    return filtered_data;   
+    // Pass raw data through the EKF instance to get filtered data
+    // filtered_data = ekf.filter(raw_data);
+    // if needed, pack the output of the ekf into the filtered data structure depending on what the ekf type returns
+    return filtered_data;
 }
-
-// TODO: This can maybe be done in the main loop instead
-// bool HwSensorMgr::update_sensor_data()
-// {
-//     // TODO: Check if timebase has gone to at least 100 Hz 
-//     if (timebase.elapsed_since_us() >= 1000000) 
-//     {
-//         return false;
-//     }
-
-//     /* Check if barometer exists */
-//     if (!sensors.bmp390)
-//     {
-//         return false;
-//     }
-
-//     /* Check if imu exists */
-//     if (!sensors.bno055)
-//     {
-//         return false;
-//     }
-
-//     return true;
-// }
 
 }  // Namespace Stmh7
 }  // Namespace LBR

@@ -26,7 +26,7 @@ struct StSensorMgrSensors
 
 struct StSensorMgrParams
 {
-    Timebase* timebase;
+    Timebase& timebase;
     StSensorMgrSensors sensors;
     Ekf* ekf;
 };
@@ -41,11 +41,11 @@ public:
     explicit HwSensorMgr(const StSensorMgrParams& params_);
 
     /**
-     * @brief Simple getter of the up to date raw sensor data 
-     * @param None
-     * @return RawSensorData struct
+     * @brief Polls the managed sensors, skipping any that are null or fail
+     * @param out Filled with the latest readings from the sensors that responded
+     * @return True if at least one sensor was read, false if none were available
      */
-    RawSensorData get_latest_sensors() const override;
+    bool update(RawSensorData& out) override;
 
     // /**
     //  * @brief Gets the readings of data from all passed in sensors and updates SensorData
@@ -65,7 +65,7 @@ private:
     RawSensorData raw_data;
     FilteredSensorData filtered_data;
     StSensorMgrSensors sensors;
-    Timebase* timebase;
+    Timebase& timebase;
     Ekf* ekf;
 };
 

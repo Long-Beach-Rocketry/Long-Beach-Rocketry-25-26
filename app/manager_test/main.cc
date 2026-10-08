@@ -35,10 +35,11 @@ int main(void)
             last_time_us += kPeriodUs;
 
             // Poll sensors into the raw write slot
-            RawSensorData& raw_write_buffer = raw_buffers[raw_write_index];
-            hw.imu.read_all(raw_write_buffer.imu);
-            raw_write_buffer.baro.press = hw.bmp390.get_pressure();
-            raw_write_buffer.baro.temp = hw.bmp390.get_temperature();
+            if (!hw.sensor_mgr.update(raw_buffers[raw_write_index]))
+            {
+                printf("No sensors available\n");
+                continue;
+            }
 
             // The slot just written becomes the stable read slot
             const size_t raw_read_index = raw_write_index;
@@ -59,7 +60,7 @@ int main(void)
             printf("  baro:  press=%f temp=%f\n", raw.baro.press, raw.baro.temp);
 
             printf("FILTERED\n");
-            // TODO: print filtered.ekf fields once Ekf::Output is defined
+            // TODO: print filtered.ekf fields once Ekf's output is defined
 
             const size_t filtered_read_index = filtered_write_index;
             filtered_write_index ^= 1;  // Toggle between 0 and 1 for double buffering
