@@ -15,6 +15,15 @@ namespace LBR
 {
 
 /**
+ * @brief Compensated barometer readings
+ */
+struct Bmp390Data
+{
+    float press;  // Pascals
+    float temp;   // degrees Celsius
+};
+
+/**
  * @brief Container for raw sensor data
  */
 struct RawSensorData
@@ -29,7 +38,8 @@ struct RawSensorData
  */
 struct FilteredSensorData
 {
-    Ekf::Output ekf;    // the filtered data the EKF will carry when it finishes through
+    // Ekf ekf;    // the filtered data the EKF will carry when it finishes through 
+                   // (may need to pack it into this struct if it returns individual values)
 };
 
 }  // namespace LBR

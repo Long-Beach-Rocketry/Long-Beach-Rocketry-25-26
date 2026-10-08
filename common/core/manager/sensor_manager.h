@@ -14,21 +14,14 @@ class SensorMgr
 {
 public:
     /**
-     * @brief Returns the latest raw sensor information 
-     * @param None
-     * @return RawSensorData struct
+     * @brief Polls the sensors and updates the provided raw sensor data structure with the latest readings
+     * @param out Filled with the latest readings from the sensors that responded
+     * @return True if at least one sensor was read, false if none were available
      */
-    virtual RawSensorData get_latest_sensors() const = 0;
-
-    // /**
-    //  * @brief Updates the sensor data struct with the most up to date readings
-    //  * @param None
-    //  * @return True if the sensor data was successfully updated, false otherwise
-    //  */
-    // virtual bool update_sensor_data() = 0;
+    virtual bool update(RawSensorData& out) = 0;
 
     /**
-     * @brief Filter the data through the EKF
+     * @brief Filter the raw sensor data through the EKF
      * @param raw_data The raw sensor data to filter
      * @return The filtered sensor data struct
      */
