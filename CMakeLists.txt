@@ -52,6 +52,11 @@ add_subdirectory(common)
 add_subdirectory(external)
 add_subdirectory(mcu_support)
 
+if("${TARGET_DEVICE}" MATCHES "^(NATIVE|SITL)$")
+    # Native harnesses can use the same sensor model as the SITL scheduler.
+    add_subdirectory(sitl/models/noise)
+endif()
+
 if("${TARGET_DEVICE}" MATCHES "SITL")
     add_subdirectory(sitl)
 endif()
