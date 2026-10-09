@@ -1,0 +1,8 @@
+* text=auto
+
+# Scripts executed by Linux, WSL, and the Dev Container must use LF endings.
+*.sh text eol=lf
+Dockerfile text eol=lf
+
+# Keep Windows-native scripts in their native format.
+*.ps1 text eol=crlf
