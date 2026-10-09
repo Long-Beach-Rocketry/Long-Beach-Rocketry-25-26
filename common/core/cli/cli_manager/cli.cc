@@ -141,12 +141,19 @@ bool Cli::take_input(uint8_t rx)
     switch (rx)
     {
         case '\177':  // backspace
-            rxBuffer.pop(rx);
+            if (rxBuffer.pop(rx))
+            {
+                rx = '\177';
+                std::span<const uint8_t> tx_span(&rx, 1);
+                usart->send(tx_span);
+            }
             return ret;
         case '\r':
         case '\n':
             ret = true;
         default:
+            std::span<const uint8_t> tx_span(&rx, 1);
+            usart->send(tx_span);
             return rxBuffer.push(rx) && ret;
     }
     return false;

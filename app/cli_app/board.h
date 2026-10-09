@@ -30,7 +30,7 @@ struct Board
     Gpio& led2;
     Gpio& led3;
 #endif
-    // Bno055& bno055;
+    Bno055& bno055;
     // Bmp390& bmp390;
 };
 

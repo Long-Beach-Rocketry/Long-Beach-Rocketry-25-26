@@ -1,7 +1,7 @@
 #include "blink_cmd.h"
 #include "cli.h"
 #include "gpio.h"
-// #include "sensor_cmd.h"
+#include "sensor_cmd.h"
 #include "usart.h"
 
 namespace LBR
@@ -14,11 +14,11 @@ void cli_init(Cli& cli, Usart* usart, Gpio& led1, Gpio& led2, Gpio& led3,
     cli.init(usart);
     /* Init Commands here */
     BlinkCmd::init(&led1, &led2, &led3);
-    // SensorCmd::init(imu, baro);
+    SensorCmd::init(imu, baro);
 
     /* Register Commands here */
     cli.register_cmd(BlinkCmd::blinkCmd);
-    // cli.register_cmd(SensorCmd::sensorCmd);
+    cli.register_cmd(SensorCmd::sensorCmd);
 }
 /* This ifdef is mainly because H7 has 3 controllable led gpios while L4 has 1 */
 #elif defined(STM32L476xx)

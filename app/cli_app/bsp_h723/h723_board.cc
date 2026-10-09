@@ -72,19 +72,19 @@ StGpioSettings scl_settings{GpioMode::ALT_FUNC, GpioOtype::OPEN_DRAIN,
 StGpioParams scl_params{scl_settings, 8, GPIOB};
 HwGpio scl{scl_params};
 
-// // Reset pin for BNO055 (PA0)
-// Stmh7::StGpioSettings rst_settings{
-//     Stmh7::GpioMode::GPOUT, Stmh7::GpioOtype::PUSH_PULL, Stmh7::GpioOspeed::LOW,
-//     Stmh7::GpioPupd::NO_PULL, 0};
-// const Stmh7::StGpioParams rst_params{rst_settings, 0, GPIOA};
-// Stmh7::HwGpio rst(rst_params);
+// Reset pin for BNO055 (PA0)
+Stmh7::StGpioSettings rst_settings{
+    Stmh7::GpioMode::GPOUT, Stmh7::GpioOtype::PUSH_PULL, Stmh7::GpioOspeed::LOW,
+    Stmh7::GpioPupd::NO_PULL, 0};
+const Stmh7::StGpioParams rst_params{rst_settings, 0, GPIOA};
+Stmh7::HwGpio rst(rst_params);
 
-// // // Create BNO055 IMU object
-// Bno055 imu(static_cast<LBR::I2c&>(i2c), Bno055::ADDR_PRIMARY);
+// // Create BNO055 IMU object
+Bno055 imu(static_cast<LBR::I2c&>(i2c), Bno055::ADDR_PRIMARY);
 
-// // Create Barometer object
-// Bmp390Params baro_params{i2c, 0x76};
-// Bmp390 baro{baro_params};
+// Create Barometer object
+Bmp390Params baro_params{i2c, 0x76};
+Bmp390 baro{baro_params};
 
 }  // namespace Stmh7
 
@@ -94,7 +94,7 @@ Board board{
     .led1 = Stmh7::ld1,
     .led2 = Stmh7::ld2,
     .led3 = Stmh7::ld3,
-    // .bno055 = Stmh7::imu,
+    .bno055 = Stmh7::imu,
     // .bmp390 = Stmh7::baro
 };
 
@@ -143,12 +143,12 @@ bool board_init()
 
     // ret &= Stmh7::baro.init();
 
-    // ret &= Stmh7::rst.init();
-    // ret &= Stmh7::rst.set(false);
-    // Utils::DelayMs(10);
-    // ret &= Stmh7::rst.set(true);
-    // Utils::DelayMs(650);
-    // Stmh7::imu.init();
+    ret &= Stmh7::rst.init();
+    ret &= Stmh7::rst.set(false);
+    Utils::DelayMs(10);
+    ret &= Stmh7::rst.set(true);
+    Utils::DelayMs(650);
+    Stmh7::imu.init();
 
     return ret;
 }
@@ -173,8 +173,6 @@ extern "C" void USART3_IRQHandler(void)
         if (board.usart.receive(rxb))
         {
             // received 1 byte, echo back
-            std::span<const uint8_t> tx_span(&rxb, 1);
-            board.usart.send(tx_span);
 
             update_flag = cli.take_input(rxb);
             if (update_flag)
