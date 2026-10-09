@@ -34,7 +34,7 @@ int main(void)
         {
             last_time_us += kPeriodUs;
 
-            // Poll sensors into the raw write slot
+            // Poll sensors (if at least one is available) into the raw write slot
             if (!hw.sensor_mgr.update(raw_buffers[raw_write_index]))
             {
                 printf("No sensors available\n");
@@ -50,6 +50,7 @@ int main(void)
 
             const RawSensorData& raw = raw_buffers[raw_read_index];
             const FilteredSensorData& filtered = filtered_buffers[filtered_write_index];
+            (void)filtered;  // Suppress unused variable warning until filtered data is printed
 
             printf("RAW  t=%llu us\n", static_cast<unsigned long long>(last_time_us));
             printf("  accel: %f %f %f\n", raw.imu.accel.x, raw.imu.accel.y, raw.imu.accel.z);

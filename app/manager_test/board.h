@@ -3,6 +3,7 @@
 #include "bno055_imu.h"
 #include "i2c.h"
 #include "timebase.h"
+#include "sensor_manager.h"
 
 namespace LBR 
 {

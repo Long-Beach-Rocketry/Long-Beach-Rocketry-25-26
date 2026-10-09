@@ -10,6 +10,7 @@
 
 namespace LBR
 {
+class Ekf;
 namespace Stmh7
 {
 
@@ -36,7 +37,7 @@ class HwSensorMgr : public SensorMgr
 public:
     /**
      * @brief Hw Contructor
-     * @param params_ struct of pointer to timebase, sensors, and EKF instance
+     * @param params_ Struct containing references to the timebase, sensors, and EKF instance used by the sensor manager
      */
     explicit HwSensorMgr(const StSensorMgrParams& params_);
 
@@ -46,13 +47,6 @@ public:
      * @return True if at least one sensor was read, false if none were available
      */
     bool update(RawSensorData& out) override;
-
-    // /**
-    //  * @brief Gets the readings of data from all passed in sensors and updates SensorData
-    //  * @param None
-    //  * @return True if successful, false if something unexpected occurs
-    //  */
-    // bool update_sensor_data() override;
 
     /**
      * @brief Filters the raw sensor data struct using the EKF instance provided to the sensor manager

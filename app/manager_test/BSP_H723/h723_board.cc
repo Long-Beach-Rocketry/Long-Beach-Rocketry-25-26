@@ -7,6 +7,7 @@
 #include "st_i2c.h"
 #include "st_sysclk.h"
 #include "st_timebase.h"
+#include "st_sensor_manager.h"
 
 namespace LBR
 {
