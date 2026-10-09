@@ -662,11 +662,10 @@
         {
             "cwd": "${workspaceFolder}",
             "executable": "${workspaceRoot}/build/stm32h723/app/cli_app/cli_app",
-            "name": "DEBUG CLI H7",
+            "name": "DEBUG CLI APP H7",
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "openocd",
-            "interface": "swd",
             "device": "STM32H723",
             "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
             "searchDir": [
@@ -681,18 +680,13 @@
                 "-d",
                 "${workspaceRoot}"
             ],
-            "overrideRestartCommands": [
-                "monitor reset halt",
+            "preRestartCommands": [
+                "add-symbol-file build/stm32h723/app/cli_app/cli_app",
                 "load",
-                "monitor reset halt"
+                "enable breakpoint",
+                "monitor reset"
             ],
-            "overrideLaunchCommands": [
-                "monitor targets stm32h7x.cpu0",
-                "monitor reset halt",
-                "load",
-                "monitor reset halt"
-            ],
-            "showDevDebugOutput": "raw",
+            "showDevDebugOutput": "vscode",
         }
     ]
 }

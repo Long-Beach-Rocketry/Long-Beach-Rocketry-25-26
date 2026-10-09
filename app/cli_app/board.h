@@ -6,6 +6,7 @@
 
 #pragma once
 #include "bmp390.h"
+#include "bno055_imu.h"
 #include "cli.h"
 #include "gpio.h"
 #include "ring_buffer.h"
@@ -29,8 +30,8 @@ struct Board
     Gpio& led2;
     Gpio& led3;
 #endif
-
-    Bmp390& bmp390;
+    // Bno055& bno055;
+    // Bmp390& bmp390;
 };
 
 bool board_init(void);
