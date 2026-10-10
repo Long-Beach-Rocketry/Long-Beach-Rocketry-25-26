@@ -289,11 +289,13 @@ In WSL:
 
 ```bash
 sudo apt install -y minicom
-ls /dev/tty*
-minicom -D <serial-port>
+sudo dmesg | grep tty
+minicom -D /dev/<serial-port>
 ```
 
-Use the serial device shown by `ls /dev/tty*`.
+Use the serial device shown by `sudo dmesg | grep tty`.
+For example :`minicom -D /dev/ttyACM0` or `minicom -D /dev/ttyUSB0`.
+You can exit the minicom terminal with `ctrl`+`A` `X`.
 
 ## 10) Team Workflow Tips
 
