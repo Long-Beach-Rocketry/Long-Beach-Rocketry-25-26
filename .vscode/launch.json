@@ -359,7 +359,7 @@
         },
         {
             "cwd": "${workspaceFolder}",
-            "executable": "${workspaceRoot}/build/stm32h723/app/usart_app/usart_app",
+            "executable": "${workspaceRoot}/build/stm32h723/app/usart_app/usart_test",
             "name": "DEBUG USART H7",
             "request": "launch",
             "type": "cortex-debug",
@@ -379,7 +379,7 @@
                 "${workspaceRoot}"
             ],
             "preRestartCommands": [
-                "add-symbol-file build/stm32h723/app/usart_app/usart_app",
+                "add-symbol-file build/stm32h723/app/usart_app/usart_test",
                 "load",
                 "enable breakpoint",
                 "monitor reset"
@@ -658,6 +658,35 @@
                 "enabled": true,
                 "samplesPerSecond": 2
             }
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceRoot}/build/stm32h723/app/cli_app/cli_app",
+            "name": "DEBUG CLI APP H7",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32H723",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToEntryPoint": "main",
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32h723/app/cli_app/cli_app",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": "vscode",
         }
     ]
 }
