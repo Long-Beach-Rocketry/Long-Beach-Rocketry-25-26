@@ -1,8 +1,8 @@
 #include "sensor_cmd.h"
 #include <algorithm>
 #include <array>
+#include <cstdio>
 #include <cstring>
-#include <format>
 #include "bmp390.h"
 #include "bno055_imu.h"
 #include "string_span.h"
@@ -42,8 +42,8 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
         {
             if (!imu)
             {
-                std::format_to_n(txOut.data(), txOut.size() - 1,
-                                 "ERROR: IMU not found!\r\n\n");
+                std::snprintf(reinterpret_cast<char*>(txOut.data()),
+                              txOut.size(), "ERROR: IMU not found!\r\n\n");
                 return false;
             }
             Bno055Data imu_data{};
@@ -51,14 +51,14 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
             {
                 if (args.argc == 1)
                 {
-                    std::format_to_n(
-                        txOut.data(), txOut.size() - 1,
+                    std::snprintf(
+                        reinterpret_cast<char*>(txOut.data()), txOut.size(),
                         "Imu Data\r\n"
-                        "\tAcceleration (x,y,z):\t{},{},{}\r\n"
-                        "\tGyroscope    (x,y,z):\t{},{},{}\r\n"
-                        "\tLinear Accel (x,y,z):\t{},{},{}\r\n"
-                        "\tGravity      (x,y,z):\t{},{},{}\r\n"
-                        "\tQuaternion (w,x,y,z):\t{},{},{},{}\r\n\n",
+                        "\tAcceleration (x,y,z):\t%.2f,%.2f,%.2f\r\n"
+                        "\tGyroscope    (x,y,z):\t%.2f,%.2f,%.2f\r\n"
+                        "\tLinear Accel (x,y,z):\t%.2f,%.2f,%.2f\r\n"
+                        "\tGravity      (x,y,z):\t%.2f,%.2f,%.2f\r\n"
+                        "\tQuaternion (w,x,y,z):\t%.2f,%.2f,%.2f,%.2f\r\n\n",
                         imu_data.accel.x, imu_data.accel.y, imu_data.accel.z,
                         imu_data.gyro.x, imu_data.gyro.y, imu_data.gyro.z,
                         imu_data.linear_accel.x, imu_data.linear_accel.y,
@@ -72,14 +72,15 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                     std::string_view op2(args.argv[1]);
                     if (op2 == "a" || op2 == "acc")
                     {
-                        std::format_to_n(
-                            txOut.data(), txOut.size() - 1,
+                        std::snprintf(
+                            reinterpret_cast<char*>(txOut.data()), txOut.size(),
                             "Imu Data\r\n"
-                            "\tAcceleration (x,y,z):\t{},{},{}\r\n"
-                            "\tGyroscope    (x,y,z):\t{},{},{}\r\n"
-                            "\tLinear Accel (x,y,z):\t{},{},{}\r\n"
-                            "\tGravity      (x,y,z):\t{},{},{}\r\n"
-                            "\tQuaternion (w,x,y,z):\t{},{},{},{}\r\n\n",
+                            "\tAcceleration (x,y,z):\t%.2f,%.2f,%.2f\r\n"
+                            "\tGyroscope    (x,y,z):\t%.2f,%.2f,%.2f\r\n"
+                            "\tLinear Accel (x,y,z):\t%.2f,%.2f,%.2f\r\n"
+                            "\tGravity      (x,y,z):\t%.2f,%.2f,%.2f\r\n"
+                            "\tQuaternion "
+                            "(w,x,y,z):\t%.2f,%.2f,%.2f,%.2f\r\n\n",
                             imu_data.accel.x, imu_data.accel.y,
                             imu_data.accel.z, imu_data.gyro.x, imu_data.gyro.y,
                             imu_data.gyro.z, imu_data.linear_accel.x,
@@ -90,52 +91,54 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                     }
                     else if (op2 == "a" || op2 == "acc")
                     {
-                        std::format_to_n(
-                            txOut.data(), txOut.size() - 1,
+                        std::snprintf(
+                            reinterpret_cast<char*>(txOut.data()), txOut.size(),
                             "Imu Data\r\n"
-                            "\tAcceleration (x,y,z):\t{},{},{}\r\n",
+                            "\tAcceleration (x,y,z):\t%.2f,%.2f,%.2f\r\n",
                             imu_data.accel.x, imu_data.accel.y,
                             imu_data.accel.z);
                     }
                     else if (op2 == "g" || op2 == "grav")
                     {
-                        std::format_to_n(
-                            txOut.data(), txOut.size() - 1,
+                        std::snprintf(
+                            reinterpret_cast<char*>(txOut.data()), txOut.size(),
                             "Imu Data\r\n"
-                            "\tGravity      (x,y,z):\t{},{},{}\r\n",
+                            "\tGravity      (x,y,z):\t%.2f,%.2f,%.2f\r\n",
                             imu_data.gravity.x, imu_data.gravity.y,
                             imu_data.gravity.z);
                     }
                     else if (op2 == "y" || op2 == "gyro")
                     {
-                        std::format_to_n(
-                            txOut.data(), txOut.size() - 1,
+                        std::snprintf(
+                            reinterpret_cast<char*>(txOut.data()), txOut.size(),
                             "Imu Data\r\n"
-                            "\tGyroscope    (x,y,z):\t{},{},{}\r\n",
+                            "\tGyroscope    (x,y,z):\t%.2f,%.2f,%.2f\r\n",
                             imu_data.gyro.x, imu_data.gyro.y, imu_data.gyro.z);
                     }
                     else if (op2 == "l" || op2 == "lacc")
                     {
-                        std::format_to_n(
-                            txOut.data(), txOut.size() - 1,
+                        std::snprintf(
+                            reinterpret_cast<char*>(txOut.data()), txOut.size(),
                             "Imu Data\r\n"
-                            "\tLinear Accel (x,y,z):\t{},{},{}\r\n",
+                            "\tLinear Accel (x,y,z):\t%.2f,%.2f,%.2f\r\n",
                             imu_data.linear_accel.x, imu_data.linear_accel.y,
                             imu_data.linear_accel.z);
                     }
                     else if (op2 == "q" || op2 == "quat")
                     {
-                        std::format_to_n(
-                            txOut.data(), txOut.size() - 1,
-                            "Imu Data\r\n"
-                            "\tQuaternion (w,x,y,z):\t{},{},{},{}\r\n\n",
-                            imu_data.quat.w, imu_data.quat.x, imu_data.quat.y,
-                            imu_data.quat.z);
+                        std::snprintf(reinterpret_cast<char*>(txOut.data()),
+                                      txOut.size(),
+                                      "Imu Data\r\n"
+                                      "\tQuaternion "
+                                      "(w,x,y,z):\t%.2f,%.2f,%.2f,%.2f\r\n\n",
+                                      imu_data.quat.w, imu_data.quat.x,
+                                      imu_data.quat.y, imu_data.quat.z);
                     }
                     else
                     {
-                        std::format_to_n(txOut.data(), txOut.size() - 1,
-                                         "ERROR: Invalid argument\r\n\n");
+                        std::snprintf(reinterpret_cast<char*>(txOut.data()),
+                                      txOut.size(),
+                                      "ERROR: Invalid argument\r\n\n");
                         return false;
                     }
                     return true;
@@ -143,8 +146,9 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
             }
             else
             {
-                std::format_to_n(txOut.data(), txOut.size() - 1,
-                                 "ERROR: Could not read IMU data!\r\n\n");
+                std::snprintf(reinterpret_cast<char*>(txOut.data()),
+                              txOut.size(),
+                              "ERROR: Could not read IMU data!\r\n\n");
 
                 return false;
             }
@@ -153,19 +157,22 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
         {
             if (!baro)
             {
-                std::format_to_n(txOut.data(), txOut.size() - 1,
-                                 "ERROR: Barometer not found!\r\n\n");
+                std::snprintf(reinterpret_cast<char*>(txOut.data()),
+                              txOut.size(),
+                              "ERROR: Barometer not found!\r\n\n");
                 return false;
             }
             float pressure = baro->get_pressure();
             float temperature = baro->get_temperature();
             if (args.argc == 1)
             {
-                std::format_to_n(txOut.data(), txOut.size() - 1,
-                                 "Barometer Data\r\n"
-                                 "\tTemperature:\t {} C\r\n"
-                                 "\tPressure   :\t {} Pa\r\n\n",
-                                 temperature, pressure);
+                std::snprintf(reinterpret_cast<char*>(txOut.data()),
+                              txOut.size(),
+                              "Barometer Data\r\n"
+                              "\tTemperature:\t %.2f C\r\n"
+                              "\tPressure   :\t %.2f Pa\r\n\n",
+                              temperature, pressure);
+
                 return true;
             }
             else
@@ -173,34 +180,37 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                 std::string_view op2(args.argv[1]);
                 if (op2 == "p" || op2 == "press")
                 {
-                    std::format_to_n(txOut.data(), txOut.size() - 1,
-                                     "Barometer Data\r\n"
-                                     "\tPressure   :\t {} Pa\r\n\n",
-                                     pressure);
+                    std::snprintf(reinterpret_cast<char*>(txOut.data()),
+                                  txOut.size(),
+                                  "Barometer Data\r\n"
+                                  "\tPressure   :\t %.2f Pa\r\n\n",
+                                  pressure);
                 }
                 else if (op2 == "t" || op2 == "temp")
                 {
-                    std::format_to_n(txOut.data(), txOut.size() - 1,
-                                     "Barometer Data\r\n"
-                                     "\tTemperature:\t {} C\r\n",
-                                     temperature);
+                    std::snprintf(reinterpret_cast<char*>(txOut.data()),
+                                  txOut.size(),
+                                  "Barometer Data\r\n"
+                                  "\tTemperature:\t %.2f C\r\n",
+                                  temperature);
                 }
                 else
                 {
-                    std::format_to_n(txOut.data(), txOut.size() - 1,
-                                     "ERROR: Invalid argument\r\n\n");
+                    std::snprintf(reinterpret_cast<char*>(txOut.data()),
+                                  txOut.size(),
+                                  "ERROR: Invalid argument\r\n\n");
                     return false;
                 }
                 return true;
             }
         }
-        std::format_to_n(txOut.data(), txOut.size() - 1,
-                         "ERROR: Invalid argument\r\n\n");
+        std::snprintf(reinterpret_cast<char*>(txOut.data()), txOut.size(),
+                      "ERROR: Invalid argument\r\n\n");
 
         return false;
     }
-    std::format_to_n(txOut.data(), txOut.size() - 1,
-                     "ERROR: No arguments specified\r\n\n");
+    std::snprintf(reinterpret_cast<char*>(txOut.data()), txOut.size(),
+                  "ERROR: No arguments specified\r\n\n");
 
     return false;
 }

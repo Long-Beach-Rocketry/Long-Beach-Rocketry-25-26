@@ -31,7 +31,7 @@ struct Board
     Gpio& led3;
 #endif
     Bno055& bno055;
-    // Bmp390& bmp390;
+    Bmp390& bmp390;
 };
 
 bool board_init(void);

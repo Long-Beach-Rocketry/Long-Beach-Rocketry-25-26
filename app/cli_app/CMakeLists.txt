@@ -27,6 +27,7 @@ if (TARGET cli_bsp)
     target_link_options_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
         --specs=nano.specs
         -Wl,--gc-sections
+        -Wl,-u,_printf_float
     )
     
 

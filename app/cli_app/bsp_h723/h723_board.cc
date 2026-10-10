@@ -61,7 +61,7 @@ StI2cParams i2c_params{I2C1, kI2cTimingR};
 
 HwI2c i2c(i2c_params);
 
-// // Set up BARO pins (SCL PB8, SDA PB9)
+// Set up BARO pins (SCL PB8, SDA PB9)
 StGpioSettings sda_settings{GpioMode::ALT_FUNC, GpioOtype::OPEN_DRAIN,
                             GpioOspeed::LOW, GpioPupd::PULL_UP, 4};
 StGpioParams sda_params{sda_settings, 9, GPIOB};
@@ -79,7 +79,7 @@ Stmh7::StGpioSettings rst_settings{
 const Stmh7::StGpioParams rst_params{rst_settings, 0, GPIOA};
 Stmh7::HwGpio rst(rst_params);
 
-// // Create BNO055 IMU object
+// Create BNO055 IMU object
 Bno055 imu(static_cast<LBR::I2c&>(i2c), Bno055::ADDR_PRIMARY);
 
 // Create Barometer object
@@ -88,15 +88,13 @@ Bmp390 baro{baro_params};
 
 }  // namespace Stmh7
 
-Board board{
-    .usart = Stmh7::usart,
-    .clock = Stmh7::clock,
-    .led1 = Stmh7::ld1,
-    .led2 = Stmh7::ld2,
-    .led3 = Stmh7::ld3,
-    .bno055 = Stmh7::imu,
-    // .bmp390 = Stmh7::baro
-};
+Board board{.usart = Stmh7::usart,
+            .clock = Stmh7::clock,
+            .led1 = Stmh7::ld1,
+            .led2 = Stmh7::ld2,
+            .led3 = Stmh7::ld3,
+            .bno055 = Stmh7::imu,
+            .bmp390 = Stmh7::baro};
 
 bool board_init()
 {
@@ -141,14 +139,14 @@ bool board_init()
 
     ret &= Stmh7::i2c.init();
 
-    // ret &= Stmh7::baro.init();
-
     ret &= Stmh7::rst.init();
     ret &= Stmh7::rst.set(false);
     Utils::DelayMs(10);
     ret &= Stmh7::rst.set(true);
     Utils::DelayMs(650);
     Stmh7::imu.init();
+
+    ret &= Stmh7::baro.init();
 
     return ret;
 }

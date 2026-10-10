@@ -29,7 +29,8 @@ int main(int argc, char* argv[])
     hw.bno055.get_sys_error(sys_error);
 
 #ifdef STM32H723xx
-    cli_init(cli, &hw.usart, hw.led1, hw.led2, hw.led3, &hw.bno055, nullptr);
+    // cli_init(cli, &hw.usart, hw.led1, hw.led2, hw.led3, nullptr, nullptr);
+    cli_init(cli, &hw.usart, hw.led1, hw.led2, hw.led3, &hw.bno055, &hw.bmp390);
 
 #elif defined(STM32L476xx)
     cli_init(cli, &hw.usart, hw.led1);
