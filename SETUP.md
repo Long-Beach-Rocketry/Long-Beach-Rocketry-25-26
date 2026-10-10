@@ -53,6 +53,30 @@ git config --global user.email "<you@example.com>"
   - Install it in your VS Code (Windows side).
   - If VS Code prompts to also install it in WSL or in the container, install it there too.
 
+- Configure USB permissions
+
+Run the commands:
+```bash
+sudo mkdir -p /etc/udev/rules.d
+sudo nano /etc/udev/rules.d/99-stlink.rules
+```
+
+Paste the text in the file
+```text
+ST-LINK v2, v2-1, v3 rules
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3744", MODE="0666", GROUP="plugdev"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374b", MODE="0666", GROUP="plugdev"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374e", MODE="0666", GROUP="plugdev"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374f", MODE="0666", GROUP="plugdev"
+```
+Press `ctrl` + `o` to write out, return, `ctr` + `x` to exit.
+
+And then apply the rules by running the command:
+```bash
+sudo udevadm control --reload-rules && sudo udevadm trigger
+```
+
+
 ## 3) Clone the Repository
 
 From your WSL terminal:
@@ -60,10 +84,12 @@ From your WSL terminal:
 ```bash
 git clone https://github.com/Long-Beach-Rocketry/Long-Beach-Rocketry-25-26.git
 cd Long-Beach-Rocketry-25-26
+git submodule update --init --recursive
 code .
 ```
 
 ## 4) Open in Dev Container
+Open the Docker Desktop Application.
 
 In VS Code:
 
