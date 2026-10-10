@@ -141,10 +141,11 @@ bool Cli::take_input(uint8_t rx)
     switch (rx)
     {
         case '\177':  // backspace
+        case '\b':
             if (rxBuffer.pop(rx))
             {
-                rx = '\177';
-                std::span<const uint8_t> tx_span(&rx, 1);
+                uint8_t erase_seq[3] = {'\b', ' ', '\b'};
+                std::span<const uint8_t> tx_span(erase_seq, 3);
                 usart->send(tx_span);
             }
             return ret;
