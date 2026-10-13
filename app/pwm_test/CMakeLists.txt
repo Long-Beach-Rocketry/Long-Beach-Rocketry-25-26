@@ -14,10 +14,13 @@ if (TARGET pwm_bsp)
     add_executable_for(${TARGET_DEVICE} ${EXECUTABLE} ${LDF}
         main.cc
         ${STARTUP_FILE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../drivers/servo/servo_motor.cpp
     )
 
     target_include_directories_for(${TARGET_DEVICE} ${EXECUTABLE}
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/../common/drivers/io
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../drivers/servo
     )
 
     target_link_options_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
