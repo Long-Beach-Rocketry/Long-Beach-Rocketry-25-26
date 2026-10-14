@@ -62,6 +62,13 @@ public:
 
     static constexpr uint8_t ADDR_PRIMARY = 0x28;    ///< Default I2C Address
     static constexpr uint8_t ADDR_ALTERNATE = 0x29;  ///< Alternate I2C Address
+    static constexpr uint8_t REGISTERS_ACC{6};
+    static constexpr uint8_t REGISTERS_MAG{6};
+    static constexpr uint8_t REGISTERS_GYR{6};
+    static constexpr uint8_t REGISTERS_EUL{6};
+    static constexpr uint8_t REGISTERS_QUAT{8};
+    static constexpr uint8_t REGISTERS_LIA{6};
+    static constexpr uint8_t REGISTERS_GRV{6};
 
     /**
      * @brief Construct a new Bno055 object

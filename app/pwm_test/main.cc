@@ -13,7 +13,7 @@ int main()
 
     Board& hw = get_board();
 
-    ServoMotorParams params{hw.pwm, 1390, 1610, 30, 50};
+    ServoMotorParams params{hw.pwm, 500, 2500, 30, 50};
     ServoMotor servo{params};
 
     if (!servo.init())
