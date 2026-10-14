@@ -61,6 +61,7 @@ bool bsp_init()
 
 Board& get_board()
 {
+    
     return board;
 }
 
