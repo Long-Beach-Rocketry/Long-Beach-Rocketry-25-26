@@ -286,14 +286,19 @@ Note: once attached to WSL, ST-Link is available to the Dev Container.
 ## 9) UART Serial Monitor (Optional)
 
 In WSL:
-
+ Install minicom with:
 ```bash
 sudo apt install -y minicom
-ls /dev/tty*
-minicom -D <serial-port>
 ```
 
-Use the serial device shown by `ls /dev/tty*`.
+View ports with:
+`sudo dmesg | grep tty`
+
+View UART with Minicom with something like
+`minicom -D /dev/ttyUSB0`
+`minicom -D /dev/ttyACM0`
+
+`ctrl+A X` to close Minicom
 
 ## 10) Team Workflow Tips
 
