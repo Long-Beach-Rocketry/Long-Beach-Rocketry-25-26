@@ -1,4 +1,4 @@
-set(EXECUTABLE usart_test)
+set(EXECUTABLE usart_app)
 set(LDF ${CMAKE_CURRENT_BINARY_DIR}/${EXECUTABLE}.ld)
 
 set(PREPROCESS_DEFS
