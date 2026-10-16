@@ -40,16 +40,28 @@ bool HwSensorMgr::update(RawSensorData& out)
         return false;
     }
 
+    raw_buffer.write(raw_data);
     out = raw_data;
     return true;
 }
 
-FilteredSensorData HwSensorMgr::filter_data(RawSensorData raw_data) const
+FilteredSensorData HwSensorMgr::filter_data(RawSensorData raw_data)
 {
     // Pass raw data through the EKF instance to get filtered data
     // filtered_data = ekf.filter(raw_data);
     // if needed, pack the output of the ekf into the filtered data structure depending on what the ekf type returns
+    filtered_buffer.write(filtered_data);
     return filtered_data;
+}
+
+bool HwSensorMgr::get_raw(RawSensorData& out) const
+{
+    return raw_buffer.read(out);
+}
+
+bool HwSensorMgr::get_filtered(FilteredSensorData& out) const
+{
+    return filtered_buffer.read(out);
 }
 
 }  // Namespace Stmh7

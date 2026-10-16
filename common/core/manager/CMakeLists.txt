@@ -7,6 +7,7 @@ target_include_directories(sensor_manager INTERFACE
 
 target_link_libraries(sensor_manager INTERFACE
     core
+    container
     driver
 )
 

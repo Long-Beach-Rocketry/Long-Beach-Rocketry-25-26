@@ -23,8 +23,7 @@ namespace LBR
 template <typename T>
 class SeqLock
 {
-    static_assert(std::is_trivially_copyable_v<T>,
-                  "SeqLock requires a trivially copyable type");
+    static_assert(std::is_trivially_copyable_v<T>, "SeqLock requires a trivially copyable type");
 
 public:
     /**
@@ -34,16 +33,16 @@ public:
     void write(const T& value)
     {
         const uint32_t s = seq.load(std::memory_order_relaxed);
-        seq.store(s + 1, std::memory_order_relaxed);  // Odd: write in progress
+        seq.store(s + 1, std::memory_order_relaxed);    // Odd: write in progress
         std::atomic_thread_fence(std::memory_order_release);
         std::memcpy(&data, &value, sizeof(T));
-        seq.store(s + 2, std::memory_order_release);  // Even: write complete
+        seq.store(s + 2, std::memory_order_release);    // Even: write complete
     }
 
     /**
      * @brief Copy out the latest value
      * @param out Filled with a consistent snapshot on success, untouched on failure
-     * @param max_tries Attempts before giving up (8 by default), so reader that preempts the writer cannot spin forever
+     * @param max_tries Number of attempts before giving up, so a reader that preempts the writer cannot spin forever
      * @return True if a consistent snapshot was read, false if no value was published or every attempt overlapped a write
      */
     bool read(T& out, uint32_t max_tries = 8) const
