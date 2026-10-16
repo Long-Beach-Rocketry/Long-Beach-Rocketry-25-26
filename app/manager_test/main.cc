@@ -22,11 +22,8 @@ int main(void)
 
     uint64_t last_time_us = hw.timebase.uptime_us();
 
-    std::array<RawSensorData, 2> raw_buffers{};
-    std::array<FilteredSensorData, 2> filtered_buffers{};
-
-    size_t raw_write_index = 0;
-    size_t filtered_write_index = 0;
+    RawSensorData raw{};
+    FilteredSensorData filtered{};
 
     while (1)
     {
@@ -34,22 +31,20 @@ int main(void)
         {
             last_time_us += kPeriodUs;
 
-            // Poll sensors (if at least one is available) into the raw write slot
-            if (!hw.sensor_mgr.update(raw_buffers[raw_write_index]))
+            // Poll sensors (if at least one is available), which publishes to the manager's raw buffer
+            RawSensorData polled{};
+            if (!hw.sensor_mgr.update(polled))
             {
                 printf("No sensors available\n");
                 continue;
             }
 
-            // The slot just written becomes the stable read slot
-            const size_t raw_read_index = raw_write_index;
-            raw_write_index ^= 1;   // Toggle between 0 and 1 for double buffering
+            // Filtering publishes to the manager's filtered buffer
+            hw.sensor_mgr.filter_data(polled);
 
-            // Filter the stable raw sample into the filtered write slot
-            filtered_buffers[filtered_write_index] = hw.sensor_mgr.filter_data(raw_buffers[raw_read_index]);
-
-            const RawSensorData& raw = raw_buffers[raw_read_index];
-            const FilteredSensorData& filtered = filtered_buffers[filtered_write_index];
+            // Consumers pull the latest snapshots from the manager
+            hw.sensor_mgr.get_raw(raw);
+            hw.sensor_mgr.get_filtered(filtered);
             (void)filtered;  // Suppress unused variable warning until filtered data is printed
 
             printf("RAW  t=%llu us\n", static_cast<unsigned long long>(last_time_us));
@@ -62,10 +57,6 @@ int main(void)
 
             printf("FILTERED\n");
             // TODO: print filtered.ekf fields once Ekf's output is defined
-
-            const size_t filtered_read_index = filtered_write_index;
-            filtered_write_index ^= 1;  // Toggle between 0 and 1 for double buffering
-            (void)filtered_read_index;  // Suppress unused variable warning
         }
     }
 

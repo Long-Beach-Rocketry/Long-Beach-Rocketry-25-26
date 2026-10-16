@@ -6,6 +6,7 @@
 
 #pragma once
 #include "sensor_manager.h"
+#include "seqlock.h"
 #include "timebase.h"
 
 namespace LBR
@@ -53,9 +54,25 @@ public:
      * @param raw_data The raw sensor data to filter
      * @return The filtered sensor data struct returned by the EKF
      */
-    FilteredSensorData filter_data(RawSensorData raw_data) const override;
+    FilteredSensorData filter_data(RawSensorData raw_data) override;
+
+    /**
+     * @brief Copy out the latest raw sensor data published by update(); safe to call from any consumer
+     * @param out Filled with a consistent snapshot on success
+     * @return False if nothing has been published yet or the read kept overlapping a write
+     */
+    bool get_raw(RawSensorData& out) const override;
+
+    /**
+     * @brief Copy out the latest filtered sensor data published by filter_data(); safe to call from any consumer
+     * @param out Filled with a consistent snapshot on success
+     * @return False if nothing has been published yet or the read kept overlapping a write
+     */
+    bool get_filtered(FilteredSensorData& out) const override;
 
 private:
+    SeqLock<RawSensorData> raw_buffer;
+    SeqLock<FilteredSensorData> filtered_buffer;
     RawSensorData raw_data;
     FilteredSensorData filtered_data;
     StSensorMgrSensors sensors;

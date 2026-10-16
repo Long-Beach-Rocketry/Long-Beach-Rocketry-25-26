@@ -25,7 +25,21 @@ public:
      * @param raw_data The raw sensor data to filter
      * @return The filtered sensor data struct
      */
-    virtual FilteredSensorData filter_data(RawSensorData raw_data) const = 0;
+    virtual FilteredSensorData filter_data(RawSensorData raw_data) = 0;
+
+    /**
+     * @brief Copy out the latest raw sensor data published by update(); safe to call from any consumer
+     * @param out Filled with a consistent snapshot on success
+     * @return False if nothing has been published yet or the read kept overlapping a write
+     */
+    virtual bool get_raw(RawSensorData& out) const = 0;
+
+    /**
+     * @brief Copy out the latest filtered sensor data published by filter_data(); safe to call from any consumer
+     * @param out Filled with a consistent snapshot on success
+     * @return False if nothing has been published yet or the read kept overlapping a write
+     */
+    virtual bool get_filtered(FilteredSensorData& out) const = 0;
 
     ~SensorMgr() = default;
 };
