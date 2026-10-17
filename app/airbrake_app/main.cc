@@ -1,23 +1,25 @@
 #include "airbrake.h"
-#include "airbrake_utils.h"
-#include "bmp390.h"
-#include "bno055_imu.h"
+#include "board.h"
 
-Bno055Data data;
-float press, temp;
+using namespace LBR;
 
 int main(int argc, char* argv[])
 {
-    bsp_init();
-    Board hw = get_board();
+    board_init();
+    Board& hw = get_board();
 
-    // should probably pass this in the airbrake ye?
-    monitor_imu(hw.imu);
-    monitor_baro(hw.bmp390);
+    // Initialize kalman filter
 
-    press = hw.bmp390.get_pressure();
+    // Initialize mpc
 
-    Airbrake airbrake(motor);
+    // Initialize servo motor
+
+    // Initialize sensor manager
+
+    AirbrakeParams params{hw.sensor_mgr, hw.motor};
+
+    Airbrake airbrake(airbrake_params);
+    airbrake.init();
 
     while (1)
     {
