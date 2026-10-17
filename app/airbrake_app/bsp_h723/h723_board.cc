@@ -2,7 +2,7 @@
 #include "delay.h"
 #include "st_gpio.h"
 #include "st_i2c.h"
-#include "st_sensor_manager.h"
+// #include "st_sensor_manager.h"
 #include "st_sysclk.h"
 #include "st_timebase.h"
 

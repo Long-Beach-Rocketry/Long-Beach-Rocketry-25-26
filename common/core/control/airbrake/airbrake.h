@@ -10,11 +10,15 @@
 #include "bno055_imu.h"
 // #include "imu_math.h"
 // #include "kalman.h"
+#include <cstdint>
 #include "sensor_data.h"
 #include "servo_motor"
 
 namespace LBR
 {
+
+// TODO: Delete this once the sensor manager is merged
+class SensorMgr;
 
 enum class AirbrakeState : uint8_t
 {
@@ -28,7 +32,8 @@ enum class AirbrakeState : uint8_t
 
 struct AirbrakeParams
 {
-    ServoMotor motor;
+    SensorMgr& sensor_mgr;
+    ServoMotor& motor;
 };
 
 class AirBrake
