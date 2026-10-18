@@ -56,6 +56,7 @@ public:
      */
     bool set_settings(Sx1262Settings new_settings);
 
+    bool init();
 private:
     Sx1262Settings settings;
     Spi& spi;
