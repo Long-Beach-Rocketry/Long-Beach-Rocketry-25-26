@@ -1,9 +1,10 @@
 #include "bmp390.h"
 #include <array>
-    #include "reg_helpers.h"
+
+#include "reg_helpers.h"
 
 /*** BMP390 Registers and Bit Definitions ***/
-static constexpr uint8_t  PWR_CTRL_REG{0x1B};
+static constexpr uint8_t PWR_CTRL_REG{0x1B};
 static constexpr uint8_t DATA_REG_START{0x04};
 static constexpr uint8_t CALIB_REG_START{0x31};
 
@@ -37,46 +38,46 @@ Bmp390::Bmp390(const Bmp390Params& params)
 {
 }
 
-    void Bmp390::get_calib_coeffs()
-    {
-        // Read calibration data
-        std::array<uint8_t, CALIB_REG_LEN> data{0};
-        _i2c.mem_read(data, CALIB_REG_START, _dev_addr);
+void Bmp390::get_calib_coeffs()
+{
+    // Read calibration data
+    std::array<uint8_t, CALIB_REG_LEN> data{0};
+    _i2c.mem_read(data, CALIB_REG_START, _dev_addr);
 
-        // Store coefficients
-        uint16_t t1 = combine_uint16(data[1], data[0]);
-        uint16_t t2 = combine_uint16(data[3], data[2]);
-        int8_t t3 = static_cast<int8_t>(data[4]);
-        int16_t p1 = combine_int16(data[6], data[5]);
-        int16_t p2 = combine_int16(data[8], data[7]);
-        int8_t p3 = static_cast<int8_t>(data[9]);
-        int8_t p4 = static_cast<int8_t>(data[10]);
-        uint16_t p5 = combine_uint16(data[12], data[11]);
-        uint16_t p6 = combine_uint16(data[14], data[13]);
-        int8_t p7 = static_cast<int8_t>(data[15]);
-        int8_t p8 = static_cast<int8_t>(data[16]);
-        int16_t p9 = combine_int16(data[18], data[17]);
-        int8_t p10 = static_cast<int8_t>(data[19]);
-        int8_t p11 = static_cast<int8_t>(data[20]);
+    // Store coefficients
+    uint16_t t1 = combine_uint16(data[1], data[0]);
+    uint16_t t2 = combine_uint16(data[3], data[2]);
+    int8_t t3 = static_cast<int8_t>(data[4]);
+    int16_t p1 = combine_int16(data[6], data[5]);
+    int16_t p2 = combine_int16(data[8], data[7]);
+    int8_t p3 = static_cast<int8_t>(data[9]);
+    int8_t p4 = static_cast<int8_t>(data[10]);
+    uint16_t p5 = combine_uint16(data[12], data[11]);
+    uint16_t p6 = combine_uint16(data[14], data[13]);
+    int8_t p7 = static_cast<int8_t>(data[15]);
+    int8_t p8 = static_cast<int8_t>(data[16]);
+    int16_t p9 = combine_int16(data[18], data[17]);
+    int8_t p10 = static_cast<int8_t>(data[19]);
+    int8_t p11 = static_cast<int8_t>(data[20]);
 
-        // Convert coefficients to floating point numbers
-        _calib_coeffs.t1 = static_cast<float>(t1) * T1_P7_CONV_FACT;
-        _calib_coeffs.t2 = static_cast<float>(t2) / T2_CONV_FACT;
-        _calib_coeffs.t3 = static_cast<float>(t3) / T3_P9_P10_CONV_FACT;
-        _calib_coeffs.p1 =
-            (static_cast<float>(p1) - P1_P2_CONV_FACT) / P1_CONV_FACT;
-        _calib_coeffs.p2 =
-            (static_cast<float>(p2) - P1_P2_CONV_FACT) / P2_CONV_FACT;
-        _calib_coeffs.p3 = static_cast<float>(p3) / P3_CONV_FACT;
-        _calib_coeffs.p4 = static_cast<float>(p4) / P4_CONV_FACT;
-        _calib_coeffs.p5 = static_cast<float>(p5) * P5_CONV_FACT;
-        _calib_coeffs.p6 = static_cast<float>(p6) / P6_CONV_FACT;
-        _calib_coeffs.p7 = static_cast<float>(p7) / T1_P7_CONV_FACT;
-        _calib_coeffs.p8 = static_cast<float>(p8) / P8_CONV_FACT;
-        _calib_coeffs.p9 = static_cast<float>(p9) / T3_P9_P10_CONV_FACT;
-        _calib_coeffs.p10 = static_cast<float>(p10) / T3_P9_P10_CONV_FACT;
-        _calib_coeffs.p11 = static_cast<float>(p11) / P11_CONV_FACT;
-    }
+    // Convert coefficients to floating point numbers
+    _calib_coeffs.t1 = static_cast<float>(t1) * T1_P7_CONV_FACT;
+    _calib_coeffs.t2 = static_cast<float>(t2) / T2_CONV_FACT;
+    _calib_coeffs.t3 = static_cast<float>(t3) / T3_P9_P10_CONV_FACT;
+    _calib_coeffs.p1 =
+        (static_cast<float>(p1) - P1_P2_CONV_FACT) / P1_CONV_FACT;
+    _calib_coeffs.p2 =
+        (static_cast<float>(p2) - P1_P2_CONV_FACT) / P2_CONV_FACT;
+    _calib_coeffs.p3 = static_cast<float>(p3) / P3_CONV_FACT;
+    _calib_coeffs.p4 = static_cast<float>(p4) / P4_CONV_FACT;
+    _calib_coeffs.p5 = static_cast<float>(p5) * P5_CONV_FACT;
+    _calib_coeffs.p6 = static_cast<float>(p6) / P6_CONV_FACT;
+    _calib_coeffs.p7 = static_cast<float>(p7) / T1_P7_CONV_FACT;
+    _calib_coeffs.p8 = static_cast<float>(p8) / P8_CONV_FACT;
+    _calib_coeffs.p9 = static_cast<float>(p9) / T3_P9_P10_CONV_FACT;
+    _calib_coeffs.p10 = static_cast<float>(p10) / T3_P9_P10_CONV_FACT;
+    _calib_coeffs.p11 = static_cast<float>(p11) / P11_CONV_FACT;
+}
 
 void Bmp390::get_raw_data()
 {
@@ -141,10 +142,11 @@ float Bmp390::compensate_pressure()
                     static_cast<float>(_raw_data.press);
     partial_data2 = _calib_coeffs.p9 + _calib_coeffs.p10 * _calib_coeffs.t_lin;
     partial_data3 = partial_data1 * partial_data2;
-    partial_data4 = partial_data3 + (static_cast<float>(_raw_data.press) *
-                                     static_cast<float>(_raw_data.press) *
-                                     static_cast<float>(_raw_data.press)) *
-                                        _calib_coeffs.p11;
+    partial_data4 = partial_data3 +
+                    (static_cast<float>(_raw_data.press) *
+                     static_cast<float>(_raw_data.press) *
+                     static_cast<float>(_raw_data.press)) *
+                        _calib_coeffs.p11;
 
     return partial_out1 + partial_out2 + partial_data4;
 }
@@ -176,3 +178,4 @@ float Bmp390::get_temperature()
     return compensate_temperature();
 }
 }  // namespace LBR
+
