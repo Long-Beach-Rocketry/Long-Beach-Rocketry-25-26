@@ -1,4 +1,7 @@
 #include <cstdio>
+#include <cstdlib>
+#include <span>
+#include "ms561101.h"
 #include "board.h"
 #include "delay.h"
 
@@ -6,20 +9,17 @@ using namespace LBR;
 
 int main(int argc, char* argv[])
 {
-    if (!bsp_init())
-    {
-        printf("MS5611 initialization failed\n");
-        return 1;
-    }
-
-    Board& hw = get_board();
+    bsp_init();
+    Board hw = get_board();
+    float temp, press;
 
     while (1)
     {
-        float press = hw.barometer.get_pressure();
-        float temp = hw.barometer.get_temperature();
+        press = hw.barometer.get_pressure();
+        temp = hw.barometer.get_temperature();
 
-        printf("Pressure: %f Pa\nTemperature: %f C\n", press, temp);
+        printf("Pressure: %f\nTemperature: %f\n", press, temp);
+
         Utils::DelayMs(800);
     }
 
