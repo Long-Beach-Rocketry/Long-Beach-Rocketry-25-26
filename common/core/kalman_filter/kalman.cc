@@ -1,5 +1,4 @@
 #include "kalman.h"
-#include "Eigen/Dense"
 
 using namespace Eigen;
 using namespace std;
@@ -9,18 +8,18 @@ namespace LBR
 //Construct system model matrix
 //Internal computation component will be init in init()
 EKF::EKF(double newDt, 
-        const Eigen::Matrix<double, 10, 10>& newF,
-        const Eigen::Matrix<double, 6, 10>& newH,
-        const Eigen::Matrix<double, 10, 10>& newQ,
-        const Eigen::Matrix<double, 6, 6>& newR
+        const Matrix<double, 10, 10>& newF,
+        const Matrix<double, 6, 10>& newH,
+        const Matrix<double, 10, 10>& newQ,
+        const Matrix<double, 6, 6>& newR
     ) : dt(newDt), F(newF), H(newH), Q(newQ), R(newR) {}
 
-Eigen::Matrix Vector10d& EKF::getXhat const(){
+const Matrix<double, 10, 1>& EKF::getXhat(){
     return x_hat;
 };
 
 
-void EKF::init(const Matrix<double, 10, 1>& x0, 
+void EKF::initialize(const Matrix<double, 10, 1>& x0, 
         const Matrix<double, 10, 10>& P0){
     x_hat = x0;
     x_hat_pred = x0;
@@ -100,7 +99,7 @@ void EKF::predict(const Vector3d& gyromeasure){
     Matrix<double, 10, 10> J;
     J.setIdentity();
 
-    J(0,2) = dt^2 / 2; //Pos - Accel relation
+    J(0,2) = pow(dt, 2) / 2; //Pos - Accel relation
     J(0,1) = dt; //Pos-vel
     J(1,2) = dt; //Vel- accel
     J.block<4, 4>(3, 3) = Jqq;
@@ -110,7 +109,7 @@ void EKF::predict(const Vector3d& gyromeasure){
     P_new = J * P * J.transpose() + Q;
 }
 
-void EKF::update(const Vector6d& z){
+void EKF::update(const Matrix<double, 6, 1>& z){
     if (!init) return;
 
     //Kalman gain
@@ -118,6 +117,6 @@ void EKF::update(const Vector6d& z){
                     * (H * P_new * H.transpose() + R).inverse();
     
     x_hat = x_hat_pred + K * (z - H * x_hat_pred);
-    P = (I - K * H) * P_new;
+    P = P_new - K * H * P_new;
 }
 }

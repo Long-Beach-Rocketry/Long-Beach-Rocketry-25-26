@@ -1,5 +1,5 @@
-#include <vector>
-#include <Eigen/Dense?
+#pragma once
+#include <Eigen/Dense>
 
 namespace LBR {
 class EKF {
@@ -7,7 +7,6 @@ public:
     //Constructor
     EKF(
         double dt, 
-        const Eigen::Matrix<double, 10, 10>& P,
         const Eigen::Matrix<double, 10, 10>& F,
         const Eigen::Matrix<double, 6, 10>& H,
         const Eigen::Matrix<double, 10, 10>& Q,
@@ -16,10 +15,10 @@ public:
 
     //Initalize state and covariance vector -- first step
     //@return True if init, False otherwise
-    bool init(const Eigen::Matrix<10, 1>& x0, 
+    void initialize(const Eigen::Matrix<double, 10, 1>& x0, 
         const Eigen::Matrix<double, 10, 10>& P0);
     
-    const Eigen::Matrix Vector13d& getXhat();  
+    const Eigen::Matrix<double, 10, 1>& getXhat();  
     //Predict the current state from the previous state (aka x_hat)
     // with the current rotation velocity from gyroscope for quaternion
     void predict(const Eigen::Vector3d& gyromeasure);
@@ -30,7 +29,6 @@ public:
 private:
     double dt; //Time-step
     bool init = false;
-    Eigen::Matrix<double, 10, 10> I //identity matrix of 13x13
     //Vector of 13 states of x hat and x_hat generated from the prediction step 
     Eigen::Matrix<double, 10, 1> x_hat, x_hat_pred;
     Eigen::Matrix<double, 10, 10> P, P_new; //covariance matrix
