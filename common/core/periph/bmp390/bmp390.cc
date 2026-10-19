@@ -1,6 +1,5 @@
 #include "bmp390.h"
 #include <array>
-
 #include "reg_helpers.h"
 
 /*** BMP390 Registers and Bit Definitions ***/
@@ -142,11 +141,10 @@ float Bmp390::compensate_pressure()
                     static_cast<float>(_raw_data.press);
     partial_data2 = _calib_coeffs.p9 + _calib_coeffs.p10 * _calib_coeffs.t_lin;
     partial_data3 = partial_data1 * partial_data2;
-    partial_data4 = partial_data3 +
-                    (static_cast<float>(_raw_data.press) *
-                     static_cast<float>(_raw_data.press) *
-                     static_cast<float>(_raw_data.press)) *
-                        _calib_coeffs.p11;
+    partial_data4 = partial_data3 + (static_cast<float>(_raw_data.press) *
+                                     static_cast<float>(_raw_data.press) *
+                                     static_cast<float>(_raw_data.press)) *
+                                        _calib_coeffs.p11;
 
     return partial_out1 + partial_out2 + partial_data4;
 }
@@ -178,4 +176,3 @@ float Bmp390::get_temperature()
     return compensate_temperature();
 }
 }  // namespace LBR
-
