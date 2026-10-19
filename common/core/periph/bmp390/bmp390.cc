@@ -3,15 +3,15 @@
 #include "reg_helpers.h"
 
 /*** BMP390 Registers and Bit Definitions ***/
-static constexpr std::uint8_t PWR_CTRL_REG{0x1B};
-static constexpr std::uint8_tuint8_t DATA_REG_START{0x04};
-static constexpr std::uint8_tuint8_t CALIB_REG_START{0x31};
+static constexpr uint8_t PWR_CTRL_REG{0x1B};
+static constexpr uint8_t DATA_REG_START{0x04};
+static constexpr uint8_t CALIB_REG_START{0x31};
 
-static constexpr std::uint8_tuint8_t PWR_CTRL_PRESS_EN{0x1};
-static constexpr std::uint8_tuint8_t PWR_CTRL_TEMP_EN{0x2};
-static constexpr std::uint8_tuint8_t PWR_CTRL_NORMAL_MODE{0x3 << 4};
-static constexpr std::uint8_tuint8_t DATA_REG_LEN{6};
-static constexpr std::uint8_tuint8_t CALIB_REG_LEN{21};
+static constexpr uint8_t PWR_CTRL_PRESS_EN{0x1};
+static constexpr uint8_t PWR_CTRL_TEMP_EN{0x2};
+static constexpr uint8_t PWR_CTRL_NORMAL_MODE{0x3 << 4};
+static constexpr uint8_t DATA_REG_LEN{6};
+static constexpr uint8_t CALIB_REG_LEN{21};
 
 /*** Conversion Factors For Coefficients ***/
 static constexpr float T1_P7_CONV_FACT{256.0};
