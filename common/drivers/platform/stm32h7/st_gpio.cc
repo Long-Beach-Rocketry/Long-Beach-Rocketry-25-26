@@ -61,7 +61,7 @@ bool HwGpio::init()
 
 bool HwGpio::toggle()
 {
-    uint8_t pin_mask = (1u << pin_num);
+    uint32_t pin_mask = (1u << pin_num);
     bool pin_state = static_cast<bool>(base_addr->ODR & pin_mask);
     return set(!pin_state);
 }

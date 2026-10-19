@@ -91,7 +91,9 @@ static inline int16_t combine(uint8_t lsb, uint8_t msb)
  */
 bool Bno055::read_all(Bno055Data& out)
 {
-    uint8_t buf[6 + 6 + 6 + 6 + 8];  // ACC + GYR + LIA + GRAV + QUAT
+    /* Reading all, even if we don't use all */
+    uint8_t buf[REGISTERS_ACC + REGISTERS_MAG + REGISTERS_GYR + REGISTERS_EUL +
+                REGISTERS_QUAT + REGISTERS_LIA + REGISTERS_GRV];
     size_t idx = 0;
 
     // Read everything starting from ACC register (0x08)
@@ -103,26 +105,14 @@ bool Bno055::read_all(Bno055Data& out)
     out.accel.x = combine(buf[0], buf[1]) / ACCEL_SCALE;
     out.accel.y = combine(buf[2], buf[3]) / ACCEL_SCALE;
     out.accel.z = combine(buf[4], buf[5]) / ACCEL_SCALE;
-    idx += 12;  // Skip accel (6) + mag (6)
+    idx += REGISTERS_ACC + REGISTERS_MAG;  // Pass accel + mag
 
     // Parse gyro
     constexpr float GYRO_SCALE = 16.0f;
     out.gyro.x = combine(buf[idx + 0], buf[idx + 1]) / GYRO_SCALE;
     out.gyro.y = combine(buf[idx + 2], buf[idx + 3]) / GYRO_SCALE;
     out.gyro.z = combine(buf[idx + 4], buf[idx + 5]) / GYRO_SCALE;
-    idx += 6;
-
-    // Parse linear accel
-    out.linear_accel.x = combine(buf[idx + 0], buf[idx + 1]) / ACCEL_SCALE;
-    out.linear_accel.y = combine(buf[idx + 2], buf[idx + 3]) / ACCEL_SCALE;
-    out.linear_accel.z = combine(buf[idx + 4], buf[idx + 5]) / ACCEL_SCALE;
-    idx += 6;
-
-    // Parse gravity
-    out.gravity.x = combine(buf[idx + 0], buf[idx + 1]) / ACCEL_SCALE;
-    out.gravity.y = combine(buf[idx + 2], buf[idx + 3]) / ACCEL_SCALE;
-    out.gravity.z = combine(buf[idx + 4], buf[idx + 5]) / ACCEL_SCALE;
-    idx += 6;
+    idx += REGISTERS_GYR + REGISTERS_EUL;  // Pass gyro + eul
 
     // Parse quaternion
     constexpr float QUAT_SCALE = 16384.0f;
@@ -130,6 +120,18 @@ bool Bno055::read_all(Bno055Data& out)
     out.quat.x = combine(buf[idx + 2], buf[idx + 3]) / QUAT_SCALE;
     out.quat.y = combine(buf[idx + 4], buf[idx + 5]) / QUAT_SCALE;
     out.quat.z = combine(buf[idx + 6], buf[idx + 7]) / QUAT_SCALE;
+    idx += REGISTERS_QUAT;  // Pass quat
+
+    // Parse linear accel
+    out.linear_accel.x = combine(buf[idx + 0], buf[idx + 1]) / ACCEL_SCALE;
+    out.linear_accel.y = combine(buf[idx + 2], buf[idx + 3]) / ACCEL_SCALE;
+    out.linear_accel.z = combine(buf[idx + 4], buf[idx + 5]) / ACCEL_SCALE;
+    idx += REGISTERS_LIA;  // Pass linear acceleration
+
+    // Parse gravity
+    out.gravity.x = combine(buf[idx + 0], buf[idx + 1]) / ACCEL_SCALE;
+    out.gravity.y = combine(buf[idx + 2], buf[idx + 3]) / ACCEL_SCALE;
+    out.gravity.z = combine(buf[idx + 4], buf[idx + 5]) / ACCEL_SCALE;
 
     return true;
 }
