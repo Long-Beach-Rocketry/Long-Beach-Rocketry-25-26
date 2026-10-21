@@ -1,3 +1,8 @@
+/**
+ * @file cli.cc
+ * @brief Implentation of cli class and methods
+ */
+
 #include "cli.h"
 
 namespace LBR
@@ -23,6 +28,8 @@ bool Cli::list_commands() const
     {
         return false;
     }
+
+    // Output this helper title and then list of command aliases
     std::string_view title{
         "Registered Commands can be seen with the 'list' command.\r\n See more "
         "info about commands with <command> -h\r\n\n"};
@@ -48,6 +55,11 @@ bool Cli::register_cmd(Cmd command)
     {
         return false;
     }
+    // else if (command.name == "list")
+    // {
+    //     // reserved help command
+    //     return false;
+    // }
     commands[commandCount++] = command;
     return true;
 }
@@ -62,21 +74,26 @@ bool Cli::process()
     const char* argv[kMaxArgs] = {nullptr};
     bool inToken{false};
 
+    // Tokenize from ring buffer characters
     while (rxBuffer.pop(rx))
     {
+        // End of command
         if (rx == '\r' || rx == '\n')
         {
             if (idx > 0 || argc > 0)
             {
+                // Safe end of string
                 tmp[idx] = '\0';
                 break;
             }
             continue;
         }
+        // Handle whitespace
         if (rx == ' ' || rx == '\t')
         {
             if (inToken)
             {
+                // Safely terminate token
                 tmp[idx++] = '\0';
                 inToken = false;
             }
@@ -95,12 +112,14 @@ bool Cli::process()
                 }
                 inToken = true;
             }
+            // Append char to current token
             tmp[idx++] = static_cast<char>(rx);
         }
     }
 
     rxBuffer.reset();
 
+    // Way it was tokenized is alias is first token so handle that
     if (argc > 0)
     {
         std::string_view input(argv[0]);
@@ -116,7 +135,7 @@ bool Cli::invoke(std::string_view input, CmdArgs cmdArgs)
     bool ret{false};
     if (input == "list")
     {
-        list_commands();
+        return list_commands();
     }
 
     for (auto cmd : commands)
@@ -127,6 +146,8 @@ bool Cli::invoke(std::string_view input, CmdArgs cmdArgs)
             ret = cmd.invoke(cmdArgs, txOut);
             if (!txOut.empty())
             {
+
+                // TODO: ret &= usart->send(txOut);
                 usart->send(txOut);
             }
             return ret;
@@ -141,9 +162,12 @@ bool Cli::take_input(uint8_t rx)
     switch (rx)
     {
         case '\177':  // backspace
-        case '\b':
+        case '\b':    // other backspace, one of these is putty, other minicom
             if (rxBuffer.pop(rx))
             {
+                /* Apparently, '\b' is backspace 
+                 so its back (left), replace with space (right), back (left)
+                */
                 uint8_t erase_seq[3] = {'\b', ' ', '\b'};
                 std::span<const uint8_t> tx_span(erase_seq, 3);
                 usart->send(tx_span);
@@ -153,8 +177,12 @@ bool Cli::take_input(uint8_t rx)
         case '\n':
             ret = true;
         default:
+            // Add input to ring buffer. NOTE: write policy is no overwrite
             std::span<const uint8_t> tx_span(&rx, 1);
             usart->send(tx_span);
+            /* 
+                IMPORTANT: Order here matters, if ret is false, compiler will just skip rxBuffer.push() so move it in front
+            */
             return rxBuffer.push(rx) && ret;
     }
     return false;

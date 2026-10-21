@@ -1,3 +1,8 @@
+/**
+ * @file sensor_cmd.cc
+ * @brief Implementation of sensor command methods and the sensor command
+ */
+
 #include "sensor_cmd.h"
 #include <algorithm>
 #include <array>

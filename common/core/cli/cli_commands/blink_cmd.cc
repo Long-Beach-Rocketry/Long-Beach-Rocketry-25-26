@@ -1,3 +1,8 @@
+/**
+ * @file blink_cmd.cc
+ * @brief Implementation of blink command methods and the blink command
+ */
+
 #include "blink_cmd.h"
 #include <algorithm>
 #include <array>
