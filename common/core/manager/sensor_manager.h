@@ -14,6 +14,21 @@ class SensorMgr
 {
 public:
     /**
+     * @brief Configure the sample period and start the timebase.
+     * Call once after hardware init, before period_elapsed().
+     * @return False if the timebase could not be configured or started
+     */
+    virtual bool start() = 0;
+
+    /**
+     * @brief Report whether a new sample period has elapsed.
+     * Advances the sample window when due, so each period is reported once.
+     * Airbrake calls this to decide when to take a new sample.
+     * @return False if sampling has not started or the period has not elapsed
+     */
+    virtual bool period_elapsed() = 0;
+
+    /**
      * @brief Polls the sensors and updates the provided raw sensor data structure with the latest readings
      * @param out Filled with the latest readings from the sensors that responded
      * @return True if at least one sensor was read, false if none were available

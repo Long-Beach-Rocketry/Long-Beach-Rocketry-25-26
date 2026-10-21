@@ -9,6 +9,9 @@
 #include "seqlock.h"
 #include "timebase.h"
 
+#include <chrono>
+#include <cstdint>
+
 namespace LBR
 {
 class Ekf;
@@ -31,6 +34,7 @@ struct StSensorMgrParams
     Timebase& timebase;
     StSensorMgrSensors sensors;
     Ekf* ekf;
+    std::chrono::microseconds sample_period;  // Sensor poll period
 };
 
 class HwSensorMgr : public SensorMgr
@@ -41,6 +45,18 @@ public:
      * @param params_ Struct containing references to the timebase, sensors, and EKF instance used by the sensor manager
      */
     explicit HwSensorMgr(const StSensorMgrParams& params_);
+
+    /**
+     * @brief Configure the managed timebase to the sample period and start it
+     * @return False if the period is invalid or the timebase could not start
+     */
+    bool start() override;
+
+    /**
+     * @brief True once per sample period since the previous true result
+     * @return False if start() has not succeeded or the period has not elapsed
+     */
+    bool period_elapsed() override;
 
     /**
      * @brief Polls the managed sensors, skipping any that are null or fail
@@ -78,6 +94,9 @@ private:
     StSensorMgrSensors sensors;
     Timebase& timebase;
     Ekf* ekf;
+    std::chrono::microseconds sample_period;
+    uint64_t last_sample_us{0};
+    bool running{false};
 };
 
 }  // namespace Stmh7

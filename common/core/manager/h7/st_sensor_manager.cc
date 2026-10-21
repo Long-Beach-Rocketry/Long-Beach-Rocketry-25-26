@@ -10,12 +10,50 @@ namespace LBR
 namespace Stmh7
 {
 
-// TODO: set timer obj
 HwSensorMgr::HwSensorMgr(const StSensorMgrParams& params_)
     : sensors{params_.sensors},
       timebase{params_.timebase},
-      ekf{params_.ekf}
+      ekf{params_.ekf},
+      sample_period{params_.sample_period}
 {
+}
+
+bool HwSensorMgr::start()
+{
+    if (sample_period.count() <= 0)
+    {
+        return false;
+    }
+
+    if (!timebase.set_period(sample_period) || !timebase.start())
+    {
+        return false;
+    }
+
+    // Record the current time as the last sample time to start the sampling window
+    last_sample_us = timebase.uptime_us();
+    running = true;
+    return true;
+}
+
+bool HwSensorMgr::period_elapsed()
+{
+    if (!running)
+    {
+        return false;
+    }
+
+    const uint64_t period_us = static_cast<uint64_t>(sample_period.count());
+
+    // Check if the required sample period has elapsed since the last sample
+    if (timebase.elapsed_since_us(last_sample_us) < period_us)
+    {
+        return false;
+    }
+
+    // Advance by one period so a late caller catches up instead of drifting.
+    last_sample_us += period_us;
+    return true;
 }
 
 bool HwSensorMgr::update(RawSensorData& out)

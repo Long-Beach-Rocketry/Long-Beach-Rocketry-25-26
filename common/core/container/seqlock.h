@@ -42,7 +42,7 @@ public:
     /**
      * @brief Copy out the latest value
      * @param out Filled with a consistent snapshot on success, untouched on failure
-     * @param max_tries Number of attempts before giving up, so a reader that preempts the writer cannot spin forever
+     * @param max_tries Attempts before giving up (8 by default), so reader that preempts the writer cannot spin forever
      * @return True if a consistent snapshot was read, false if no value was published or every attempt overlapped a write
      */
     bool read(T& out, uint32_t max_tries = 8) const

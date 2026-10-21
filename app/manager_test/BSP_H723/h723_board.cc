@@ -1,3 +1,4 @@
+#include <chrono>
 #include <cstdint>
 #include "bmp390.h"
 #include "bno055_imu.h"
@@ -21,6 +22,8 @@ extern "C" void SysTick_Handler(void)
 }
 
 static constexpr uint32_t kSysclkHz{64'000'000};
+// 100 Hz sensor poll. The manager sets and checks this on the timebase.
+static constexpr std::chrono::microseconds kSamplePeriod{10'000};
 // For 64 MHz HSI, I2C timing value from STM32CubeMX
 static constexpr uint32_t kTimingR{0x20303E5D};
 // Default APB1 timer input frequency on HSI (64 MHz)
@@ -84,6 +87,7 @@ const Stmh7::StSensorMgrParams sensor_mgr_params{
     .timebase = timebase,
     .sensors = sensor_mgr_sensors,
     .ekf = nullptr,  // TODO: no EKF instance yet, add once implemented
+    .sample_period = kSamplePeriod,
 };
 
 Stmh7::HwSensorMgr sensor_mgr(sensor_mgr_params);
