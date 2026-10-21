@@ -1,3 +1,9 @@
+/**
+ * @file   board.h
+ * @brief  Board definition for sensor manager test application
+ * @author Alex Pulido
+ */
+
 #pragma once
 #include "bmp390.h"
 #include "bno055_imu.h"

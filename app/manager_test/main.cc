@@ -1,3 +1,9 @@
+/**
+ * @file   main.cc
+ * @brief  Test application for the sensor manager
+ * @author Alex Pulido
+ */
+
 #include <array>
 #include <cstddef>
 #include <cstdint>
