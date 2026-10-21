@@ -19,7 +19,7 @@ namespace SensorCmd
 extern const Cmd sensorCmd;
 
 void init(Bno055* imu_, Bmp390* baro_);
-bool blink_cmd_handler(CmdArgs& args, std::span<uint8_t> txOut);
+bool sensor_cmd_handler(CmdArgs& args, std::span<uint8_t> txOut);
 
 }  // namespace SensorCmd
 
