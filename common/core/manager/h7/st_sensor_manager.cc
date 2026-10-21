@@ -58,7 +58,7 @@ bool HwSensorMgr::period_elapsed()
 
 bool HwSensorMgr::update(RawSensorData& out)
 {
-    bool any_ok = false;    // Tracks if at least one sensor read was successful
+    bool any_ok = false;  // Tracks if at least one sensor read was successful
 
     if (sensors.bno055 && sensors.bno055->read_all(raw_data.imu))
     {

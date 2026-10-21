@@ -6,9 +6,9 @@
 #include "delay.h"
 #include "st_gpio.h"
 #include "st_i2c.h"
+#include "st_sensor_manager.h"
 #include "st_sysclk.h"
 #include "st_timebase.h"
-#include "st_sensor_manager.h"
 
 namespace LBR
 {
@@ -74,7 +74,8 @@ Bmp390 bmp390(bmp390_params);
 Bno055 imu(static_cast<LBR::I2c&>(i2c), Bno055::ADDR_PRIMARY);
 
 // TIM3 Timebase (16-bit, APB1)
-const Stmh7::StTimebaseParams timebase_params{TIM3, TIM3_IRQn, kTim3ClkHz, true};
+const Stmh7::StTimebaseParams timebase_params{TIM3, TIM3_IRQn, kTim3ClkHz,
+                                              true};
 Stmh7::HwTimebase timebase(timebase_params);
 
 // Sensors managed by the sensor manager
@@ -154,4 +155,4 @@ extern "C" void TIM3_IRQHandler(void)
     timebase.handle_irq();
 }
 
-}   // namespace LBR
+}  // namespace LBR
