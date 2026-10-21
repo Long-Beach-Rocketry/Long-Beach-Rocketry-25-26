@@ -8,6 +8,7 @@ namespace LBR
 struct Board
 {
     ms561101& barometer;
+    
 };
 
 bool bsp_init(void);

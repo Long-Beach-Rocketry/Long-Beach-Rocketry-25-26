@@ -1,14 +1,14 @@
-add_library(MS561101BA03 INTERFACE)
+add_library(ms561101ba03 INTERFACE)
 
-target_sources(MS561101BA03 INTERFACE
+target_sources(ms561101ba03 INTERFACE
     ms561101.cc
 )
 
-target_include_directories(MS561101BA03 INTERFACE
+target_include_directories(ms561101ba03 INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_link_libraries(MS561101BA03 INTERFACE
+target_link_libraries(ms561101ba03 INTERFACE
     driver
     utils
 )
