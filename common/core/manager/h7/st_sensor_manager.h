@@ -24,8 +24,8 @@ namespace Stmh7
  */
 struct StSensorMgrSensors
 {
-    Bno055* const bno055;   // IMU
-    Bmp390* const bmp390;   // Barometer (old)
+    Bno055* const bno055;  // IMU
+    Bmp390* const bmp390;  // Barometer (old)
     // Ms5611* const ms5611;   // Barometer
 };
 

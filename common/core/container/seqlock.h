@@ -23,7 +23,8 @@ namespace LBR
 template <typename T>
 class SeqLock
 {
-    static_assert(std::is_trivially_copyable_v<T>, "SeqLock requires a trivially copyable type");
+    static_assert(std::is_trivially_copyable_v<T>,
+                  "SeqLock requires a trivially copyable type");
 
 public:
     /**
@@ -33,10 +34,10 @@ public:
     void write(const T& value)
     {
         const uint32_t s = seq.load(std::memory_order_relaxed);
-        seq.store(s + 1, std::memory_order_relaxed);    // Odd: write in progress
+        seq.store(s + 1, std::memory_order_relaxed);  // Odd: write in progress
         std::atomic_thread_fence(std::memory_order_release);
         std::memcpy(&data, &value, sizeof(T));
-        seq.store(s + 2, std::memory_order_release);    // Even: write complete
+        seq.store(s + 2, std::memory_order_release);  // Even: write complete
     }
 
     /**

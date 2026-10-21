@@ -38,8 +38,8 @@ struct RawSensorData
  */
 struct FilteredSensorData
 {
-    // Ekf ekf;    // the filtered data the EKF will carry when it finishes through 
-                   // (may need to pack it into this struct if it returns individual values)
+    // Ekf ekf;    // the filtered data the EKF will carry when it finishes through
+    // (may need to pack it into this struct if it returns individual values)
 };
 
 }  // namespace LBR

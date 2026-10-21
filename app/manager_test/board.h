@@ -2,10 +2,10 @@
 #include "bmp390.h"
 #include "bno055_imu.h"
 #include "i2c.h"
-#include "timebase.h"
 #include "sensor_manager.h"
+#include "timebase.h"
 
-namespace LBR 
+namespace LBR
 {
 
 struct Board
@@ -20,4 +20,4 @@ struct Board
 bool bsp_init();
 Board& get_board();
 
-}   // namespace LBR
+}  // namespace LBR

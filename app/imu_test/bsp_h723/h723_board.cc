@@ -71,7 +71,7 @@ bool bsp_init()
     ret = ret && scl.init();
     ret = ret && i2c.init();
     ret = ret && rst.init();
-    
+
     // BNO055 reset sequence
     ret = ret && rst.set(false);
     LBR::Utils::DelayMs(10);
