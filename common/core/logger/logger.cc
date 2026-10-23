@@ -2,64 +2,87 @@
 
 namespace LBR
 {
-Logger::Logger(USART_TypeDef* usart_base) 
-    :usart(usart_base)
-{
-}
+// Initialize Logger by reference, only need to use send() in Uart
+Logger::Logger(Usart& uart) 
+    :usart(uart){}
 
 bool Logger::log_debug(const char* message)
 {
-    return usart->send(message_compress(message)), strlen(message);
-    // return ("LOG DEBUG >> " + std::string(message) + "\n");
+    return format_and_send("LOG DEBUG >> ", message);
 }
 
-char Logger::log_error(const char* message)
+bool Logger::log_error(const char* message)
 {
-    return usart->send(message_compress(message)), strlen(message);
-    // return ("LOG ERROR >> " + std::string(message) + "\n");
+    return format_and_send("LOG ERROR >> ", message);
 }
 
-char Logger::log_warn(const char* message)
+bool Logger::log_warn(const char* message)
 {
-    return usart->send(message_compress(message)), strlen(message);
-    // return ("LOG WARN >> " + std::string(message) + "\n");
+    return format_and_send("LOG WARN  >> ", message);
 }
 
-char Logger::log_info(const char* message)
+bool Logger::log_info(const char* message)
 {
-    return usart->send(message_compress(message)), strlen(message);
-    // return ("LOG INFO >> " +std::string(message) + "\n");
+    return format_and_send("LOG INFO  >> ", message);
 }
-bool Logger::size_check(const char* message)
+
+bool Logger::size_check(const char* message) const
 {
-    if (len < 0)
-        {
-            continue;
-        }
+    return (message != nullptr && std::strlen(message) <= MAX_LOG_MESSAGE_LENGTH);
+}   
 
-        if (len >= static_cast<int>(sizeof(buf)))
-        {
-            len = static_cast<int>(sizeof(buf)) - 1;
-        }
-        //change type and send tx_span to uart
-        std::span<const uint8_t> tx_span(reinterpret_cast<const uint8_t*>(buf),
-                                         static_cast<size_t>(len));
-        board.usart.send(tx_span);
+// handles the string buff and prepend logic
+bool Logger::format_and_send(const char* prefix, const char* message)
+{
+    if(!size_check(message)) 
+    {
+        return false;
+    }
+
+    // Stack allocation.  18 = 15 (prefix) + 2 (\r\n) + 1 (\0)
+    char tx_buffer[MAX_LOG_MESSAGE_LENGTH + 18]; 
+    
+    int written = std::snprintf(tx_buffer, sizeof(tx_buffer), 
+                                "%s%s\r\n", 
+                                prefix, message);
+    
+    if (written < 0 || written >= static_cast<int>(sizeof(tx_buffer)))
+    {
+        return false;
+    }
+
+    // Cleans format
+    return uart.send(std::span<const uint8_t>(reinterpret_cast<const uint8_t*>(tx_buffer),
+                                                static_cast<std::size_t>(written)));
 }
 
-void flash_logger_print(void){
-    int len = snprintf(buf, sizeof(buf),
-                           "--------------------------------\r\n"
-                           " LOGGER\r\n"
-                           "--------------------------------\r\n"
-                           " LOG DEBUG >> : %s \r\n"
-                           " LOG ERROR >> : %s \r\n"
-                           " LOG WARN  >> : %s \r\n"
-                           " LOG INFO  >> : %s \r\n"
-                           
-                           "--------------------------------\r\n",
-                           message, message, message, message);
-                        }
-        
+bool Logger::print_all(const char* message)
+{
+    if (!size_check(message))
+    {
+        return false;
+    }
+
+    char buffer[720];
+
+    const int written = std::snprintf(buffer, sizeof(buffer),
+        "--------------------------------\r\n"
+        " LOGGER\r\n"
+        "--------------------------------\r\n"
+        " LOG DEBUG >> : %s \r\n"
+        " LOG ERROR >> : %s \r\n"
+        " LOG WARN  >> : %s \r\n"
+        " LOG INFO  >> : %s \r\n"
+        "--------------------------------\r\n",
+        message, message, message, message);
+
+    if (written < 0 || written >= static_cast<int>(sizeof(buffer)))
+    {
+        return false;
+    }
+
+    return uart.send(std::span<const uint8_t>(reinterpret_cast<const uint8_t*>(buffer),
+                                                static_cast<std::size_t>(written)));
 }
 
+} 
