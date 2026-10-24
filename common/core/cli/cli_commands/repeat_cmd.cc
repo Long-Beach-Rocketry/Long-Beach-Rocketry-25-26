@@ -16,7 +16,8 @@ static constexpr uint16_t kMinRepeatDelay{10};
 
 constexpr std::string_view kRepeatCmdDefaultOut =
     "INFO: Attempting to repeat "
-    "- if fails, the most recent command may not be repeatable\r\n\n";
+    "- if fails, it could be because the most recent command is not be "
+    "repeatable\r\n\n";
 
 bool repeat_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
 {
