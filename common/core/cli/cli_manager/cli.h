@@ -146,7 +146,7 @@ private:
     std::string_view last_cmd_alias{""};
     CmdArgs last_cmd_args{.argc = 0, .argv = nullptr};
     char argStorage[kMaxArgs][kMaxArgLen]{};
-    const char* m_argPtrs[kMaxArgs]{};
+    const char* argPtrs[kMaxArgs]{};
 };
 
 }  // namespace LBR

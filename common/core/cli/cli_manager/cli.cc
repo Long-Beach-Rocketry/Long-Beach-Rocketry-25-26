@@ -152,7 +152,7 @@ bool Cli::invoke(std::string_view input, CmdArgs& cmdArgs)
             if (ret)
             {
                 last_cmd_alias = cmd.name;
-                last_cmd_args = cmdArgs;
+                ret &= save(cmdArgs);
             }
             return ret;
         }
@@ -257,8 +257,17 @@ bool Cli::run()
     return true;
 }
 
-bool save(const CmdArgs& args)
+bool Cli::save(const CmdArgs& args)
 {
+    for (int i = 0; i < args.argc; i++)
+    {
+        strncpy(argStorage[i], args.argv[i], kMaxArgLen - 1);
+        argStorage[i][kMaxArgLen - 1] = '\0';
+        argPtrs[i] = argStorage[i];
+    }
+    last_cmd_args.argc = args.argc;
+    last_cmd_args.argv = argPtrs;
+    return true;
 }
 
 }  // namespace LBR
