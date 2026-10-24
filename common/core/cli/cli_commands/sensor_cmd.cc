@@ -231,7 +231,8 @@ const Cmd sensorCmd = {
         "-b, --baro [p, press | t, temp]\r\n\t"
         "Outputs the specified barometer data\r\n\n"
         "\t-h, --help\t\tShows this message.\r\n",
-    .invoke = sensor_cmd_handler};
+    .invoke = sensor_cmd_handler,
+    .repeatable = true};
 
 }  // namespace SensorCmd
 

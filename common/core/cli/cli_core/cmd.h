@@ -41,6 +41,7 @@ struct Cmd
      * text to usart
      */
     bool (*invoke)(const CmdArgs& args, std::span<uint8_t> txOut);
+    bool repeatable = false;
 };
 
 }  // namespace LBR

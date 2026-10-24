@@ -8,9 +8,11 @@
 
 #include <array>
 #include <cstdint>
+#include <cstring>
 #include <span>
 #include <string_view>
 #include "cmd.h"
+#include "delay.h"
 #include "ring_buffer.h"
 #include "string_span.h"
 #include "usart.h"
@@ -19,27 +21,23 @@ namespace LBR
 {
 constexpr uint8_t kMaxCommands{10};
 constexpr uint8_t kMaxArgs{8};
+constexpr uint8_t kMaxArgLen{(kMaxInputLen - kMaxArgs) / kMaxArgs};
 
-/* 
-TODO: I dont like current initialization structure - make CliSettings {promptname, *usart}; also promptName -> cliPrefix or promptPrefix
-*/
+struct CliSettings
+{
+    std::string_view promptName;
+    Usart* usart;
+};
 
 class Cli
 {
 public:
     /**
-     * @brief The Cli constructor
-     * @param promptName_ The prefix like in other consoles,
+     * @brief The Cli constructor method
+     * @param settings Cli settings structure with uart pointern prompt prefix
      * for example `PS> ` or `$ `
      */
-    Cli(std::string_view promptName_);
-
-    /**
-     * @brief Initialization function that stores a pointer to usart
-     * @param usart_ A pointer to the usart which will be used to output text
-     * 
-     */
-    void init(Usart* usart_);
+    Cli(CliSettings settings);
 
     /**
      * @brief Simple getter for the CLI prompt prefix
@@ -63,10 +61,10 @@ public:
     bool list_commands() const;
 
     /**
-     * @brief Tokenizes the inputs in the ring buffer and invokes the command if valid
-     * @return true if successful, false otherwise
+     * @brief Checks whether a command should be run by looking at the flags and executes if so
+     * @return true if a command was invoked and invoked successfully, false otherwise
      */
-    bool process();
+    bool run();
 
     /**
      * @brief Adds the input buffer given an input from the user or pops if backspace
@@ -77,6 +75,13 @@ public:
     bool take_input(uint8_t rx);
 
 private:
+    /************************ Member Methods ************************/
+    /**
+     * @brief Tokenizes the inputs in the ring buffer and invokes the command if valid
+     * @return true if successful, false otherwise
+     */
+    bool process();
+
     /**
      * @brief Searches for the command called, invokes if exists, and outputs result
      * 
@@ -84,12 +89,31 @@ private:
      * @param cmdArgs Object with command count and run argument list
      * @return true if successful, false otherwise
      */
-    bool invoke(std::string_view input, CmdArgs cmdArgs);
+    bool invoke(std::string_view input, CmdArgs& cmdArgs);
 
     /**
-     * 
+     * @brief Attempts to invoke the most recently called command
+     * @return true if successful, false otherwise
      */
-    RingBuffer<uint8_t, kMaxInputLen> rxBuffer{};
+    bool repeat();
+
+    /**
+     * @brief Echos the input back to the serial terminal
+
+     * @param rx The character input from the user
+     * @return true if the usart sends successfully, false otherwise
+     */
+    bool echo_input(uint8_t rx);
+
+    /**
+     * @brief Saves the command arguments in case of repeat called
+     *
+     * @param args The commands args we want to deep copy
+     * @return true if successful, false otherwise
+     */
+    bool save(const CmdArgs& args);
+
+    /************************ Member Variables ************************/
 
     /**
      * @brief Array of registered commands in the CLI
@@ -101,13 +125,28 @@ private:
      */
     uint8_t commandCount{0};
 
+    RingBuffer<uint8_t, kMaxInputLen> rxBuffer{};
+
     Usart* usart{nullptr};
-    bool init_flag{false};
 
     /**
      * @brief The cli prefix prompt like in other terminals or shells. Ex: `>`, `$`
      */
-    std::string_view promptName{};
+    std::string_view _promptName{};
+
+    /**
+     * @brief Flag for if a command was invoked
+     */
+    bool invoke_flag{false};
+
+    /**
+     * @brief Flag for if a command was invoked to run repeatedly
+     */
+    bool repeat_flag{false};
+    std::string_view last_cmd_alias{""};
+    CmdArgs last_cmd_args{.argc = 0, .argv = nullptr};
+    char argStorage[kMaxArgs][kMaxArgLen]{};
+    const char* m_argPtrs[kMaxArgs]{};
 };
 
 }  // namespace LBR

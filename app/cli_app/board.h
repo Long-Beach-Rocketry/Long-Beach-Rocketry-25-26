@@ -15,7 +15,6 @@
 
 extern LBR::RingBuffer<char, 128> rxBuffer;
 extern uint8_t rxb;
-extern LBR::Cli cli;
 extern bool update_flag;
 
 namespace LBR
@@ -32,6 +31,8 @@ struct Board
 #endif
     Bno055& bno055;
     Bmp390& bmp390;
+
+    Cli& cli;
 };
 
 bool board_init(void);

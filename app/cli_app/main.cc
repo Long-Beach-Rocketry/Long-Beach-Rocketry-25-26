@@ -9,7 +9,6 @@ using namespace LBR;
 
 uint8_t rxb;
 bool update_flag{false};
-Cli cli("Cli app> ");
 
 uint8_t chip_id = 0;
 Bno055::Mode opr_mode = Bno055::Mode::CONFIG;
@@ -29,24 +28,22 @@ int main(int argc, char* argv[])
     hw.bno055.get_sys_error(sys_error);
 
 #ifdef STM32H723xx
-    // cli_init(cli, &hw.usart, hw.led1, hw.led2, hw.led3, nullptr, nullptr);
-    cli_init(cli, &hw.usart, hw.led1, hw.led2, hw.led3, &hw.bno055, &hw.bmp390);
+    cli_init(hw.cli, &hw.usart, hw.led1, hw.led2, hw.led3, &hw.bno055,
+             &hw.bmp390);
 
 #elif defined(STM32L476xx)
-    cli_init(cli, &hw.usart, hw.led1);
+    cli_init(hw.cli, &hw.usart, hw.led1);
 
 #endif
 
-    cli.list_commands();
-    hw.usart.send(cli.get_prompt());
+    hw.cli.list_commands();
+    hw.usart.send(hw.cli.get_prompt());
 
     while (1)
     {
-        if (update_flag)
+        if (hw.cli.run())
         {
-            update_flag = false;
-            cli.process();
-            hw.usart.send(cli.get_prompt());
+            hw.usart.send(hw.cli.get_prompt());
         }
     }
 

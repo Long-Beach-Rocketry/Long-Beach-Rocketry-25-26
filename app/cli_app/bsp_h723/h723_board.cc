@@ -88,13 +88,17 @@ Bmp390 baro{baro_params};
 
 }  // namespace Stmh7
 
+CliSettings cli_settings{.promptName = "LBR> ", .usart = &Stmh7::usart};
+Cli cli{cli_settings};
+
 Board board{.usart = Stmh7::usart,
             .clock = Stmh7::clock,
             .led1 = Stmh7::ld1,
             .led2 = Stmh7::ld2,
             .led3 = Stmh7::ld3,
             .bno055 = Stmh7::imu,
-            .bmp390 = Stmh7::baro};
+            .bmp390 = Stmh7::baro,
+            .cli = cli};
 
 bool board_init()
 {
@@ -171,9 +175,7 @@ extern "C" void USART3_IRQHandler(void)
         if (board.usart.receive(rxb))
         {
             // received 1 byte, echo back
-
-            update_flag = cli.take_input(rxb);
-            if (update_flag)
+            if (board.cli.take_input(rxb))
             {
                 std::array<uint8_t, 4> newLine{"\r\n\n"};
                 board.usart.send(newLine);

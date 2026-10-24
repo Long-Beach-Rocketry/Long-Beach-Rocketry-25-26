@@ -11,7 +11,6 @@ namespace LBR
 void cli_init(Cli& cli, Usart* usart, Gpio& led1, Gpio& led2, Gpio& led3,
               Bno055* imu, Bmp390* baro)
 {
-    cli.init(usart);
     /* Init Commands here */
     BlinkCmd::init(&led1, &led2, &led3);
     SensorCmd::init(imu, baro);
@@ -24,7 +23,6 @@ void cli_init(Cli& cli, Usart* usart, Gpio& led1, Gpio& led2, Gpio& led3,
 #elif defined(STM32L476xx)
 void cli_init(Cli& cli, Usart* usart, Gpio& led1)
 {
-    cli.init(usart);
     /* TODO: INIT and register */
     BlinkCmd::init(&led1, nullptr, nullptr);
     cli.register_cmd(BlinkCmd::blinkCmd);

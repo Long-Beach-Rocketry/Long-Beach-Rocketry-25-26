@@ -7,28 +7,23 @@
 
 namespace LBR
 {
-Cli::Cli(std::string_view promptName_) : promptName(promptName_)
-{
-}
 
-void Cli::init(Usart* usart_)
+Cli::Cli(CliSettings settings)
+    : usart(settings.usart), _promptName(settings.promptName)
 {
-    usart = usart_;
-    init_flag = true;
 }
 
 std::span<const uint8_t> Cli::get_prompt() const
 {
-    return sv_to_span(promptName);
+    return sv_to_span(_promptName);
 }
 
 bool Cli::list_commands() const
 {
-    if (!init_flag)
+    if (usart == nullptr)
     {
         return false;
     }
-
     // Output this helper title and then list of command aliases
     std::string_view title{
         "Registered Commands can be seen with the 'list' command.\r\n See more "
@@ -55,11 +50,11 @@ bool Cli::register_cmd(Cmd command)
     {
         return false;
     }
-    // else if (command.name == "list")
-    // {
-    //     // reserved help command
-    //     return false;
-    // }
+    else if (command.name == "list" || command.name == "q")
+    {
+        // reserved commands
+        return false;
+    }
     commands[commandCount++] = command;
     return true;
 }
@@ -68,7 +63,7 @@ bool Cli::process()
 {
     uint8_t rx{};
     uint8_t argc{0};
-    static char tmp[kMaxInputLen]{};
+    char tmp[kMaxInputLen]{};
     size_t idx{0};
 
     const char* argv[kMaxArgs] = {nullptr};
@@ -130,12 +125,17 @@ bool Cli::process()
     return false;
 }
 
-bool Cli::invoke(std::string_view input, CmdArgs cmdArgs)
+bool Cli::invoke(std::string_view input, CmdArgs& cmdArgs)
 {
     bool ret{false};
     if (input == "list")
     {
         return list_commands();
+    }
+    else if (input == "repeat")
+    {
+        repeat_flag = true;
+        return repeat();
     }
 
     for (auto cmd : commands)
@@ -144,11 +144,15 @@ bool Cli::invoke(std::string_view input, CmdArgs cmdArgs)
         {
             std::array<uint8_t, kMaxInputLen> txOut{};
             ret = cmd.invoke(cmdArgs, txOut);
+
             if (!txOut.empty())
             {
-
-                // TODO: ret &= usart->send(txOut);
-                usart->send(txOut);
+                ret &= usart->send(txOut);
+            }
+            if (ret)
+            {
+                last_cmd_alias = cmd.name;
+                last_cmd_args = cmdArgs;
             }
             return ret;
         }
@@ -158,6 +162,16 @@ bool Cli::invoke(std::string_view input, CmdArgs cmdArgs)
 
 bool Cli::take_input(uint8_t rx)
 {
+    invoke_flag = echo_input(rx);
+    return invoke_flag;
+}
+
+bool Cli::echo_input(uint8_t rx)
+{
+    if (usart == nullptr)
+    {
+        return false;
+    }
     bool ret{false};
     switch (rx)
     {
@@ -177,6 +191,12 @@ bool Cli::take_input(uint8_t rx)
         case '\n':
             ret = true;
         default:
+            if (repeat_flag)
+            {
+                repeat_flag = false;
+                return false;
+            }
+
             // Add input to ring buffer. NOTE: write policy is no overwrite
             std::span<const uint8_t> tx_span(&rx, 1);
             usart->send(tx_span);
@@ -186,6 +206,59 @@ bool Cli::take_input(uint8_t rx)
             return rxBuffer.push(rx) && ret;
     }
     return false;
+}
+
+bool Cli::repeat()
+{
+    if (usart == nullptr)
+    {
+        return false;
+    }
+    LBR::Utils::DelayMs(10);
+    {
+    }
+    if (last_cmd_alias != "")
+    {
+        for (auto cmd : commands)
+        {
+            if (cmd.name == last_cmd_alias && cmd.repeatable)
+            {
+                bool ret{true};
+                std::array<uint8_t, kMaxInputLen> txOut{};
+                ret = cmd.invoke(last_cmd_args, txOut);
+
+                if (!txOut.empty())
+                {
+                    ret &= usart->send(txOut);
+                }
+                return ret;
+            }
+        }
+    }
+    repeat_flag = false;
+    return false;
+}
+
+bool Cli::run()
+{
+    if (invoke_flag)
+    {
+        invoke_flag = false;
+        process();
+    }
+    else if (repeat_flag)
+    {
+        repeat();
+    }
+    else
+    {
+        return false;
+    }
+    return true;
+}
+
+bool save(const CmdArgs& args)
+{
 }
 
 }  // namespace LBR

@@ -106,7 +106,8 @@ const Cmd blinkCmd = {
         "Usage: blink [LED PIN]\r\n\nToggles the pin of an "
         "led.\r\n\nOptions:\r\n\t-o, --option [1|2|3]\tToggles the selected "
         "pin\r\n\n\t-h, --help\t\tShows this message.\r\n",
-    .invoke = blink_cmd_handler};
+    .invoke = blink_cmd_handler,
+    .repeatable = true};
 
 }  // namespace BlinkCmd
 
