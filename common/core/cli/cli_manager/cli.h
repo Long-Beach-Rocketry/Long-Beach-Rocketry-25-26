@@ -13,6 +13,7 @@
 #include <string_view>
 #include "cmd.h"
 #include "delay.h"
+#include "repeat_cmd.h"
 #include "ring_buffer.h"
 #include "string_span.h"
 #include "usart.h"
@@ -38,6 +39,12 @@ public:
      * for example `PS> ` or `$ `
      */
     Cli(CliSettings settings);
+
+    /**
+     * @brief Intializes the CLI with the repeat command.
+     * @return true if successful, false otherwise
+     */
+    bool init();
 
     /**
      * @brief Simple getter for the CLI prompt prefix

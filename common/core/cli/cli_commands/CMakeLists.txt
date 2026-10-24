@@ -1,6 +1,7 @@
 add_library(cli_commands STATIC
    blink_cmd.cc
    sensor_cmd.cc
+   repeat_cmd.cc
 )
 
 target_include_directories(cli_commands PUBLIC

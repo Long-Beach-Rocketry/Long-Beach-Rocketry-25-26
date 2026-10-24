@@ -151,6 +151,7 @@ bool board_init()
     Stmh7::imu.init();
 
     ret &= Stmh7::baro.init();
+    ret &= cli.init();
 
     return ret;
 }

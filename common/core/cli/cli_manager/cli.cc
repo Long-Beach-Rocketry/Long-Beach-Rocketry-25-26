@@ -13,6 +13,11 @@ Cli::Cli(CliSettings settings)
 {
 }
 
+bool Cli::init()
+{
+    return register_cmd(RepeatCmd::repeatCmd);
+}
+
 std::span<const uint8_t> Cli::get_prompt() const
 {
     return sv_to_span(_promptName);
@@ -132,27 +137,27 @@ bool Cli::invoke(std::string_view input, CmdArgs& cmdArgs)
     {
         return list_commands();
     }
-    else if (input == "repeat")
-    {
-        repeat_flag = true;
-        return repeat();
-    }
 
     for (auto cmd : commands)
     {
         if (cmd.name == input)
         {
             std::array<uint8_t, kMaxInputLen> txOut{};
-            ret = cmd.invoke(cmdArgs, txOut);
+            bool status = cmd.invoke(cmdArgs, txOut);
 
             if (!txOut.empty())
             {
                 ret &= usart->send(txOut);
             }
-            if (ret)
+            if (cmd.name != "repeat" && cmd.repeatable && status)
             {
                 last_cmd_alias = cmd.name;
-                ret &= save(cmdArgs);
+                ret &= status && save(cmdArgs);
+            }
+            else if (cmd.name == "repeat" && status)
+            {
+                repeat_flag = true;
+                return repeat();
             }
             return ret;
         }
@@ -191,6 +196,7 @@ bool Cli::echo_input(uint8_t rx)
         case '\n':
             ret = true;
         default:
+            // If in repeat mode, stop it
             if (repeat_flag)
             {
                 repeat_flag = false;
@@ -214,7 +220,7 @@ bool Cli::repeat()
     {
         return false;
     }
-    LBR::Utils::DelayMs(10);
+    LBR::Utils::DelayMs(RepeatCmd::msDelay);
     {
     }
     if (last_cmd_alias != "")
