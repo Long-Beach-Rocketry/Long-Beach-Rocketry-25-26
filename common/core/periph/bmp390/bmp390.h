@@ -65,7 +65,7 @@ public:
 
     /**
      * @brief BMP390 hardware initializer
-     * @return true if successful, false otherwise
+     * @return true if all sensors are initialized successfully, false otherwise
      */
     bool init(void);
 
