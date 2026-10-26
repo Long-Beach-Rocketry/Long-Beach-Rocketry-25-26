@@ -1,63 +1,149 @@
 /* 
 * @file atmosphere.cc
 * @author Mario Cruz
-* @brief Implements generic ISA/barometric physics equations declared in atmosphere.h (not specific to SITL)
+* @brief Implements the ISA troposphere equations declared in atmosphere.h
 * @date 9-30-2026
 */
 
-// Implements the functions declared in "atmosphere.h"
 #include "atmosphere.h"
-#include <math.h>
+#include <cmath>
 
-// Standard atmospheric physics constants
-#define TROPOSPHERE_LAPSE_RATE_K_PER_M 0.0065
-#define STANDARD_GRAVITY_MPS2 9.80665
-#define MOLAR_MASS_DRY_AIR_KG_PER_MOL 0.0289644
-#define UNIVERSAL_GAS_CONSTANT_J_PER_MOL_K 8.3144598
-#define SPECIFIC_GAS_CONSTANT_DRY_AIR 287.05
-
-// atmosphere temperature = ground temperature - (lapse rate * height)
-double atmosphere_temperature_k(double height_above_ground_m,
-                                const GroundConditions* ground)
+namespace LBR
 {
-    return ground->temperature_k -
-           TROPOSPHERE_LAPSE_RATE_K_PER_M * height_above_ground_m;
+
+namespace
+{
+// --------------------------------------------------------------------------------
+// Constants - All values are pulled from the 1976 U.S Standard Atmosphere book
+// {https://ntrs.nasa.gov/api/citations/19770003812/downloads/19770003812.pdf}
+// --------------------------------------------------------------------------------
+
+// Standard day air conditions at sea level, used in standard_atmosphere() for SITL, tests, or backup data
+constexpr double SeaLevelPressurePa{101325.0};  // 1 atmosphere
+constexpr double SeaLevelTemperatureK{288.15};  // 15 C
+
+constexpr double LapseRateKPerM{
+    0.0065};  // Troposphere lapse rate, air gets 0.0065K colder per meter climbed
+
+constexpr double GravityMps2{9.80665};             // Standard gravity
+constexpr double MolarMassAirKgPerMol{0.0289644};  // Mean molar mass of dry air
+constexpr double UniversalGasConstant{
+    8.31432};  // Universal gas constant, J/(mol*K)
+constexpr double SpecificGasConstantAir{
+    UniversalGasConstant /
+    MolarMassAirKgPerMol};  // Gas constant for dry air per kilogram, J/(kg*K)
+
+// Sets how steeply pressure falls as the air cools, barometric formula: g * M / (R * L) = 5.2558
+constexpr double PressureExponent{(GravityMps2 * MolarMassAirKgPerMol) /
+                                  (UniversalGasConstant * LapseRateKPerM)};
+
+// --------------------------------------------------------------------------------
+// Safety checks
+// --------------------------------------------------------------------------------
+
+// Pressure, temperature, and density are real & positive numbers
+bool positive_and_finite(double value)
+{
+    return std::isfinite(value) && value > 0.0;
 }
 
-// atmosphere pressure = ground pressure * barometric formula factor
-double atmosphere_pressure_pa(double height_above_ground_m,
-                              const GroundConditions* ground)
+// Check barometer reading conditions are real & positive
+bool launch_conditions_valid(const AtmosphereConditions& launch_conditions)
 {
-    const double exponent =
-        (STANDARD_GRAVITY_MPS2 * MOLAR_MASS_DRY_AIR_KG_PER_MOL) /
-        (UNIVERSAL_GAS_CONSTANT_J_PER_MOL_K * TROPOSPHERE_LAPSE_RATE_K_PER_M);
-    const double base_ratio =
-        1.0 - (TROPOSPHERE_LAPSE_RATE_K_PER_M * height_above_ground_m) /
-                  ground->temperature_k;
-    return ground->pressure_pa * pow(base_ratio, exponent);
+    return positive_and_finite(launch_conditions.pressure_pa) &&
+           positive_and_finite(launch_conditions.temperature_k);
 }
 
-// atmosphere density = pressure / (specific gas constant * temperature)
-// THE number that ends up in the rocket's drag equation
-double atmosphere_density_kgm3(double height_above_ground_m,
-                               const GroundConditions* ground)
+// --------------------------------------------------------------------------------
+// Troposphere equations
+// --------------------------------------------------------------------------------
+
+// Rule 1, temperature drops in a straight line: T = T0 - L * h
+double calc_temperature_k(const AtmosphereConditions& launch_conditions,
+                          double altitude_m)
 {
-    const double temperature_k =
-        atmosphere_temperature_k(height_above_ground_m, ground);
-    const double pressure_pa =
-        atmosphere_pressure_pa(height_above_ground_m, ground);
-    return pressure_pa / (SPECIFIC_GAS_CONSTANT_DRY_AIR * temperature_k);
+    return launch_conditions.temperature_k - LapseRateKPerM * altitude_m;
 }
 
-// Returns standard ground conditions at a given elevation
-// Calculated as if sea level were the ground and elevation_m were the height above it
-GroundConditions ground_conditions_for_elevation_m(double elevation_m)
+// Rule 2, barometric formula: P = P0 * (T / T0) ^ 5.25588
+double calc_pressure_pa(const AtmosphereConditions& launch_conditions,
+                        double altitude_m)
 {
-    GroundConditions sea_level_ground = {ISA_SEA_LEVEL_TEMPERATURE_K,
-                                         ISA_SEA_LEVEL_PRESSURE_PA};
-    GroundConditions ground;
-    ground.temperature_k =
-        atmosphere_temperature_k(elevation_m, &sea_level_ground);
-    ground.pressure_pa = atmosphere_pressure_pa(elevation_m, &sea_level_ground);
-    return ground;
+    const double temperature =
+        calc_temperature_k(launch_conditions, altitude_m) /
+        launch_conditions.temperature_k;
+    return launch_conditions.pressure_pa *
+           std::pow(temperature, PressureExponent);
 }
+
+// Run both rules 1 and 1, checks the inputs before and results after
+bool calc_conditions(const AtmosphereConditions& launch_conditions,
+                     double altitude_m, AtmosphereConditions& conditions_out)
+{
+    // Check altitude and atmosphere conditions are valid numbers
+    if (!std::isfinite(altitude_m) ||
+        !launch_conditions_valid(launch_conditions))
+    {
+        return false;
+    }
+
+    const AtmosphereConditions conditions{
+        .pressure_pa = calc_pressure_pa(launch_conditions, altitude_m),
+        .temperature_k = calc_temperature_k(launch_conditions, altitude_m)};
+
+    if (!positive_and_finite(conditions.pressure_pa) ||
+        !positive_and_finite(conditions.temperature_k))
+    {
+        return false;
+    }
+    conditions_out = conditions;
+    return true;
+}
+
+}  // namespace
+
+// --------------------------------------------------------------------------------
+// Atmosphere class
+// --------------------------------------------------------------------------------
+
+Atmosphere::Atmosphere(const AtmosphereConditions& launch_conditions_)
+    : launch_conditions{launch_conditions_}
+{
+}
+
+// Standard conditions at a launch site, used as launch conditions until real ones are measured
+bool Atmosphere::standard_atmosphere(
+    double elevation_m, AtmosphereConditions& launch_conditions_out)
+{
+    const AtmosphereConditions sea_level{.pressure_pa = SeaLevelPressurePa,
+                                         .temperature_k = SeaLevelTemperatureK};
+    return calc_conditions(sea_level, elevation_m, launch_conditions_out);
+}
+
+// Safety checks that launch conditions are physically possible
+bool Atmosphere::is_valid() const
+{
+    return launch_conditions_valid(launch_conditions);
+}
+
+// Rule 3, ideal gas law: density = P / (Rs * T)
+bool Atmosphere::density_kgm3(double altitude_m, double& density_out) const
+{
+    AtmosphereConditions conditions{};
+    if (!calc_conditions(launch_conditions, altitude_m, conditions))
+    {
+        return false;
+    }
+    density_out = conditions.pressure_pa /
+                  (SpecificGasConstantAir * conditions.temperature_k);
+    return true;
+}
+
+// Simulated barometer for SITL testing, gives pressure and temperature
+bool Atmosphere::sim_barometer(double altitude_m,
+                               AtmosphereConditions& conditions_out) const
+{
+    return calc_conditions(launch_conditions, altitude_m, conditions_out);
+}
+
+}  // namespace LBR

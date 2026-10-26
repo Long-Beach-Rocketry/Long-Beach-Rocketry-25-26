@@ -5,16 +5,15 @@
 * @date 9-30-2026
 */
 
-#ifndef ROCKET_DYNAMICS_H
-#define ROCKET_DYNAMICS_H
+#pragma once
 
-// Named reference values for airbrake retraction and deployment degrees
-// In SITL pipeline, flap angle arrives already resolved from Actuator Model
-#define AIRBRAKE_RETRACTED_DEG 0.0
-#define AIRBRAKE_DEPLOYED_DEG 30.0
+namespace LBR
+{
 
-// Rocket's variables (time, position, mass, etc) at any given instant
-typedef struct
+/**
+ * @brief Rocket's variables (time, position, mass, etc) at any given instant
+ */
+struct RocketVariables
 {
     double time_s;
     double x_m;
@@ -24,43 +23,73 @@ typedef struct
     double acceleration_x_mps2;
     double acceleration_y_mps2;
     double mass_kg;
-} RocketVariables;
+};
 
-// Rocket's physical characteristics that remain constant during simulation
-// The flap angle is controlled separately and may change during simulation
-// Referenced as Static Properties in LBR Airbrake Simulation Testing Pipeline
-typedef struct
+/**
+ * @brief Airbrake properties, each flap should be identical
+ */
+struct AirbrakeProperties
 {
-    double rocket_coefficient_of_drag;
-    double rocket_reference_area_m2;
-    double flap_coefficient_of_drag;
-    double flap_reference_area_m2;
-    int number_of_flaps;
-    double flap_angle_deg;  // Flap angle does change
-} RocketStaticProperties;
+    int count;                   // Number of deployable flaps
+    double reference_area_m2;    // Reference area of a single flap
+    double coefficient_of_drag;  // Drag coefficient of a single flap
+    double angle_deg;            // Current flap angle
+};
 
-// Rocket properties that may change during simulation.
-// Referenced as Dynamic Properties in LBR Airbrake Simulation Testing Pipeline
-typedef struct
+/** 
+ * @brief Physical characteristics of the rocket body and its airbrake flaps
+ */
+struct RocketProperties
 {
-    double dt_s;
-    double thrust_n;
-    double body_angle_deg;
-    double gravity_mps2;
-    double air_density_kgm3;
-} RocketDynamicProperties;
+    double rocket_coefficient_of_drag;  // Drag coefficient of the body
+    double rocket_reference_area_m2;    // Reference area of the body
+    AirbrakeProperties flaps;           // Airbrake: count, area, cd, angle
+};
 
-#ifdef __cplusplus
-extern "C"
+/**
+ * @brief Values from outside the rocket model that one step needs
+ */
+struct FlightInputs
 {
-#endif
+    double dt_s;              // Time step
+    double thrust_n;          // Motor thrust, 0 after burnout
+    double body_angle_deg;    // Tilt from vertical, 0 = straight up
+    double air_density_kgm3;  // From the atmosphere model
+};
 
-    // Updates the rocket's dynamic states in one simulation time step
-    RocketVariables update_rocket_dynamics(
-        const RocketVariables* current, const RocketStaticProperties* property,
-        const RocketDynamicProperties* sim);
+class RocketDynamicModel
+{
+public:
+    /**
+     * @brief Creates the rocket model
+     * @param properties_ Rocket body and airbrake characteristics
+     */
+    explicit RocketDynamicModel(const RocketProperties& properties_);
 
-#ifdef __cplusplus
-}
-#endif
-#endif
+    /**
+     * @brief Updates the rocket by one time step
+     * @param current The rocket's variables right now
+     * @param inputs Time step, thrust, tilt, and air density
+     * @param next_out Filled with rocket's variables after dt_s seconds
+     * @return true if successful, false otherwise
+     */
+    bool step(const RocketVariables& current, const FlightInputs& inputs,
+              RocketVariables& next_out) const;
+
+    /**
+     * @brief Sets the flap angle used in drag calculation. MPC will use this to search for best angle.
+     * @param angle_deg Requested flap_angle
+     * @return true if successful, false otherwise
+     */
+    bool set_flap_angle_deg(double angle_deg);
+
+    /**
+     * @return Current flap angle
+     */
+    double get_flap_angle_deg() const;
+
+private:
+    RocketProperties properties;
+};
+
+}  // namespace LBR

@@ -1,49 +1,67 @@
-/* 
+/** 
 * @file atmosphere.h
 * @author Mario Cruz
-* @brief Generic ISA/barometric physics (not specific to SITL),
-*        reusable for future applications needing atmospheric physics
+* @brief International Standard Atmosphere (ISA) troposphere model
 * @date 9-30-2026
 */
 
-#ifndef ATMOSPHERE_H
-#define ATMOSPHERE_H
+#pragma once
 
-// Ground-level temperature and pressure measured at the launch pad
-// Used as the starting point for all altitude calculations below
-typedef struct
+namespace LBR
 {
-    double temperature_k;
-    double pressure_pa;
-} GroundConditions;
 
-// Standard sea-level reference conditions, used only as placeholders
-// While real ground conditions haven't been measured yet
-#define ISA_SEA_LEVEL_TEMPERATURE_K 288.15  // 15°C, standard day
-#define ISA_SEA_LEVEL_PRESSURE_PA 101325.0  // 1 atmosphere
-
-#ifdef __cplusplus
-extern "C"
+/**
+ * @brief Pressure and temperature measured at a given altitude
+ */
+struct AtmosphereConditions
 {
-#endif
+    double pressure_pa;    // Pascal
+    double temperature_k;  // Kelvin
+};
 
-    // Returns temperature at given height above ground level
-    double atmosphere_temperature_k(double height_above_ground_m,
-                                    const GroundConditions* ground);
+class Atmosphere
+{
+public:
+    /**
+     * @brief Creates the atmosphere model for one launch
+     * @param launch_conditions_ Measured pressure and temperature at launch site. Every calculation starts from here
+     */
+    explicit Atmosphere(const AtmosphereConditions& launch_conditions_);
 
-    // Returns pressure at given height above ground level
-    double atmosphere_pressure_pa(double height_above_ground_m,
-                                  const GroundConditions* ground);
+    /**
+     * @brief Standard conditions at a launch site, used as launch conditions until real ones are measured
+     * @param elevation_m Launch pad elevation above sea level
+     * @param launch_conditions_out Filled with the site's standard conditions
+     * @return true if successful, false if elevation_m isn't valid
+     */
+    static bool standard_atmosphere(
+        double elevation_m, AtmosphereConditions& launch_conditions_out);
 
-    // Returns air density at a given height above ground level
-    double atmosphere_density_kgm3(double height_above_ground_m,
-                                   const GroundConditions* ground);
+    /**
+     * @brief Safety checks that conditions are physically possible
+     * @return true if pressure and temperature are positive real numbers
+     */
+    bool is_valid() const;
 
-    // Returns ground conditions for a given site elevation
-    // Placeholder until real measured conditions are available
-    GroundConditions ground_conditions_for_elevation_m(double elevation_m);
+    /**
+     * @brief Computes the air density at a given altitude, used in the drag equation
+     * @param altitude_m Altitude above the launch pad, not sea level
+     * @param density_out Filled with computed air density
+     * @return true if successful, false otherwise
+     */
+    bool density_kgm3(double altitude_m, double& density_out) const;
 
-#ifdef __cplusplus
-}
-#endif
-#endif
+    /**
+     * @brief Sim barometer for SITL testing, computes the pressure and temperature at a given altitude
+     * @param altitude_m Altitude above the launch pad, not sea level
+     * @param conditions_out Filled with the computed pressure and temperature at altitude_m
+     * @return true if successful, false otherwise
+     */
+    bool sim_barometer(double altitude_m,
+                       AtmosphereConditions& conditions_out) const;
+
+private:
+    AtmosphereConditions
+        launch_conditions;  // Measured pressure and temperature at launch site
+};
+}  // namespace LBR
