@@ -3,7 +3,8 @@
 */
 #pragma once
 
-#include <cstddef>
+#include <cstdio>
+#include <cstring>
 #include "usart.h"
 
 namespace LBR
@@ -11,14 +12,14 @@ namespace LBR
 class Logger
 {
 private:
-    Usart& uart;
+    Usart& usart;
     static const std::size_t MAX_LOG_MESSAGE_LENGTH = 128;
 
     /*
      * @brief Checks if size is valid with MAX_LOG_MESSAGE_LENGTH
      *
      * @param message Type const char* 
-     */    
+     */
     bool size_check(const char* message) const;
 
     /*
@@ -26,11 +27,10 @@ private:
      *
      * @param prefix LOG prefix eg. "LOG DEBUG >> : "
      * @param message Type const char* 
-     */    
+     */
     bool format_and_send(const char* prefix, const char* message);
 
-public: 
-
+public:
     /*
      * @brief Initializes the logger with USART
      *
@@ -57,5 +57,4 @@ public:
     bool print_all(const char* message);
 };
 
-}
-
+}  // namespace LBR
