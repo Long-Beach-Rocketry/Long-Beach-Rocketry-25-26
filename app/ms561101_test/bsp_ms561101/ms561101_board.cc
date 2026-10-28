@@ -30,11 +30,11 @@ Stmh7::HwGpio scl(scl_params);
 Stmh7::HwGpio sda(sda_params);
 
 // Create MS5611 object
-static constexpr uint8_t kMs5611Address{0x76};
-const ms561101Params barometer_params{i2c, kMs5611Address};
-ms561101 barometer(barometer_params);
+static constexpr uint8_t kMs5611Address{0x77};
+const Ms561101Params barometer_params{i2c, kMs5611Address};
+Ms561101 barometer(barometer_params);
 
-Board board{.barometer = barometer};
+Board board{.i2c = i2c, .barometer = barometer};
 
 bool bsp_init()
 {

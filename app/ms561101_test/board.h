@@ -7,8 +7,8 @@ namespace LBR
 
 struct Board
 {
-    ms561101& barometer;
-    
+    I2c& i2c;
+    Ms561101& barometer;
 };
 
 bool bsp_init(void);

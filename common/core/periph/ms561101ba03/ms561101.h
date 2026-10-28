@@ -41,9 +41,10 @@ class Ms561101
 public:
     explicit Ms561101(const Ms561101Params& params);
 
-    bool init();
-    float get_pressure();
-    float get_temperature();
+    bool init(void);
+    bool get_pressure(float& pressure);
+    bool get_temperature(float& temperature);
+    ~Ms561101() = default;
 
 private:
     I2c& _i2c;
@@ -51,13 +52,13 @@ private:
     uint8_t _dev_addr;
     Ms561101CalibCoeffs _calib_coeffs{};
     Ms561101RawData _raw_data{};
-    
+
     //function
     bool get_calib_coeffs(void);
     bool get_raw_data(void);
     float compensate_pressure(void);
     float compensate_temperature(void);
-    uint16_t read_coeff(uint8_t address);
+    bool read_coeff(uint8_t address, uint16_t& value);
 };
 
-} // namespace LBR
+}  // namespace LBR
