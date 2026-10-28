@@ -3,7 +3,7 @@
 // #include "logger.h"
 #include "usart.h"
 
-extern uint8_t rxb;
+// extern uint8_t rxb;
 
 namespace LBR
 {

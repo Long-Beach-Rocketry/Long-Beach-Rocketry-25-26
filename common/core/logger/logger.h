@@ -3,6 +3,7 @@
 */
 #pragma once
 
+#include <cstdint>
 #include <cstdio>
 #include <cstring>
 #include "usart.h"
@@ -13,7 +14,7 @@ class Logger
 {
 private:
     Usart& usart;
-    static const std::size_t MAX_LOG_MESSAGE_LENGTH = 128;
+    static const std::size_t MAX_LOG_MESSAGE_LENGTH = 32;
 
     /*
      * @brief Checks if size is valid with MAX_LOG_MESSAGE_LENGTH

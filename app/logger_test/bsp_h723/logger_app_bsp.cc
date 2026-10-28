@@ -60,16 +60,16 @@ Board& get_board()
     return board;
 }
 
-extern "C" void USART3_IRQHandler(void)
-{
-    if (usart.get_addr()->ISR & USART_ISR_RXNE_RXFNE)
-    {
-        if (board.usart.receive(rxb))
-        {
-            // received 1 byte, echo back
-            std::span<const uint8_t> tx_span(&rxb, 1);
-            board.usart.send(tx_span);
-        }
-    }
-}
+// extern "C" void USART3_IRQHandler(void)
+// {
+//     if (usart.get_addr()->ISR & USART_ISR_RXNE_RXFNE)
+//     {
+//         if (board.usart.receive(rxb))
+//         {
+//             // received 1 byte, echo back
+//             std::span<const uint8_t> tx_span(&rxb, 1);
+//             board.usart.send(tx_span);
+//         }
+//     }
+// }
 }  // namespace LBR

@@ -26,13 +26,14 @@ if (TARGET logger_app_bsp)
         -Wl,--gc-sections
     )
     target_link_libraries_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
-        logger 
+        logger
     )
 
     if (TARGET logger_app_bsp)
         target_link_libraries_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
             logger_app_bsp
             logger
+
         )
     endif()
 
