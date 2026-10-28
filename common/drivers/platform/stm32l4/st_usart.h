@@ -17,7 +17,7 @@ private:
     USART_TypeDef* base_addr;
     uint16_t uartdiv;
 
-public:
+public: 
     /**
      * @brief Paramterized contructor which initilazes important values for specific USART object.
      * 

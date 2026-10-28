@@ -9,7 +9,8 @@ target_include_directories(logger_app_bsp PUBLIC
 
 target_link_libraries(logger_app_bsp
     PUBLIC
-        driver
-        core
-        bus
+    ${CMAKE_CURRENT_LIST_DIR}
+        # driver
+        # core
+        # bus
 )
