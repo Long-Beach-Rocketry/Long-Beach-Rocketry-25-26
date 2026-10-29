@@ -3,6 +3,13 @@
 #include "st_gpio.h"
 #include "st_i2c.h"
 
+extern "C" void IncDelayTicks(void);
+
+extern "C" void SysTick_Handler(void)
+{
+    IncDelayTicks();
+}
+
 namespace LBR
 {
 // SCL pin config (PB8)
@@ -38,21 +45,24 @@ Board board{.i2c = i2c, .barometer = barometer};
 
 bool bsp_init()
 {
+    // Start the millisecond timebase
+    SystemCoreClockUpdate();
+
+    if (SysTick_Config(SystemCoreClock / 1000U) != 0U)
+    {
+        return false;
+    }
     // Enable peripheral clocks
     RCC->AHB4ENR |= RCC_AHB4ENR_GPIOBEN;
     RCC->APB1LENR |= RCC_APB1LENR_I2C1EN;
 
     // Initialize I2C and pins
-    bool ret = true;
+    const bool sda_ok = sda.init();
+    const bool scl_ok = scl.init();
+    const bool i2c_ok = i2c.init();
+    const bool barometer_ok = barometer.init();
 
-    ret = ret && sda.init();
-    ret = ret && scl.init();
-    ret = ret && i2c.init();
-
-    // Initialize sensor
-    ret = ret && barometer.init();
-
-    return ret;
+    return sda_ok && scl_ok && i2c_ok && barometer_ok;
 }
 
 Board& get_board()

@@ -1,7 +1,7 @@
 #include "ms561101.h"
 #include <array>
+#include "delay.h"
 #include "reg_helpers.h"
-
 /*Register and bit definitions*/
 static constexpr uint8_t REST{0x1E};
 static constexpr uint8_t PROM{0xA0};
@@ -27,23 +27,6 @@ Ms561101::Ms561101(const Ms561101Params& params)
 {
 }
 
-/*
-uint16_t Ms561101::get_pressure()
-{
-    get_raw_data();
-    compensate_temperature();
-    return compensate_pressure();
-}
-
-uint16_t Ms561101::get_temperature()
-{
-    get_raw_data();
-    return compensate_temperature();
-}
-
-
-*/
-
 bool Ms561101::get_temperature(float& temperature)
 {
     if (!get_raw_data())
@@ -62,9 +45,10 @@ bool Ms561101::get_pressure(float& pressure)
         return false;
     }
 
-    pressure = compensate_pressure() / 100.0f;
+    pressure = compensate_pressure();
     return true;
 }
+
 // read each individually one at the time
 bool Ms561101::read_coeff(uint8_t address, uint16_t& value)
 {
@@ -82,24 +66,18 @@ bool Ms561101::read_coeff(uint8_t address, uint16_t& value)
 
 bool Ms561101::get_calib_coeffs(void)
 {
-    uint16_t c1{};
-    uint16_t c2{};
-    uint16_t c3{};
-    uint16_t c4{};
-    uint16_t c5{};
-    uint16_t c6{};
+    Ms561101CalibCoeffs coeffs{};
+    if (!read_coeff(0xA2, coeffs.c1) || !read_coeff(0xA4, coeffs.c2) ||
+        !read_coeff(0xA6, coeffs.c3) || !read_coeff(0xA8, coeffs.c4) ||
+        !read_coeff(0xAA, coeffs.c5) || !read_coeff(0xAC, coeffs.c6))
+    {
+        return false;
+    }
 
-    // read the calibration data
-    // the read coefficient is 0xA0 + shift left one
-    // Store the coefficients
-    _calib_coeffs.c1 = c1;
-    _calib_coeffs.c2 = c2;
-    _calib_coeffs.c3 = c3;
-    _calib_coeffs.c4 = c4;
-    _calib_coeffs.c5 = c5;
-    _calib_coeffs.c6 = c6;
+    _calib_coeffs = coeffs;
     return true;
 }
+
 bool Ms561101::get_raw_data(void)
 {
     // read(): recieve the byte from I2C
@@ -111,6 +89,8 @@ bool Ms561101::get_raw_data(void)
     {
         return false;
     }
+
+    LBR::Utils::DelayMs(3);
 
     // 24 bits of adcs = 3 bytes
     std::array<std::uint8_t, 3> pressure{};
@@ -125,6 +105,8 @@ bool Ms561101::get_raw_data(void)
     {
         return false;
     }
+
+    LBR::Utils::DelayMs(3);
 
     // get the temperature
     std::array<uint8_t, 3> temperature{};
@@ -175,7 +157,7 @@ float Ms561101::compensate_pressure(void)
     const int64_t pressure =
         (static_cast<int64_t>(_raw_data.d1) * sens / 2097152 - off) / 32768;
 
-    return static_cast<float>(pressure) / 100.0f;
+    return static_cast<float>(pressure);
 }
 
 float Ms561101::compensate_temperature(void)
@@ -199,6 +181,7 @@ bool Ms561101::init()
     {
         return false;
     }
+    LBR::Utils::DelayMs(3);
 
     return get_calib_coeffs();
 }
