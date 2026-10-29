@@ -72,6 +72,7 @@ static bool IsConsistent(const ConsistentSnapshot& snapshot)
         return false;
     }
 
+    // Check that the sequence number matches the expected value for all elements in the array
     for (uint32_t value : snapshot.values)
     {
         if (value != static_cast<uint32_t>(snapshot.sequence))
@@ -330,6 +331,7 @@ TEST_F(SeqLockTest, ConcurrentSingleWriterMultiReaderNoTornReads)
 
     for (size_t r = 0; r < kNumReaders; ++r)
     {
+        // Each reader will keep reading until the done flag is set
         readers.emplace_back(ReadUntilDone, std::cref(lock), std::cref(done),
                              std::ref(total_successful_reads),
                              std::ref(torn_read_count));
