@@ -16,14 +16,14 @@ private:
     Usart& usart;
     static const std::size_t MAX_LOG_MESSAGE_LENGTH = 32;
 
-    /*
+    /**
      * @brief Checks if size is valid with MAX_LOG_MESSAGE_LENGTH
      *
      * @param message Type const char* 
      */
     bool size_check(const char* message) const;
 
-    /*
+    /**
      * @brief Formats and sends message for individual function call
      *
      * @param prefix LOG prefix eg. "LOG DEBUG >> : "
@@ -32,7 +32,7 @@ private:
     bool format_and_send(const char* prefix, const char* message);
 
 public:
-    /*
+    /**
      * @brief Initializes the logger with USART
      *
      * @param uart The base address of the USART peripheral
@@ -40,7 +40,7 @@ public:
 
     Logger(Usart& uart);
 
-    /*
+    /**
      * @brief Convert string into char buffer
      *
      * @param message Type const char* 
@@ -50,7 +50,7 @@ public:
     bool log_warn(const char* message);
     bool log_info(const char* message);
 
-    /*
+    /**
      * @brief (Feature) Prints all logs 
      *
      * @param message Type const char* 
