@@ -80,9 +80,11 @@ bool Ms561101::get_calib_coeffs(void)
 
 bool Ms561101::get_raw_data(void)
 {
-    // read(): recieve the byte from I2C
-    // write(): send bytes froms Stm32 to sensor
-    // the I2C does not accept one byte, need the group of byte
+    /*
+    read(): recieve the byte from I2C
+    write(): send bytes froms Stm32 to sensor
+    the I2C does not accept one byte, need the group of byte
+    */
     std::array<std::uint8_t, 1> command{D1};
 
     if (!_i2c.write(command, _dev_addr))
@@ -123,7 +125,16 @@ bool Ms561101::get_raw_data(void)
                    temperature[2];
     return true;
 }
-
+/**
+ * Pressure compensation formula:
+ * dT   = D2 - C5 × 2^8
+ * TEMP = 2000 + dT × C6 / 2^23
+ * OFF  = C2 × 2^16 + C4 × dT / 2^7
+ * SENS = C1 × 2^15 + C3 × dT / 2^8
+ *
+ * If TEMP < 2000, apply the low-temperature corrections to OFF and SENS.
+ * P = (D1 × SENS / 2^21 - OFF) / 2^15
+ */
 float Ms561101::compensate_pressure(void)
 {
     // static_cast: which number type to use for a calculation.
@@ -154,12 +165,19 @@ float Ms561101::compensate_pressure(void)
         sens -= sens2;
     }
 
-    const int64_t pressure =
-        (static_cast<int64_t>(_raw_data.d1) * sens / 2097152 - off) / 32768;
+    const float pressure =
+        (static_cast<float>(_raw_data.d1) * sens / 2097152 - off) / 32768;
 
     return static_cast<float>(pressure);
 }
-
+/**
+ * Temperature compensation formula:
+ * dT   = D2 - C5 × 2^8
+ * TEMP = 2000 + dT × C6 / 2^23
+ *
+ * If TEMP < 2000, apply the second-order temperature correction.
+ * Return TEMP / 100 as degrees Celsius.
+ */
 float Ms561101::compensate_temperature(void)
 {
     const int64_t dT{static_cast<int64_t>(_raw_data.d2) -

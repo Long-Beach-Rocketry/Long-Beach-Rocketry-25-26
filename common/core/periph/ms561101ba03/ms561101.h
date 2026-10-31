@@ -1,3 +1,10 @@
+/**
+ * @file ms561101.h
+ * @brief <description>
+ * @author Hai Phan
+ * @date 10/31/2026
+ */
+
 #pragma once
 #include <cstdint>
 #include "i2c.h"
@@ -13,13 +20,14 @@ struct Ms561101Params
 
 struct Ms561101CalibCoeffs
 {
-    // C1: Pressure sensitivity
-    // C2: Pressure offset
-    // C3: Temperature coefficient of pressure sensitivity
-    // C4: Temperature coefficient of pressure offset
-    // C5: Reference temperature
-    // C6: Temperature coefficient of temperature
-
+    /*
+    C1: Pressure sensitivity
+    C2: Pressure offset
+    C3: Temperature coefficient of pressure sensitivity
+    C4: Temperature coefficient of pressure offset
+    C5: Reference temperature
+    C6: Temperature coefficient of temperature
+    */
     uint16_t c1{};
     uint16_t c2{};
     uint16_t c3{};
@@ -30,8 +38,10 @@ struct Ms561101CalibCoeffs
 
 struct Ms561101RawData
 {
-    // D1: Digital pressure value
-    // D2: Digital temperature value
+    /*
+    D1: Digital pressure value
+    D2: Digital temperature value
+    */
     uint32_t d1{};
     uint32_t d2{};
 };
@@ -53,11 +63,25 @@ private:
     Ms561101CalibCoeffs _calib_coeffs{};
     Ms561101RawData _raw_data{};
 
-    //function
+    /**
+    * @brief Reads the factory calibration coefficients from the sensor PROM.
+    */
     bool get_calib_coeffs(void);
+    /**
+    * @brief Reads the raw pressure (D1) and temperature (D2) values from the sensor.
+    */
     bool get_raw_data(void);
+    /**
+    * @brief Calculates compensated pressure using the raw readings and calibration coefficients.
+    */
     float compensate_pressure(void);
+    /**
+    * @brief Calculates compensated temperature using the raw readings and calibration coefficients.
+    */
     float compensate_temperature(void);
+    /**
+    * @brief Reads one calibration coefficient from the specified PROM address.
+    */
     bool read_coeff(uint8_t address, uint16_t& value);
 };
 
