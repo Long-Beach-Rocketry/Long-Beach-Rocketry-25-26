@@ -17,4 +17,17 @@ if("${TARGET_DEVICE}" MATCHES "^(NATIVE|SITL)$")
     )
 
     add_test(NAME ring_buffer_test COMMAND ring_buffer_test)
+
+    add_executable(seqlock_test
+        seqlock_test.cc
+    )
+
+    target_link_libraries(seqlock_test
+        PRIVATE
+            container
+            GTest::gtest_main
+            pthread
+    )
+
+    add_test(NAME seqlock_test COMMAND seqlock_test)
 endif()
