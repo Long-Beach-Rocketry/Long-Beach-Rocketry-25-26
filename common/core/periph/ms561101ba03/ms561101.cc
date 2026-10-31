@@ -168,7 +168,7 @@ float Ms561101::compensate_pressure(void)
     const float pressure =
         (static_cast<float>(_raw_data.d1) * sens / 2097152 - off) / 32768;
 
-    return static_cast<float>(pressure);
+    return pressure;
 }
 /**
  * Temperature compensation formula:

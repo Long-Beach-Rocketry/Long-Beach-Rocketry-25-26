@@ -1,6 +1,6 @@
 /**
  * @file ms561101.h
- * @brief <description>
+ * @brief Declares the MS5611 barometric pressure and temperature sensor driver.
  * @author Hai Phan
  * @date 10/31/2026
  */
@@ -63,25 +63,36 @@ private:
     Ms561101CalibCoeffs _calib_coeffs{};
     Ms561101RawData _raw_data{};
 
-    /**
-    * @brief Reads the factory calibration coefficients from the sensor PROM.
-    */
+     /**
+     * @brief Reads the factory calibration coefficients from the sensor PROM.
+     * @return true if all coefficients are read successfully; otherwise, false.
+     */
     bool get_calib_coeffs(void);
+
     /**
-    * @brief Reads the raw pressure (D1) and temperature (D2) values from the sensor.
-    */
+     * @brief Reads the raw pressure (D1) and temperature (D2) values from the sensor.
+     * @return true if both raw values are read successfully; otherwise, false.
+     */
     bool get_raw_data(void);
+
     /**
-    * @brief Calculates compensated pressure using the raw readings and calibration coefficients.
-    */
+     * @brief Calculates compensated pressure using the raw readings and calibration coefficients.
+     * @return The compensated pressure value.
+     */
     float compensate_pressure(void);
+
     /**
-    * @brief Calculates compensated temperature using the raw readings and calibration coefficients.
-    */
+     * @brief Calculates compensated temperature using the raw readings and calibration coefficients.
+     * @return The compensated temperature in degrees Celsius.
+     */
     float compensate_temperature(void);
+
     /**
-    * @brief Reads one calibration coefficient from the specified PROM address.
-    */
+     * @brief Reads one calibration coefficient from the specified PROM address.
+     * @param address PROM address of the coefficient to read.
+     * @param value Receives the coefficient value.
+     * @return true if the coefficient is read successfully; otherwise, false.
+     */
     bool read_coeff(uint8_t address, uint16_t& value);
 };
 
