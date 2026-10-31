@@ -63,10 +63,10 @@ private:
     Ms561101CalibCoeffs _calib_coeffs{};
     Ms561101RawData _raw_data{};
 
-     /**
+    /**
      * @brief Reads the factory calibration coefficients from the sensor PROM.
      * @return true if all coefficients are read successfully; otherwise, false.
-     */
+    */
     bool get_calib_coeffs(void);
 
     /**
