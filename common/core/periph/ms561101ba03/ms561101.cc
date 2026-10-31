@@ -9,7 +9,7 @@ static constexpr uint8_t D1{0x40};
 static constexpr uint8_t D2{0x50};
 static constexpr uint8_t ADC_result{0x00};
 
-static constexpr int64_t PRESSURE_SENS_DIVISOR{2097152};  
+static constexpr int64_t PRESSURE_SENS_DIVISOR{2097152};
 static constexpr int64_t PRESSURE_DIVISOR{32768};
 
 /*Conversion Factors For Coefficients: Read the data sheet*/
@@ -169,7 +169,9 @@ float Ms561101::compensate_pressure(void)
     }
 
     const float pressure =
-        (static_cast<float>(_raw_data.d1) * sens / PRESSURE_SENS_DIVISOR - off) / PRESSURE_DIVISOR;
+        (static_cast<float>(_raw_data.d1) * sens / PRESSURE_SENS_DIVISOR -
+         off) /
+        PRESSURE_DIVISOR;
 
     return pressure;
 }
