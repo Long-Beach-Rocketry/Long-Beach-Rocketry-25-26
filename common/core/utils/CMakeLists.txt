@@ -1,5 +1,6 @@
 add_library(utils STATIC
     reg_helpers.cc
+    string_span.cc
 )
 
 target_include_directories(utils PUBLIC
