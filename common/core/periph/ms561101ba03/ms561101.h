@@ -50,9 +50,26 @@ class Ms561101
 {
 public:
     explicit Ms561101(const Ms561101Params& params);
-
+    /**
+    * @brief Initializes the MS5611 pressure sensor.
+    *
+    * @return true if initialization succeeds; otherwise, false.
+    */
     bool init(void);
+
+    /**
+    * @brief Reads the atmospheric pressure.
+    *
+    * @param[out] pressure Pressure reading, in the units used by the driver.
+    * @return true if the reading succeeds; otherwise, false.
+    */
     bool get_pressure(float& pressure);
+    /**
+    * @brief Reads the sensor temperature.
+    *
+    * @param[out] temperature Temperature reading, in the units used by the driver.
+    * @return true if the reading succeeds; otherwise, false.
+    */
     bool get_temperature(float& temperature);
     ~Ms561101() = default;
 
