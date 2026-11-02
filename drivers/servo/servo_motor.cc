@@ -47,13 +47,9 @@ bool ServoMotor::init()
         return false;
     }
 
-    if (!pwm.init())
-    {
-        return false;
-    }
-
     initialized = true;
-    return true;
+
+    return set_angle(0);
 }
 
 bool ServoMotor::set_angle(uint16_t angle)
@@ -82,19 +78,18 @@ uint8_t ServoMotor::calculate_duty_cycle(uint16_t angle) const
 {
     // Linearly map the angle to a pulse width, then convert it to a
     // duty-cycle percentage: (pulse width / PWM period) * 100.
-    const uint32_t pulse_range = (max_pulse_width) - (min_pulse_width);
+    const uint32_t pulse_range = static_cast<uint32_t>(max_pulse_width) -
+                                 static_cast<uint32_t>(min_pulse_width);
 
-    const uint32_t pulse_width =
-        (min_pulse_width) + (pulse_range * angle) / max_angle;
+    const uint32_t pulse_width = static_cast<uint32_t>(min_pulse_width) +
+                                 (pulse_range * angle) / max_angle;
 
     const uint32_t duty_cycle = (pulse_width * 100U + period / 2U) / period;
 
     return static_cast<uint8_t>(duty_cycle);
 }
-
 uint16_t ServoMotor::get_angle() const
 {
     return current_angle;
 }
-
 }  // namespace LBR

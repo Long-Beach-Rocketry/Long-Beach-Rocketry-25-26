@@ -14,7 +14,7 @@ if (TARGET pwm_bsp)
     add_executable_for(${TARGET_DEVICE} ${EXECUTABLE} ${LDF}
         main.cc
         ${STARTUP_FILE}
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../drivers/servo/servo_motor.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../drivers/servo/servo_motor.cc
     )
 
     target_include_directories_for(${TARGET_DEVICE} ${EXECUTABLE}
