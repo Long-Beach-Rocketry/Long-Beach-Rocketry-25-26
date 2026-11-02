@@ -232,12 +232,6 @@ Replace `<preset>` with the build preset you are using for your board or environ
 
 Example presets: `stm32h723`, `stm32l476`, `native`.
 
-### Windows PowerShell
-
-```powershell
-./make.ps1 -t <preset>
-```
-
 ### Useful options
 
 - Build only one app target:
@@ -282,18 +276,25 @@ lsusb
 4. In VS Code, open Run and Debug, pick the appropriate launch configuration, then start debugging.
 
 Note: once attached to WSL, ST-Link is available to the Dev Container.
+Note 2: If you want to disconnect USB cleanly after attaching and bind: `usbipd detach --busid <BUSID>`
+
 
 ## 9) UART Serial Monitor (Optional)
 
-In WSL:
-
+In WSL terminal:
+ Install minicom with:
 ```bash
 sudo apt install -y minicom
-ls /dev/tty*
-minicom -D <serial-port>
-```
 
-Use the serial device shown by `ls /dev/tty*`.
+
+View ports with:
+`sudo dmesg | grep tty`
+
+View UART with Minicom with something like
+`minicom -D /dev/ttyUSB0`
+`minicom -D /dev/ttyACM0`
+
+`ctrl`+`A` `X` to close Minicom
 
 ## 10) Team Workflow Tips
 
