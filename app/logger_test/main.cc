@@ -16,9 +16,7 @@ int main(int argc, char** argv)
         logger.log_warn("warn");
         logger.log_info("info");
 
-        for (volatile uint32_t i = 0; i < 1000000; i++)
-        {
-        }
+        delay_ms(1000);
     }
 
     return 0;
