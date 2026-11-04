@@ -1,5 +1,5 @@
 #include "board.h"
-
+#include "logger.h"
 using namespace LBR;
 
 int main(int argc, char** argv)

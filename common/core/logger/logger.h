@@ -1,5 +1,7 @@
 /**
+* @file logger.h
 * @brief Logger module for logging messages for telemetry.
+* @author Aaron Oh
 */
 #pragma once
 
@@ -13,13 +15,14 @@ namespace LBR
 class Logger
 {
 private:
-    Usart& usart;
-    static const std::size_t MAX_LOG_MESSAGE_LENGTH = 32;
+    Usart& _usart;
+    static const std::size_t MAX_LOG_MESSAGE_LENGTH = 64;
 
     /**
      * @brief Checks if size is valid with MAX_LOG_MESSAGE_LENGTH
      *
      * @param message Type const char* 
+     * @return true/false if the message is less than MAX_LOG_MESSAGE_LENGTH
      */
     bool size_check(const char* message) const;
 
@@ -32,30 +35,42 @@ private:
     bool format_and_send(const char* prefix, const char* message);
 
 public:
+
     /**
      * @brief Initializes the logger with USART
      *
      * @param uart The base address of the USART peripheral
      */
-
     Logger(Usart& uart);
 
     /**
-     * @brief Convert string into char buffer
+     * @brief Convert string into char buffer for debug
      *
      * @param message Type const char* 
      */
     bool log_debug(const char* message);
-    bool log_error(const char* message);
-    bool log_warn(const char* message);
-    bool log_info(const char* message);
 
     /**
-     * @brief (Feature) Prints all logs 
+     * @brief Convert string into char buffer for error
      *
      * @param message Type const char* 
      */
-    bool print_all(const char* message);
+    bool log_error(const char* message);
+
+    /**
+     * @brief Convert string into char buffer for warn
+     *
+     * @param message Type const char* 
+     */
+    bool log_warn(const char* message);
+
+    /**
+     * @brief Convert string into char buffer for info
+     *
+     * @param message Type const char* 
+     */
+    bool log_info(const char* message);
+
 };
 
 }  // namespace LBR
