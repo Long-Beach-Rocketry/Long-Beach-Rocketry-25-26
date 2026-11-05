@@ -1,9 +1,7 @@
 #pragma once
 #include "gpio.h"
-// #include "logger.h"
+#include "sys_clock.h"
 #include "usart.h"
-
-// extern uint8_t rxb;
 
 namespace LBR
 {
@@ -12,6 +10,7 @@ struct Board
     Usart& usart;
     Gpio& rx;
     Gpio& tx;
+    Clock& clock;
 };
 
 bool bsp_init();
