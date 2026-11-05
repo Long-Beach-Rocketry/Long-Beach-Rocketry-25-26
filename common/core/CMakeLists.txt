@@ -3,6 +3,7 @@ add_subdirectory(utils)
 add_subdirectory(container)
 add_subdirectory(protobuff)
 add_subdirectory(network)
+add_subdirectory(logger)
 add_subdirectory(cli)
 
 # Make core consumers also get utils and chip_select by adding them to the INTERFACE core target
