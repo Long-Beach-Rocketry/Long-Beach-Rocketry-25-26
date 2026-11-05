@@ -281,11 +281,11 @@ Note 2: If you want to disconnect USB cleanly after attaching and bind: `usbipd 
 
 ## 9) UART Serial Monitor (Optional)
 
-In WSL:
+In WSL terminal:
  Install minicom with:
 ```bash
 sudo apt install -y minicom
-```
+
 
 View ports with:
 `sudo dmesg | grep tty`
@@ -294,7 +294,7 @@ View UART with Minicom with something like
 `minicom -D /dev/ttyUSB0`
 `minicom -D /dev/ttyACM0`
 
-`ctrl+A X` to close Minicom
+`ctrl`+`A` `X` to close Minicom
 
 ## 10) Team Workflow Tips
 
