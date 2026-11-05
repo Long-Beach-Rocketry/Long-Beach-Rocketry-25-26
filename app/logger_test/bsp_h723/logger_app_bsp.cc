@@ -44,7 +44,7 @@ bool bsp_init()
     result &= rx_gpio.init();
 
     result &= usart.init();
-
+    return result;
 }
 
 Board& get_board()

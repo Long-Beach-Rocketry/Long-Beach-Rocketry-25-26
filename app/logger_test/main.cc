@@ -1,4 +1,5 @@
 #include "board.h"
+#include "delay.h"
 #include "logger.h"
 using namespace LBR;
 
@@ -16,7 +17,7 @@ int main(int argc, char** argv)
         logger.log_warn("warn");
         logger.log_info("info");
 
-        delay_ms(1000);
+        LBR::Utils::DelayMs(1000);
     }
 
     return 0;

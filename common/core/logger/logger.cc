@@ -60,7 +60,7 @@ bool Logger::format_and_send(const char* prefix, const char* message)
     }
 
     // Cleans format
-    return usart.send(
+    return _usart.send(
         std::span<const uint8_t>(reinterpret_cast<const uint8_t*>(tx_buffer),
                                  static_cast<std::size_t>(written)));
 }
