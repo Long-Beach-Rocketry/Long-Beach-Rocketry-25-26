@@ -6,18 +6,24 @@ set(PREPROCESS_DEFS
     -DDEF_FLASH_SIZE=1024K
 )
 
-if (TARGET spi_app_bsp)
+
+if (${TARGET_DEVICE} STREQUAL "STM32H723")
+    set(BSP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/app/spi_test/BSP_H723)
+    set(BSP_TARGET spi_bsp)
+elseif(${TARGET_DEVICE} STREQUAL "STM32L476")
+    set(BSP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/app/spi_test/BSP_L476)
+    set(BSP_TARGET spi_app_bsp)
+endif()
+
+if (BSP_TARGET)
+    if (NOT TARGET ${SPI_BSP_TARGET})
+        add_subdirectory(${BSP_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/spi_bsp)
+    endif()
 
     add_executable_for(${TARGET_DEVICE} ${EXECUTABLE} ${LDF}
         main.cc
         ${STARTUP_FILE}
     )
-
-    if (${TARGET_DEVICE} STREQUAL "STM32H723")
-        set(BSP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/app/spi_test/BSP_H723)
-    else()
-        set(BSP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/app/spi_test/BSP_L476)
-    endif()
 
     target_link_options_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
         --specs=nano.specs
@@ -33,7 +39,7 @@ if (TARGET spi_app_bsp)
     )
 
     target_link_libraries_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
-        spi_app_bsp
+        ${BSP_TARGET}
         core
         w25q
     )
