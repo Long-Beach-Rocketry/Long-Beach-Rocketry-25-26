@@ -16,7 +16,7 @@ elseif(${TARGET_DEVICE} STREQUAL "STM32L476")
 endif()
 
 if (BSP_TARGET)
-    if (NOT TARGET ${SPI_BSP_TARGET})
+    if (NOT TARGET ${BSP_TARGET})
         add_subdirectory(${BSP_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/spi_bsp)
     endif()
 
