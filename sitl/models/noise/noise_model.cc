@@ -8,11 +8,13 @@ using namespace std;
 namespace LBR
 {
 
+// initialize owned settings, the seeded generator, and a standard gaussian
+// the gaussian starts with mean zero and standard deviation one
 NoiseModel::NoiseModel(NoiseModelConfig config, uint32_t seed)
     : config_(config), generator_(seed), standard_normal_(0.0, 1.0)
 {
-    // Validate that all noise parameters are finite and that jitter and
-    // quantization resolution are nonnegative before accepting the config.
+    // reject infinities, invalid numbers, and negative jitter or rounding steps
+    // signed bias and drift remain valid because errors can point either way
     if (!isfinite(config_.jitter_stddev) || !isfinite(config_.fixed_bias) ||
         !isfinite(config_.bias_drift_per_s) ||
         !isfinite(config_.quantization_step) ||
@@ -26,6 +28,7 @@ NoiseModel::NoiseModel(NoiseModelConfig config, uint32_t seed)
 
 double NoiseModel::sample(double true_value, double time_s)
 {
+    // reject invalid measurements and times before doing arithmetic
     if (!isfinite(true_value) || !isfinite(time_s) || time_s < 0.0)
     {
         throw invalid_argument(
@@ -33,17 +36,19 @@ double NoiseModel::sample(double true_value, double time_s)
             "and nonnegative simulation time");
     }
 
-    // Absolute simulation time keeps drift independent of sensor sample rate.
-    // A second sample at the same instant therefore has the same drift bias.
+    // absolute time makes drift independent of how often this method is called
+    // the same time keeps the same drift, but each call can draw new jitter
     const double drifting_bias = config_.bias_drift_per_s * time_s;
     double reading = true_value + config_.fixed_bias + drifting_bias;
 
     if (config_.jitter_stddev > 0.0)
     {
-        // Fresh zero-mean Gaussian jitter models reading-to-reading variation.
+        // draw fresh jitter and scale its spread into this channel's units
+        // zero skips the draw, while positive spread is not an error limit
         reading += config_.jitter_stddev * standard_normal_(generator_);
     }
 
+    // finite inputs can still overflow when their errors are combined
     if (!isfinite(reading))
     {
         throw overflow_error("NoiseModel reading exceeded finite range");
@@ -51,8 +56,8 @@ double NoiseModel::sample(double true_value, double time_s)
 
     if (config_.quantization_step > 0.0)
     {
-        // Quantize last, as a physical sensor rounds its already imperfect
-        // analog measurement to the nearest representable step.
+        // round the imperfect measurement to the nearest configured step last
+        // divide to count steps, round the count, then restore channel units
         reading = round(reading / config_.quantization_step) *
                   config_.quantization_step;
     }
@@ -60,4 +65,4 @@ double NoiseModel::sample(double true_value, double time_s)
     return reading;
 }
 
-}  // namespace LBR
+}  // project namespace
