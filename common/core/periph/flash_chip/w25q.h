@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <cstring>
 #include <span>
+#include "delay.h"
 #include "gpio_cs.h"
 #include "spi.h"
 
