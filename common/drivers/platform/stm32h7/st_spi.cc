@@ -95,32 +95,24 @@ bool HwSpi::write(std::span<uint8_t> tx_data)
     // Re-enable peripheral and trigger master transmission
     instance->CR1 |= (SPI_CR1_SPE | SPI_CR1_SSI);
     (void)instance->CR1;
-
-    size_t tx_count = 0;
-    while ((instance->SR & SPI_SR_TXP) && (tx_count < total_bytes))
-    {
-        *((volatile uint8_t*)&instance->TXDR) = tx_data[tx_count++];
-    }
-
     instance->CR1 |= SPI_CR1_CSTART;
 
+    size_t tx_count = 0;
     size_t rx_count = 0;
 
     // Full-duplex loop driving lines while draining incoming dummy bytes
-    while (rx_count < total_bytes)
+    while (tx_count < total_bytes || rx_count < total_bytes)
     {
-
-        uint32_t sr = instance->SR;
-        if ((sr & SPI_SR_TXP) && tx_count < total_bytes)
+        if ((instance->SR & SPI_SR_TXP) && (tx_count < total_bytes))
+        {
             *((volatile uint8_t*)&instance->TXDR) = tx_data[tx_count++];
-        if (sr & SPI_SR_RXP)
-        {
-            (void)*((volatile uint8_t*)&instance->RXDR);
-            rx_count++;
         }
-        if (sr & (SPI_SR_UDR | SPI_SR_OVR | SPI_SR_MODF))
+
+        if (instance->SR & SPI_SR_RXP)
         {
-            return false;
+            volatile uint8_t dummy = *((volatile uint8_t*)&instance->RXDR);
+            (void)dummy;
+            rx_count++;
         }
     }
 
@@ -161,16 +153,9 @@ bool HwSpi::seq_transfer(std::span<uint8_t> tx_data, std::span<uint8_t> rx_data)
     // Re-enable peripheral and start concurrent transfer
     instance->CR1 |= (SPI_CR1_SPE | SPI_CR1_SSI);
     (void)instance->CR1;
-
-    size_t tx_count = 0;
-
-    while ((instance->SR & SPI_SR_TXP) && (tx_count < total_bytes))
-    {
-        *((volatile uint8_t*)&instance->TXDR) = tx_data[tx_count++];
-    }
-
     instance->CR1 |= SPI_CR1_CSTART;
 
+    size_t tx_count = 0;
     size_t rx_count = 0;
 
     // Match both indices simultaneously over the wire layout
@@ -234,7 +219,6 @@ bool HwSpi::init()
 
     instance->CR2 = 0;
     instance->IFCR = 0xFFFFFFFF;
-    instance->CFG2 |= SPI_CFG2_AFCNTR;
 
     // Enable SPI peripheral
     instance->CR1 |= SPI_CR1_SPE;
