@@ -68,6 +68,18 @@
                 "TARGET_DEVICE": "STM32H723",
                 "MCU_NAME": "STM32H723xx"
             }
+        },
+        {
+            "name": "stm32h733",
+            "inherits": "stm32h7",
+            "binaryDir": "${sourceDir}/build/stm32h733",
+            "toolchainFile": "cmake/gcc-m7f.cmake",
+            "cacheVariables": {
+                "LINKER_SCRIPT": "${sourceDir}/mcu_support/stm32/h7xx/h733/STM32H733ZGTx_FLASH.ld",
+                "STARTUP_FILE": "${sourceDir}/mcu_support/stm32/h7xx/h733/startup_stm32h733xx.s",
+                "TARGET_DEVICE": "STM32H733",
+                "MCU_NAME": "STM32H733xx"
+            }
         }
     ]
 }

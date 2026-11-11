@@ -9,4 +9,6 @@ target_link_libraries(st_h7_support PUBLIC
     st_h7_hal
 )
 
+add_subdirectory(h723)
+add_subdirectory(h733)
 add_subdirectory(HAL)
