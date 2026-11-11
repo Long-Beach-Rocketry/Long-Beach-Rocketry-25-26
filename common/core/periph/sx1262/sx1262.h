@@ -32,6 +32,13 @@ public:
      * @param params_ SX1262 settings and spi instance
      */
     explicit Sx1262(Sx1262Params& params_);
+    
+     /**
+     * @brief Initialize the SX1262 transceiver
+     * 
+     * @return true Initialization successful, false otherwise
+     */
+    bool init();
 
     /**
      * @brief Transmit bytes from a buffer with specified values.
@@ -43,7 +50,7 @@ public:
     /**
      * @brief Receive bytes and store in buffer
      * 
-     * @param buf 
+     * @param rx_buf Buffer to store received bytes
      * @return true Bytes received and stored in buffer successfully, false otherwise
      */
     bool receive(const std::span<uint8_t>& rx_buf);
@@ -56,7 +63,6 @@ public:
      */
     bool set_settings(Sx1262Settings new_settings);
 
-    bool init();
 private:
     Sx1262Settings settings;
     Spi& spi;
