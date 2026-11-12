@@ -359,7 +359,7 @@
         },
         {
             "cwd": "${workspaceFolder}",
-            "executable": "${workspaceRoot}/build/stm32h723/app/usart_app/usart_app",
+            "executable": "${workspaceRoot}/build/stm32h723/app/usart_app/usart_test",
             "name": "DEBUG USART H7",
             "request": "launch",
             "type": "cortex-debug",
@@ -379,7 +379,7 @@
                 "${workspaceRoot}"
             ],
             "preRestartCommands": [
-                "add-symbol-file build/stm32h723/app/usart_app/usart_app",
+                "add-symbol-file build/stm32h723/app/usart_app/usart_test",
                 "load",
                 "enable breakpoint",
                 "monitor reset"
@@ -492,6 +492,39 @@
             ],
             "preRestartCommands": [
                 "add-symbol-file build/stm32h723/app/bmp390_test/bmp390_test",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true,
+            "liveWatch": {
+                "enabled": true,
+                "samplesPerSecond": 2
+            }
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceRoot}/build/stm32h723/app/ms561101_test/ms561101_test",
+            "name": "DEBUG MS561101 H7",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32H7",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32h723/app/ms561101_test/ms561101_test",
                 "load",
                 "enable breakpoint",
                 "monitor reset"
@@ -649,6 +682,68 @@
             ],
             "preRestartCommands": [
                 "add-symbol-file build/stm32h723/app/timebase_test/timebase_test",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true,
+            "liveWatch": {
+                "enabled": true,
+                "samplesPerSecond": 2
+            }
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceRoot}/build/stm32h723/app/cli_app/cli_app",
+            "name": "DEBUG CLI APP H7",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32H723",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToEntryPoint": "main",
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32h723/app/cli_app/cli_app",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": "vscode",
+        }
+        {
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceRoot}/build/stm32h723/app/logger_test/logger_app_test",
+            "name": "DEBUG LOGGER TEST H7",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32H723",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32h723/app/logger_test/logger_app_test",
                 "load",
                 "enable breakpoint",
                 "monitor reset"

@@ -18,6 +18,7 @@ if (TARGET pwm_bsp)
 
     target_include_directories_for(${TARGET_DEVICE} ${EXECUTABLE}
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/../common/drivers/io
     )
 
     target_link_options_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
@@ -26,7 +27,7 @@ if (TARGET pwm_bsp)
     )
 
     target_link_libraries_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
-        pwm_bsp
+        pwm_bsp servo_motor
     )
 
     target_preprocess_for(${TARGET_DEVICE} ${EXECUTABLE} ${LINKER_SCRIPT} ${LDF} ${PREPROCESS_DEFS})
