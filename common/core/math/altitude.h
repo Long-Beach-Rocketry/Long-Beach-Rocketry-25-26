@@ -4,6 +4,6 @@
 namespace LBR 
 {
 
-float cal_altitude(float pressure_pa, float sea_level_pa);
+float cal_altitude(float pressure_pa, float atmosph_press_inHg);
 
 }
