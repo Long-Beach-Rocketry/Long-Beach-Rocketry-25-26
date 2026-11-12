@@ -67,11 +67,11 @@ struct NoiseSimulationConfig
         temperature_noise.jitter_stddev =
             0.005;  // Change this line to alter the random temperature noise spread (C).
         temperature_noise.fixed_bias =
-            0.0;    // Change this line to add a constant temperature offset (C).
+            0.0;  // Change this line to add a constant temperature offset (C).
         temperature_noise.bias_drift_per_s =
-            0.0;    // Change this line to add a temperature offset drift over time (C/s).
+            0.0;  // Change this line to add a temperature offset drift over time (C/s).
         temperature_noise.quantization_step =
-            0.0;    // Change this line to set temperature rounding size (C); zero disables rounding.
+            0.0;  // Change this line to set temperature rounding size (C); zero disables rounding.
     }
 };
 
