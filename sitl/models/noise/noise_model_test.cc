@@ -5,8 +5,6 @@
 
 #include <gtest/gtest.h>
 
-using namespace std;
-
 namespace LBR
 {
 namespace
@@ -61,13 +59,13 @@ TEST(NoiseModelTest, RejectsInvalidConfigurationAndInputs)
 {
     NoiseModelConfig config;
     config.quantization_step = -0.1;
-    EXPECT_THROW(NoiseModel invalid(config), invalid_argument);
+    EXPECT_THROW(NoiseModel invalid(config), std::invalid_argument);
 
     NoiseModel model({});
-    EXPECT_THROW((void)model.sample(1.0, -0.1), invalid_argument);
+    EXPECT_THROW((void)model.sample(1.0, -0.1), std::invalid_argument);
     EXPECT_THROW(
-        (void)model.sample(numeric_limits<double>::quiet_NaN(), 0.0),
-        invalid_argument);
+        (void)model.sample(std::numeric_limits<double>::quiet_NaN(), 0.0),
+        std::invalid_argument);
 }
 
 }  // namespace

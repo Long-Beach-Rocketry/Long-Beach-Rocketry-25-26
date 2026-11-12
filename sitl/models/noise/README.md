@@ -50,12 +50,20 @@ each channel when independent jitter sequences are wanted. The model does not
 choose calibrated noise settings; use sensor specifications or measured data to
 set realistic values.
 
+The model uses `std::mt19937` (Mersenne Twister) to supply the random engine
+values consumed by the Gaussian distribution. Switching from the earlier
+`std::minstd_rand` engine changes jitter sequences even when seeds are unchanged.
+New runs remain repeatable on the same toolchain; expected bias, drift, rounding,
+and configured jitter spread are unchanged. The standard defines both engines
+in its [predefined random engines specification](https://eel.is/c++draft/rand.predef).
+
 ## Loop demonstration
 
 The [`noise_model_sim` application](../../../app/noise_model_sim_test/main.cc)
 prints ideal and noisy pressure/temperature values through 10 simulated seconds.
-The comment at the top of its `main.cc` explains Linux/dev-container and
-PowerShell-to-WSL commands. Edit [simulation_config.h](../../../app/noise_model_sim_test/simulation_config.h),
+Its [application readme](../../../app/noise_model_sim_test/README.md) explains
+Linux/dev-container and PowerShell-to-WSL commands, configuration, and examples.
+Edit [simulation_config.h](../../../app/noise_model_sim_test/simulation_config.h),
 then rebuild and restart the application to use new settings.
 Output uses labeled blocks with units for each reading. The executable remains
 named `noise_model_sim`; its source folder is `app/noise_model_sim_test`.
