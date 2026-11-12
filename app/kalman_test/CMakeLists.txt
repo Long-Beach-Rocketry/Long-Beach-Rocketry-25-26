@@ -18,6 +18,8 @@ if (TARGET kalman_bsp)
 		${CMAKE_SOURCE_DIR}/common/core/math/altitude.cc
 		${STARTUP_FILE}
 	)
+	
+	target_compile_options(${EXECUTABLE} PRIVATE -O3)
 
 	target_include_directories_for(${TARGET_DEVICE} ${EXECUTABLE}
 		PRIVATE		${CMAKE_CURRENT_SOURCE_DIR}
@@ -26,14 +28,13 @@ if (TARGET kalman_bsp)
 	)
 
 	target_link_options_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
-        --specs=nano.specs
+        --specs=rdimon.specs
         -Wl,--gc-sections
     )
 
 	target_link_libraries_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE
 		kalman_bsp
         Eigen3::Eigen
-
 	)
 
 	target_preprocess_for(${TARGET_DEVICE} ${EXECUTABLE} ${LINKER_SCRIPT} ${LDF} ${PREPROCESS_DEFS})

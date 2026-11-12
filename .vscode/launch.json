@@ -350,13 +350,20 @@
                 "-d",
                 "${workspaceRoot}"
             ],
+            "postLaunchCommands": [
+                "monitor arm semihosting enable",
+                "monitor arm semihosting_basedir {${workspaceFolder}/app/kalman_test}"
+            ],
             "preRestartCommands": [
                 "add-symbol-file build/stm32h723/app/kalman_test/kalman_test",
                 "load",
                 "enable breakpoint",
                 "monitor reset"
             ],
-            "showDevDebugOutput": true
+            "showDevDebugOutput": true,
+            "liveWatch": {
+                "enabled": true
+            }
         },
         //End kalman
         {

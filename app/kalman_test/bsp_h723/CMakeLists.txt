@@ -1,3 +1,5 @@
+find_package(Eigen3 REQUIRED)
+
 add_library(kalman_bsp STATIC
     h723_board.cc
 )
@@ -14,5 +16,6 @@ target_include_directories(kalman_bsp PUBLIC
 target_link_libraries(kalman_bsp PUBLIC
   driver
   core
+  Eigen3::Eigen
 )
 

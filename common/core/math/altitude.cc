@@ -3,9 +3,9 @@
 namespace LBR
 {
 
-float cal_altitude(float pressure_pa, float sea_level_pa)
+float cal_altitude(float pressure_pa, float atmosph_press_inHg)
 {
-    return 44330 * (1 - pow(pressure_pa / sea_level_pa, 1 / 5.255));
+    return 44330 * (1 - pow(pressure_pa / (atmosph_press_inHg * 3386.389), 1 / 5.255));
 }
 
 }

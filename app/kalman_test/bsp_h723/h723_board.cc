@@ -3,6 +3,7 @@
 #include "st_gpio.h"
 #include "st_i2c.h"
 #include "st_sysclk.h"
+#include "stm32h7xx_hal.h" // Ensure HAL headers are visible for GPIO_InitTypeDef
 
 static constexpr uint32_t kSysclkHz{8'000'000};
 static constexpr uint32_t kBaudRate{115'200};
@@ -89,6 +90,10 @@ bool board_init()
     Stmh7::imu.init();
 
     ret &= Stmh7::baro.init();
+
+    // Enable Cache
+    // SCB_EnableICache();
+    // SCB_EnableDCache();
 
     return ret;
 }
