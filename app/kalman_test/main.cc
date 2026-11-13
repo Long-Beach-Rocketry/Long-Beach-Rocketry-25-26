@@ -13,7 +13,7 @@ using namespace std;
 using namespace LBR;
 
 static constexpr double ATMOSPH_PRESS_InHg{29.98};
-static constexpr uint16_t MAX_SAMPLING_SIZE{500};
+static constexpr uint16_t MAX_SAMPLING_SIZE{1800};
 static constexpr uint8_t MAX_CALIB_SIZE{60};
 
 double baro_altitude(Board& hw);
@@ -26,7 +26,6 @@ LBR::Bno055Data reading;
 double altitude;
 Matrix<double, 3, 1> kf_state;
 Matrix<double, 2, 1> z;
-volatile int csv_open_errno = 0;
 
 extern "C" void initialise_monitor_handles(void);
 
@@ -121,7 +120,7 @@ EKF filter_init()
     const double alpha = 0.02;
 
     model.Q.setZero();
-    model.Q.diagonal() << 7.1e-3 * pow(alpha, 4), 1.35e-4 * pow(alpha, 2),
+    model.Q.diagonal() << 7.5e-3 * pow(alpha, 4), 1.35e-4 * pow(alpha, 2),
         14e-2 * alpha;
 
     model.R.setZero();
@@ -134,7 +133,7 @@ EKF filter_init()
     params.x_predict = params.x;
 
     params.P.setZero();
-    params.P.diagonal() << 3.0, 1, 0.002;
+    params.P.diagonal() << 3.0, 0.01, 0.002;
     params.P_predict = params.P;
 
     filter.init(params);
@@ -190,7 +189,7 @@ AverageBias param_average(Board& hw)
 void csv_processing()
 {
     //Process the sample array to store it into the csv file
-    ofstream csv_file("flight_data.csv", ios::out | ios::trunc);
+    ofstream csv_file("data_testing/flight_data.csv", ios::out | ios::trunc);
 
     if (!csv_file.is_open())
     {
