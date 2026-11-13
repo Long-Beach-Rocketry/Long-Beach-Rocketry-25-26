@@ -13,10 +13,12 @@
 #include "simulation_config.h"
 #include "simulation_scenario.h"
 
+using namespace LBR;
+
 int main()
 {
     // load read-only settings without requiring compile-time evaluation
-    const LBR::NoiseSimulationConfig config{};
+    const NoiseSimulationConfig config{};
 
     // validate timeline settings before generating any readings
     if (!std::isfinite(config.time_step_s) || config.time_step_s <= 0.0)
@@ -30,10 +32,10 @@ int main()
         return 1;
     }
 
-    LBR::NoiseModel pressure_noise(config.pressure_noise,
-                                   config.pressure_seed);  // pressure test
-    LBR::NoiseModel temperature_noise(config.temperature_noise,
-                                      config.temperature_seed);  // temp test
+    NoiseModel pressure_noise(config.pressure_noise,
+                              config.pressure_seed);  // pressure test
+    NoiseModel temperature_noise(config.temperature_noise,
+                                 config.temperature_seed);  // temp test
 
     std::cout << "Ideal -> simulated barometer readings\n";
     std::cout << std::fixed << std::setprecision(4);
@@ -45,8 +47,7 @@ int main()
         const double time_s = step * config.time_step_s;
 
         // obtain this instant's ideal values before adding measurement errors
-        const LBR::BarometerTruth truth =
-            LBR::barometer_truth_at(config, time_s);
+        const BarometerTruth truth = barometer_truth_at(config, time_s);
 
         // sample() adds bias, elapsed-time drift, fresh jitter, then rounding.
         const double noisy_pressure_pa =
