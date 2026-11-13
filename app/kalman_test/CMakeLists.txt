@@ -5,7 +5,13 @@ set(PREPROCESS_DEFS
 	-DDEF_FLASH_START_ADDR=0x8000000
 	-DDEF_FLASH_SIZE=1024K
 )
-find_package(Eigen3 REQUIRED)
+
+find_package(Eigen3 QUIET)
+
+if(NOT Eigen3_FOUND)
+    message(STATUS "Skipping kalman_test: Eigen3 was not found")
+    return()
+endif()
 
 # Only add BSP for this target device
 add_subdirectory_for(STM32H723 bsp_h723)
@@ -15,7 +21,7 @@ if (TARGET kalman_bsp)
 	add_executable_for(${TARGET_DEVICE} ${EXECUTABLE} ${LDF}
 		main.cc
 		${CMAKE_SOURCE_DIR}/common/core/kalman_filter/kalman.cc
-		${CMAKE_SOURCE_DIR}/common/core/math/altitude.cc
+		${CMAKE_SOURCE_DIR}/common/core/math/baro_math.cc
 		${STARTUP_FILE}
 	)
 	

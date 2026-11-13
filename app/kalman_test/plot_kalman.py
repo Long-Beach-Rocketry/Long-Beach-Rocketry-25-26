@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Plot position, velocity, and acceleration."
+        description="Plot position, velocity, acceleration, and calculate variance."
     )
     parser.add_argument("csv_file", type=Path)
     parser.add_argument("--output", type=Path, default=None)
@@ -78,7 +78,7 @@ def main():
     except (OSError, ValueError) as error:
         parser.error(str(error))
 
-    # All samples are plotted. First sample is at zero seconds.
+    # First sample is at zero seconds.
     intervals_s = intervals_ms / 1000.0
     time_s = np.concatenate(([0.0], np.cumsum(intervals_s)))
 
@@ -88,7 +88,7 @@ def main():
     if invalid.any():
         print(
             f"Warning: {invalid.sum()} nonfinite values "
-            "will appear as gaps."
+            "will appear as gaps and be excluded from variance calculations."
         )
     values[invalid] = np.nan
 
@@ -98,23 +98,42 @@ def main():
     kf_vz = values[:, 3]
     kf_az = values[:, 4]
 
-    # Print the actual filtered velocity range.
-    finite_vz = kf_vz[np.isfinite(kf_vz)]
-
-    if finite_vz.size:
-        print(f"KF velocity minimum: {finite_vz.min():.8f} m/s")
-        print(f"KF velocity maximum: {finite_vz.max():.8f} m/s")
-        print(
-            "KF velocity standard deviation: "
-            f"{finite_vz.std():.8f} m/s"
-        )
-
     # Altitude-derived average velocity over each sample interval.
-    # Used only for graphing, not as a filter measurement.
+    # Used only for analysis and graphing, not as a filter measurement.
     vz_baro = np.diff(z_pz) / intervals_s
 
-    # Plot interval-average velocity at the interval midpoint.
+    # Plot interval-average velocity at each interval's midpoint.
     velocity_time_s = 0.5 * (time_s[:-1] + time_s[1:])
+
+    # Calculate sample variance using N - 1 in the denominator.
+    signals = [
+        ("Measured position", z_pz, "m²"),
+        ("KF position", kf_pz, "m²"),
+        ("Altitude-derived velocity", vz_baro, "(m/s)²"),
+        ("KF velocity", kf_vz, "(m/s)²"),
+        ("Measured acceleration", z_az, "(m/s²)²"),
+        ("KF acceleration", kf_az, "(m/s²)²"),
+    ]
+
+    print("\nSample variances (ddof=1):")
+    print("-" * 85)
+
+    for name, signal, units in signals:
+        finite_values = signal[np.isfinite(signal)]
+
+        if finite_values.size < 2:
+            print(f"{name}: insufficient valid samples")
+            continue
+
+        variance = np.var(finite_values, ddof=1)
+
+        print(
+            f"{name:<28} "
+            f"variance = {variance:.8e} {units} "
+            f"(n={finite_values.size})"
+        )
+
+    print("-" * 85)
 
     fig, axes = plt.subplots(
         4,
@@ -142,7 +161,6 @@ def main():
     axes[0].set_title("Vertical position")
     axes[0].set_ylabel("Position (m)")
 
-    # Raw altitude-derived velocity on its own axis.
     axes[1].plot(
         velocity_time_s,
         vz_baro,
@@ -157,7 +175,6 @@ def main():
     axes[1].set_title("Raw altitude-derived vertical velocity")
     axes[1].set_ylabel("Velocity (m/s)")
 
-    # Filtered velocity on a separate, independently scaled axis.
     axes[2].plot(
         time_s,
         kf_vz,
@@ -218,7 +235,7 @@ def main():
     finally:
         plt.close(fig)
 
-    print(f"Samples: {len(data)}")
+    print(f"\nSamples: {len(data)}")
     print(f"Duration: {time_s[-1]:.3f} s")
     print(f"Mean interval: {mean_interval_ms:.3f} ms")
     print(f"Mean sampling rate: {mean_rate_hz:.3f} Hz")

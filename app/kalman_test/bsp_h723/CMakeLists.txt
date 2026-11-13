@@ -1,4 +1,10 @@
-find_package(Eigen3 REQUIRED)
+find_package(Eigen3 QUIET)
+
+if(NOT Eigen3_FOUND)
+    message(STATUS "Skipping kalman_test: Eigen3 was not found")
+    return()
+endif()
+
 
 add_library(kalman_bsp STATIC
     h723_board.cc
