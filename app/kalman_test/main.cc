@@ -4,8 +4,8 @@
 #include <fstream>  // For CSV file stream logging operations
 #include <iomanip>
 #include "board.h"
+#include "delay.h"
 #include "kalman.h"
-#include "delay.h" 
 
 using namespace Eigen;
 using namespace std;
@@ -140,7 +140,9 @@ EKF create_filter()
 double baro_altitude(Board& hw)
 {
     const double baro_measure = hw.bmp390.get_pressure();
-    return double(44330 * (1 - pow(baro_measure / (ATMOSPH_PRESS_InHg * 3386.389), 1 / 5.255)));
+    return double(
+        44330 *
+        (1 - pow(baro_measure / (ATMOSPH_PRESS_InHg * 3386.389), 1 / 5.255)));
 }
 
 AverageBias param_average(Board& hw)
