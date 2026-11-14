@@ -8,14 +8,22 @@ function(add_executable_for DEVICE EXECUTABLE LINKER_SCRIPT)
             message("Selecting linker opts for ARM MCU")
             target_link_options(${EXECUTABLE} PRIVATE
                 -T${LINKER_SCRIPT}
-                -specs=nosys.specs
                 -lc
                 -lm
-                -lnosys
                 -Wl,-Map=${EXECUTABLE}.map,--cref
                 -Wl,--gc-sections
                 # -Wl, --print-memory-usage
             )
+
+            # kalman_test uses rdimon.specs from its application CMakeLists.
+            # Other applications keep their existing nosys configuration.
+            if (NOT "${EXECUTABLE}" STREQUAL "kalman_test")
+                target_link_options(${EXECUTABLE} PRIVATE
+                    -specs=nosys.specs
+                    -lnosys
+                )
+            endif()
+
 
             add_custom_command(TARGET ${EXECUTABLE}
                 POST_BUILD

@@ -328,6 +328,44 @@
                 "samplesPerSecond": 2
             }
         },
+        //Add Kalman_test setting
+        {
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceRoot}/build/stm32h723/app/kalman_test/kalman_test",
+            "name": "DEBUG KALMAN H7",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32H7",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "postLaunchCommands": [
+                "monitor arm semihosting enable",
+                "monitor arm semihosting_basedir {${workspaceFolder}/app/kalman_test}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32h723/app/kalman_test/kalman_test",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true,
+            "liveWatch": {
+                "enabled": true
+            }
+        },
+        //End kalman
         {
             "cwd": "${workspaceFolder}",
             "executable": "${workspaceRoot}/build/stm32h723/app/i2c_test/i2c_test",
