@@ -8,10 +8,8 @@ function(add_executable_for DEVICE EXECUTABLE LINKER_SCRIPT)
             message("Selecting linker opts for ARM MCU")
             target_link_options(${EXECUTABLE} PRIVATE
                 -T${LINKER_SCRIPT}
-                #-specs=nosys.specs
                 -lc
                 -lm
-                #-lnosys
                 -Wl,-Map=${EXECUTABLE}.map,--cref
                 -Wl,--gc-sections
                 # -Wl, --print-memory-usage

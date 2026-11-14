@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Plot position, velocity, acceleration, and calculate variance."
+        description="Plot position, velocity, and acceleration."
     )
     parser.add_argument("csv_file", type=Path)
     parser.add_argument("--output", type=Path, default=None)
@@ -88,7 +88,7 @@ def main():
     if invalid.any():
         print(
             f"Warning: {invalid.sum()} nonfinite values "
-            "will appear as gaps and be excluded from variance calculations."
+            "will appear as gaps."
         )
     values[invalid] = np.nan
 
@@ -104,36 +104,6 @@ def main():
 
     # Plot interval-average velocity at each interval's midpoint.
     velocity_time_s = 0.5 * (time_s[:-1] + time_s[1:])
-
-    # Calculate sample variance using N - 1 in the denominator.
-    signals = [
-        ("Measured position", z_pz, "m²"),
-        ("KF position", kf_pz, "m²"),
-        ("Altitude-derived velocity", vz_baro, "(m/s)²"),
-        ("KF velocity", kf_vz, "(m/s)²"),
-        ("Measured acceleration", z_az, "(m/s²)²"),
-        ("KF acceleration", kf_az, "(m/s²)²"),
-    ]
-
-    print("\nSample variances (ddof=1):")
-    print("-" * 85)
-
-    for name, signal, units in signals:
-        finite_values = signal[np.isfinite(signal)]
-
-        if finite_values.size < 2:
-            print(f"{name}: insufficient valid samples")
-            continue
-
-        variance = np.var(finite_values, ddof=1)
-
-        print(
-            f"{name:<28} "
-            f"variance = {variance:.8e} {units} "
-            f"(n={finite_values.size})"
-        )
-
-    print("-" * 85)
 
     fig, axes = plt.subplots(
         4,

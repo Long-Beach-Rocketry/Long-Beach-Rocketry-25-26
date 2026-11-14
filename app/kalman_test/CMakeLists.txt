@@ -21,7 +21,7 @@ if (TARGET kalman_bsp)
 	add_executable_for(${TARGET_DEVICE} ${EXECUTABLE} ${LDF}
 		main.cc
 		${CMAKE_SOURCE_DIR}/common/core/kalman_filter/kalman.cc
-		${CMAKE_SOURCE_DIR}/common/core/math/baro_math.cc
+		${CMAKE_SOURCE_DIR}/common/drivers/utils/delay.cc
 		${STARTUP_FILE}
 	)
 	

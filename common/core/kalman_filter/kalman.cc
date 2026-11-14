@@ -19,10 +19,12 @@ const Eigen::Matrix<double, 3, 1>& EKF::get_state() const
     return params.x;
 }
 
-void EKF::predict(double dt)
+bool EKF::predict(double dt)
 {
     if (!initialized)
-        return;
+    {
+        return false;
+    }
 
     // State: [position, velocity, acceleration].
     matrix.F(0, 1) = dt;
@@ -32,12 +34,16 @@ void EKF::predict(double dt)
     // Predict state and covariance.
     params.x_predict = matrix.F * params.x;
     params.P_predict = matrix.F * params.P * matrix.F.transpose() + matrix.Q;
+
+    return true;
 }
 
-void EKF::update(const Eigen::Matrix<double, 2, 1>& z)
+bool EKF::update(const Eigen::Matrix<double, 2, 1>& z)
 {
     if (!initialized)
-        return;
+    {
+        return false;
+    }
 
     // Measurement: [position, acceleration].
     const Eigen::Matrix<double, 3, 2> K =
@@ -52,6 +58,8 @@ void EKF::update(const Eigen::Matrix<double, 2, 1>& z)
         Eigen::Matrix<double, 3, 3>::Identity();
 
     params.P = (I3 - K * matrix.H) * params.P_predict;
+
+    return true;
 }
 
 }  // namespace LBR

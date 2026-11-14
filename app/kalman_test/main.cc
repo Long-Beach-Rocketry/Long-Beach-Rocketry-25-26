@@ -3,22 +3,21 @@
 #include <cstdlib>
 #include <fstream>  // For CSV file stream logging operations
 #include <iomanip>
-#include "baro_math.h"
 #include "board.h"
 #include "kalman.h"
-#include "stm32h7xx_hal.h"  // For access to the global clock function HAL_Delay()
+#include "delay.h" 
 
 using namespace Eigen;
 using namespace std;
 using namespace LBR;
 
 static constexpr double ATMOSPH_PRESS_InHg{29.98};
-static constexpr uint16_t MAX_SAMPLING_SIZE{1800};
+static constexpr uint16_t MAX_SAMPLING_SIZE{500};
 static constexpr uint8_t MAX_CALIB_SIZE{60};
 
 double baro_altitude(Board& hw);
 AverageBias param_average(Board& hw);
-EKF filter_init();
+EKF create_filter();
 void csv_processing();
 
 Info samples[MAX_SAMPLING_SIZE];
@@ -39,12 +38,12 @@ int main()
     double accel_offset = param_bias.accel_bias;
     double altitude_offset = param_bias.altitude_bias;
 
-    EKF ekFilter = filter_init();
+    EKF ekFilter = create_filter();
 
     uint16_t sample_count = 0;
 
     double ax, ay, az, qw, qx, qy, qz;
-    uint32_t previous_sample_ms = HAL_GetTick();
+    uint32_t previous_sample_ms = Utils::GetMsTicks();
 
     while (sample_count < MAX_SAMPLING_SIZE)
     //while(1)
@@ -63,8 +62,7 @@ int main()
         az = reading.linear_accel.z;
 
         // Rotate the az_sensor to z_real_world
-        // This is due to wind resistance that can cause yaw, pitch, roll motion,
-        // which rotate the imu and require to correct its internal axis to real world
+        // If imu is rotated in the body frame, need to correct its internal axis to real world
         // Solution: use the Euler-Rodrigues 3d rotation with quaternion measurement
         double az_rot =
             (2 * ax * (qx * qz - qw * qy) + 2 * ay * (qy * qz + qw * qx) +
@@ -73,7 +71,7 @@ int main()
 
         altitude = baro_altitude(hw) - altitude_offset;
 
-        uint32_t sample_time_ms = HAL_GetTick();
+        uint32_t sample_time_ms = Utils::GetMsTicks();
         uint32_t elapsed_ms = sample_time_ms - previous_sample_ms;
 
         //Check if sample_time_ms has is greater enough than previous_sample_ms
@@ -94,7 +92,6 @@ int main()
         ekFilter.predict(dt_seconds);
         ekFilter.update(z);
 
-        // Keep this global variable available in Watch.
         kf_state = ekFilter.get_state();
 
         Info& record = samples[sample_count];
@@ -110,7 +107,7 @@ int main()
     return 0;
 }
 
-EKF filter_init()
+EKF create_filter()
 {
     KalmanMatrix model;
     model.F.setIdentity();
@@ -143,7 +140,7 @@ EKF filter_init()
 double baro_altitude(Board& hw)
 {
     const double baro_measure = hw.bmp390.get_pressure();
-    return cal_altitude(baro_measure, ATMOSPH_PRESS_InHg);
+    return double(44330 * (1 - pow(baro_measure / (ATMOSPH_PRESS_InHg * 3386.389), 1 / 5.255)));
 }
 
 AverageBias param_average(Board& hw)
@@ -171,7 +168,7 @@ AverageBias param_average(Board& hw)
         samples[n].z_meas(1) = az_rot;
         samples[n].z_meas(0) = altitude;
 
-        HAL_Delay(20);
+        Utils::DelayMs(20);
     }
 
     double accel_bias = 0.0;

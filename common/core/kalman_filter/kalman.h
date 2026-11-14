@@ -25,22 +25,41 @@ struct KalmanParams
 class EKF
 {
 public:
-    //Constructor
+    /**
+     * @brief Constructs the filter with the specified model matrices.
+     * @param matrix State transition, measurement, and noise matrices.
+     */
     explicit EKF(const KalmanMatrix& matrix);
 
-    //Initalize state and covariance vector -- first step
-    //@return True if init, False otherwise
+    /**
+     * @brief Initializes the filter state and covariance.
+     * @param params Initial state and covariance parameters.
+     * @return true if initialization succeeds, false otherwise.
+     */
     bool init(const KalmanParams params);
 
+    /**
+     * @brief Returns the current estimated state.
+     * @return Constant reference to the state vector
+     *         [vertical position (m), vertical velocity (m/s),
+     *          vertical acceleration (m/s²)].
+     */
     const Eigen::Matrix<double, 3, 1>& get_state() const;
 
-    //Predict the current state from the previous state (aka x_hat)
-    // with the current rotation velocity from gyroscope for quaternion
-    void predict(double dt);
+    /**
+     * @brief Predicts the state and covariance at the next sample time.
+     * @param dt Elapsed time since the previous sample, in seconds.
+    * @return true if initialization has happened before this step, false otherwise.
+     */
+    bool predict(double dt);
 
-    //Update the state agaisnt the newest measurement z
-    // z = [pz, az, qw, qx, qy, qz]
-    void update(const Eigen::Matrix<double, 2, 1>& z);
+    /**
+     * @brief Corrects the predicted state and covariance using measurements.
+     * @param z Measurement vector containing
+     *              [vertical position (m), vertical acceleration (m/s²)].
+    * @return true if initialization has happened before this step, false otherwise.
+     */
+    bool update(const Eigen::Matrix<double, 2, 1>& z);
 
 private:
     bool initialized{false};
