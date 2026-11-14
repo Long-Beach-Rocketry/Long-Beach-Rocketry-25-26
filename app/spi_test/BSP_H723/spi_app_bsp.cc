@@ -2,6 +2,7 @@
 #include "gpio_cs.h"
 #include "st_gpio.h"
 #include "st_spi.h"
+#include "st_sysclk.h"
 #include "stm32h723xx.h"
 
 // Pin Configurations:
@@ -9,6 +10,8 @@
 // PA5  -> SPI1_SCK  (Serial Clock - Configured with PULL_DOWN for SPI Mode 0)
 // PA6  -> SPI1_MISO (Master In Slave Out - Alternate Function 5)
 // PB5  -> SPI1_MOSI (Master Out Slave In - Alternate Function 5)
+
+static constexpr uint32_t kSysclkHz{8'000'000};
 
 using namespace LBR::Stmh7;
 namespace LBR
@@ -47,7 +50,14 @@ HwGpio mosi{mosi_params};
 // Create Chip Select Object to manual toggle cs pin
 GpioChipSelect chip_select{cs_gpio};
 
-Board board{.cs = chip_select, .spi = spi1};
+// Create Clock object (Sysclk = 65 MHz, HCLK = 32.5 MHz, PCLK1 = PCLK2 = PCLK3 = PCLK4 = 16.25 MHz)
+ClockParams clock_params{Source::HSE8_MHZ_BYPASS, kSysclkHz,
+                         D1cprePrescaler::DIV1,   AhbPrescaler::DIV2,
+                         Apb1Prescaler::DIV2,     Apb2Prescaler::DIV2,
+                         Apb3Prescaler::DIV2,     Apb4Prescaler::DIV2};
+HwClock clock{clock_params};
+
+Board board{.cs = chip_select, .spi = spi1, .clock = clock};
 
 // Initialize SPI BSP
 bool bsp_init()
@@ -105,12 +115,22 @@ bool bsp_init()
     // Disable chip select to put flash in standby
     chip_select.cs_disable();
 
+    result = result && clock.init();
+
     return result;
 }
 
 Board& get_board()
 {
     return board;
+}
+
+extern "C" void IncDelayTicks(void);
+
+extern "C" void SysTick_Handler(void)
+{
+    HAL_IncTick();
+    IncDelayTicks();
 }
 
 }  // namespace LBR

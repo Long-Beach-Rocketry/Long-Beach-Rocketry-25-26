@@ -38,28 +38,10 @@ bool W25q::init()
 
 bool W25q::busy_check()
 {
-    // Init tx and rx buf to send command and receive data
-    uint8_t sr1_cmd = static_cast<uint8_t>(StatusRead::STATUS_REGISTER_1);
-    std::array<uint8_t, 1> sr1_val;
-
-    // Chip select enable
-    cs.cs_enable();
-
-    // Send 0x05h command
-    std::array<uint8_t, 1> sr1_cmd_buf = {sr1_cmd};
-    bool status = spi.seq_transfer(sr1_cmd_buf, sr1_val);
-
-    // Chip select disable
-    cs.cs_disable();
-
-    // Check if Sequential Transfer failed
-    if (!status)
-    {
+    std::array<uint8_t, 1> sr1;
+    if (!status_reg_read(StatusRead::STATUS_REGISTER_1, sr1))
         return false;
-    }
-
-    // Check if BUSY bit is 1
-    return sr1_val[0] & kBusyMask;
+    return sr1[0] & kBusyMask;
 }
 
 bool W25q::status_reg_write(StatusWrite status_reg_num, uint8_t mask,
@@ -113,6 +95,7 @@ bool W25q::status_reg_write(StatusWrite status_reg_num, uint8_t mask,
     }
 
     // Add delay of tw
+    Utils::DelayMs(10);
 
     // Check busy bit
     while (this->busy_check())
@@ -143,11 +126,13 @@ bool W25q::status_reg_read(StatusRead status_reg_num, std::span<uint8_t> rxbuf)
     cs.cs_enable();
 
     // Create tx buf of status reg number to read out of
-    std::array<uint8_t, 1> status_reg_cmd = {
-        static_cast<uint8_t>(status_reg_num)};
+    std::array<uint8_t, 2> status_reg_cmd = {
+        static_cast<uint8_t>(status_reg_num), 0x00};
+    std::array<uint8_t, 2> rx;
 
     // Send Status Read Command from status_reg_num
-    bool status = spi.seq_transfer(status_reg_cmd, rxbuf);
+    bool status = spi.seq_transfer(status_reg_cmd, rx);
+    rxbuf[0] = rx[1];
 
     // Chip Select Disable
     cs.cs_disable();
@@ -239,6 +224,7 @@ bool W25q::reset()
     }
 
     // Add 30 microsecond delay using timer
+    Utils::DelayMs(30);
 
     // Check if WEL bit was cleared after reset
     std::array<uint8_t, 1> status_reg_val;
@@ -264,10 +250,18 @@ bool W25q::read(uint8_t block, uint8_t sector, uint8_t page, uint8_t offset,
     addr += (static_cast<uint32_t>(page) * kPageSizeBytes);
     addr += (static_cast<uint32_t>(offset) * kOffsetSizeBit);
 
-    // Create tx buf of read command and address bytes
-    std::array<uint8_t, 4> txbuf = {
-        Opcode::kReadData, static_cast<uint8_t>(addr >> 16),
-        static_cast<uint8_t>(addr >> 8), static_cast<uint8_t>(addr)};
+    // // Create tx buf of read command and address bytes
+    // std::array<uint8_t, 4> txbuf = {
+    //     Opcode::kReadData, static_cast<uint8_t>(addr >> 16),
+    //     static_cast<uint8_t>(addr >> 8), static_cast<uint8_t>(addr)};
+
+    std::array<uint8_t, 260> tx{};
+    std::array<uint8_t, 260> rx{};
+    tx[0] = Opcode::kReadData;
+    tx[1] = addr >> 16;
+    tx[2] = addr >> 8;
+    tx[3] = addr;
+    const size_t len = 4 + rxbuf.size();
 
     // Check BUSY bit for current erase or write
     while (this->busy_check())
@@ -278,10 +272,16 @@ bool W25q::read(uint8_t block, uint8_t sector, uint8_t page, uint8_t offset,
     cs.cs_enable();
 
     // Send txbuf and read from memory
-    bool status = spi.seq_transfer(txbuf, rxbuf);
+    bool status = spi.seq_transfer(std::span<uint8_t>(tx.data(), len),
+                                   std::span<uint8_t>(rx.data(), len));
 
     // Chip Select Disable
     cs.cs_disable();
+
+    if (status)
+    {
+        std::memcpy(rxbuf.data(), &rx[4], rxbuf.size());
+    }
 
     return status;
 }
@@ -498,6 +498,7 @@ bool W25q::chip_erase()
     }
 
     // Wait delay of tCE
+    Utils::DelayMs(10);
 
     // Wait for Chip Erase to complete before ending
     while (this->busy_check())
@@ -598,16 +599,16 @@ bool W25q::block_lock_status_read(uint32_t block_addr, uint8_t& block_lock_byte)
     }
 
     // Send Block address and Block Lock Read cmd
-    std::array<uint8_t, 4> txbuf{Opcode::kReadBlockLock,
+    std::array<uint8_t, 5> txbuf{Opcode::kReadBlockLock,
                                  static_cast<uint8_t>(block_addr >> 16),
                                  static_cast<uint8_t>(block_addr >> 8),
-                                 static_cast<uint8_t>(block_addr)};
-    std::array<uint8_t, 1> block_lock_status;
+                                 static_cast<uint8_t>(block_addr), 0x00};
+    std::array<uint8_t, 5> block_lock_status;
     cs.cs_enable();
     bool status = spi.seq_transfer(txbuf, block_lock_status);
     cs.cs_disable();
 
-    block_lock_byte = block_lock_status[0];
+    block_lock_byte = block_lock_status[4];
 
     return status;
 }
