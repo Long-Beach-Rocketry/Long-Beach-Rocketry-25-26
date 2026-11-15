@@ -9,6 +9,8 @@ function(add_executable_for DEVICE EXECUTABLE LINKER_SCRIPT)
             target_link_options(${EXECUTABLE} PRIVATE
                 -T${LINKER_SCRIPT}
                 -lc
+                -specs=nosys.specs
+                -lnosys
                 -lm
                 -Wl,-Map=${EXECUTABLE}.map,--cref
                 -Wl,--gc-sections

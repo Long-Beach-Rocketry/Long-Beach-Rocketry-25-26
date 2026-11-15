@@ -3,10 +3,8 @@
 #include "st_gpio.h"
 #include "st_i2c.h"
 #include "st_sysclk.h"
-#include "stm32h7xx_hal.h"  // Ensure HAL headers are visible for GPIO_InitTypeDef
 
 static constexpr uint32_t kSysclkHz{8'000'000};
-static constexpr uint32_t kBaudRate{115'200};
 static constexpr uint32_t kI2cTimingR{0x00303D5B};
 
 namespace LBR
@@ -67,13 +65,11 @@ bool board_init()
     bool ret = true;
 
     // Enable peripheral clocks
-    RCC->AHB4ENR |= RCC_AHB4ENR_GPIOAEN | RCC_AHB4ENR_GPIOBEN |
-                    RCC_AHB4ENR_GPIODEN | RCC_AHB4ENR_GPIOEEN;
-    RCC->APB1LENR |= RCC_APB1LENR_USART3EN | RCC_APB1LENR_I2C1EN;
+    RCC->AHB4ENR |= RCC_AHB4ENR_GPIOAEN | RCC_AHB4ENR_GPIOBEN;
+    RCC->APB1LENR |= RCC_APB1LENR_I2C1EN;
 
     // Configure clock tree for this test.
-    bool clock_ok = Stmh7::clock.init();
-    ret &= clock_ok;
+    ret &= Stmh7::clock.init();
 
     ret &= Stmh7::sda.init();
     ret &= Stmh7::scl.init();
