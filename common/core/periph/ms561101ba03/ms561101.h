@@ -71,6 +71,14 @@ public:
     * @return true if the reading succeeds; otherwise, false.
     */
     bool get_temperature(float& temperature);
+    /**
+    * @brief Reads pressure and temperature from one conversion pair.
+    *
+    * @param[out] pressure Pressure reading, in the units used by the driver.
+    * @param[out] temperature Temperature reading, in degrees Celsius.
+    * @return true if the reading succeeds; otherwise, false.
+    */
+    bool read_all(float& pressure, float& temperature);
     ~Ms561101() = default;
 
 private:

@@ -65,11 +65,9 @@ bool HwSensorMgr::update(RawSensorData& out)
         any_ok = true;
     }
 
-    // Bmp390 reads have no failure signal, so presence is treated as success
-    if (sensors.bmp390)
+    if (sensors.ms561101 &&
+        sensors.ms561101->read_all(raw_data.baro.press, raw_data.baro.temp))
     {
-        raw_data.baro.press = sensors.bmp390->get_pressure();
-        raw_data.baro.temp = sensors.bmp390->get_temperature();
         any_ok = true;
     }
 

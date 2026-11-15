@@ -6,18 +6,17 @@
 
 #pragma once
 
-// #include "ms5611.h"
-#include "bmp390.h"
 #include "bno055_imu.h"
+#include "ms561101.h"
 // #include "ekf.h"
 
 namespace LBR
 {
 
 /**
- * @brief Compensated barometer readings
+ * @brief Compensated barometer readings from the MS561101 sensor
  */
-struct Bmp390Data
+struct Ms561101Data
 {
     float press;  // Pascals
     float temp;   // degrees Celsius
@@ -28,8 +27,7 @@ struct Bmp390Data
  */
 struct RawSensorData
 {
-    // Ms5611Data baro;
-    Bmp390Data baro;
+    Ms561101Data baro;
     Bno055Data imu;
 };
 

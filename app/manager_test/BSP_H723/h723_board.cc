@@ -1,9 +1,10 @@
 #include <chrono>
 #include <cstdint>
-#include "bmp390.h"
+// #include "bmp390.h"
 #include "bno055_imu.h"
 #include "board.h"
 #include "delay.h"
+#include "ms561101.h"
 #include "st_gpio.h"
 #include "st_i2c.h"
 #include "st_sensor_manager.h"
@@ -66,9 +67,9 @@ Stmh7::StGpioSettings rst_settings{
 const Stmh7::StGpioParams rst_params{rst_settings, 0, GPIOA};
 Stmh7::HwGpio rst(rst_params);
 
-// Create BMP390 object (default I2C address 0x76)
-const Bmp390Params bmp390_params{i2c, 0x76};
-Bmp390 bmp390(bmp390_params);
+// Create MS561101 object (default I2C address 0x77)
+const Ms561101Params ms561101_params{i2c, 0x77};
+Ms561101 ms561101(ms561101_params);
 
 // Create BNO055 IMU object
 Bno055 imu(static_cast<LBR::I2c&>(i2c), Bno055::ADDR_PRIMARY);
@@ -81,7 +82,7 @@ Stmh7::HwTimebase timebase(timebase_params);
 // Sensors managed by the sensor manager
 const Stmh7::StSensorMgrSensors sensor_mgr_sensors{
     .bno055 = &imu,
-    .bmp390 = &bmp390,
+    .ms561101 = &ms561101,
 };
 
 const Stmh7::StSensorMgrParams sensor_mgr_params{
@@ -94,7 +95,7 @@ const Stmh7::StSensorMgrParams sensor_mgr_params{
 Stmh7::HwSensorMgr sensor_mgr(sensor_mgr_params);
 
 Board board{
-    .bmp390 = bmp390,
+    .ms561101 = ms561101,
     .imu = imu,
     .timebase = timebase,
     .i2c = i2c,
@@ -127,7 +128,7 @@ bool bsp_init()
     LBR::Utils::DelayMs(650);
 
     // Initialize sensors
-    ret = ret && bmp390.init();
+    ret = ret && ms561101.init();
     imu.init();
 
     // Configure NVIC for TIM3 timebase
