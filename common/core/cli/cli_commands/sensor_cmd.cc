@@ -10,21 +10,24 @@
 #include <cstring>
 #include "bmp390.h"
 #include "bno055_imu.h"
+#include "ms561101.h"
 #include "string_span.h"
 
 namespace LBR
 {
 // TODO: replace with sensor manager
 static Bno055* imu{nullptr};
-static Bmp390* baro{nullptr};
+static Bmp390* bmp_baro{nullptr};
+static Ms561101* ms_baro{nullptr};
 
 namespace SensorCmd
 {
 
-void init(Bno055* imu_, Bmp390* baro_)
+void init(Bno055* imu_, Bmp390* bmp_baro_, Ms561101* ms5611_baro_)
 {
     imu = imu_;
-    baro = baro_;
+    bmp_baro = bmp_baro_;
+    ms_baro = ms5611_baro_;
 }
 
 bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
@@ -63,7 +66,8 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                         "\tGyroscope    (x,y,z):\t%.2f,%.2f,%.2f\r\n"
                         "\tLinear Accel (x,y,z):\t%.2f,%.2f,%.2f\r\n"
                         "\tGravity      (x,y,z):\t%.2f,%.2f,%.2f\r\n"
-                        "\tQuaternion (w,x,y,z):\t%.2f,%.2f,%.2f,%.2f\r\n\n",
+                        "\tQuaternion "
+                        "(w,x,y,z):\t%.2f,%.2f,%.2f,%.2f\r\n\n",
                         imu_data.accel.x, imu_data.accel.y, imu_data.accel.z,
                         imu_data.gyro.x, imu_data.gyro.y, imu_data.gyro.z,
                         imu_data.linear_accel.x, imu_data.linear_accel.y,
@@ -158,17 +162,17 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                 return false;
             }
         }
-        else if (op1 == "-b" || op1 == "--baro")
+        else if (op1 == "-b1" || op1 == "--bmpbaro")
         {
-            if (!baro)
+            if (!bmp_baro)
             {
                 std::snprintf(reinterpret_cast<char*>(txOut.data()),
                               txOut.size(),
                               "ERROR: Barometer not found!\r\n\n");
                 return false;
             }
-            float pressure = baro->get_pressure();
-            float temperature = baro->get_temperature();
+            float pressure = bmp_baro->get_pressure();
+            float temperature = bmp_baro->get_temperature();
             if (args.argc == 1)
             {
                 std::snprintf(reinterpret_cast<char*>(txOut.data()),
@@ -209,6 +213,58 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                 return true;
             }
         }
+        else if (op1 == "-b2" || op1 == "--msbaro")
+        {
+            if (!ms_baro)
+            {
+                std::snprintf(reinterpret_cast<char*>(txOut.data()),
+                              txOut.size(),
+                              "ERROR: Barometer not found!\r\n\n");
+                return false;
+            }
+            float pressure{0}, temperature{0};
+            bool ret = ms_baro->get_pressure(pressure) &&
+                       ms_baro->get_temperature(temperature);
+            if (args.argc == 1)
+            {
+                std::snprintf(reinterpret_cast<char*>(txOut.data()),
+                              txOut.size(),
+                              "Barometer Data\r\n"
+                              "\tTemperature:\t %.2f C\r\n"
+                              "\tPressure   :\t %.2f Pa\r\n\n",
+                              temperature, pressure);
+
+                return ret;
+            }
+            else
+            {
+                std::string_view op2(args.argv[1]);
+                if (op2 == "p" || op2 == "press")
+                {
+                    std::snprintf(reinterpret_cast<char*>(txOut.data()),
+                                  txOut.size(),
+                                  "Barometer Data\r\n"
+                                  "\tPressure   :\t %.2f Pa\r\n\n",
+                                  pressure);
+                }
+                else if (op2 == "t" || op2 == "temp")
+                {
+                    std::snprintf(reinterpret_cast<char*>(txOut.data()),
+                                  txOut.size(),
+                                  "Barometer Data\r\n"
+                                  "\tTemperature:\t %.2f C\r\n",
+                                  temperature);
+                }
+                else
+                {
+                    std::snprintf(reinterpret_cast<char*>(txOut.data()),
+                                  txOut.size(),
+                                  "ERROR: Invalid argument\r\n\n");
+                    return false;
+                }
+                return ret;
+            }
+        }
         std::snprintf(reinterpret_cast<char*>(txOut.data()), txOut.size(),
                       "ERROR: Invalid argument\r\n\n");
 
@@ -228,8 +284,10 @@ const Cmd sensorCmd = {
         "Options:\r\n\t"
         "-i, --imu [a, acce | g, gyro | l, lacc | g, grav | q, quat]\r\n\t"
         "Outputs specified imu data\r\n\n\t"
-        "-b, --baro [p, press | t, temp]\r\n\t"
-        "Outputs the specified barometer data\r\n\n"
+        "-b1, --bmpbaro [p, press | t, temp]\r\n\t"
+        "Outputs the bmp390 barometer data\r\n\n"
+        "-b2, --msbaro [p, press | t, temp]\r\n\t"
+        "Outputs the bmp390 barometer data\r\n\n"
         "\t-h, --help\t\tShows this message.\r\n",
     .invoke = sensor_cmd_handler,
     .repeatable = true};

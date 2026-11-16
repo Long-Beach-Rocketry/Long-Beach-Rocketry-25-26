@@ -13,6 +13,7 @@ namespace LBR
 
 class Bno055;
 class Bmp390;
+class Ms561101;
 
 namespace SensorCmd
 {
@@ -23,7 +24,7 @@ extern const Cmd sensorCmd;
  * @param imu_ Pointer to Bno055 object
  * @param baro_ Pointer to Bmp390 object
  */
-void init(Bno055* imu_, Bmp390* baro_);
+void init(Bno055* imu_, Bmp390* bmp_baro_, Ms561101* ms56_baro_);
 
 /**
  * @brief Outputs command usage and requested sensor data

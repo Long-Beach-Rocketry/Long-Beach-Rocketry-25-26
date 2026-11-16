@@ -82,9 +82,14 @@ Stmh7::HwGpio rst(rst_params);
 // Create BNO055 IMU object
 Bno055 imu(static_cast<LBR::I2c&>(i2c), Bno055::ADDR_PRIMARY);
 
-// Create Barometer object
+// Create Barometer object (bmp390)
 Bmp390Params baro_params{i2c, 0x76};
-Bmp390 baro{baro_params};
+Bmp390 bmp_baro{baro_params};
+
+// Create MS5611 object (ms5611)
+static constexpr uint8_t kMs5611Address{0x77};
+const Ms561101Params barometer_params{i2c, kMs5611Address};
+Ms561101 ms56_baro(barometer_params);
 
 }  // namespace Stmh7
 
@@ -97,7 +102,8 @@ Board board{.usart = Stmh7::usart,
             .led2 = Stmh7::ld2,
             .led3 = Stmh7::ld3,
             .bno055 = Stmh7::imu,
-            .bmp390 = Stmh7::baro,
+            .bmp390 = Stmh7::bmp_baro,
+            .ms5611 = Stmh7::ms56_baro,
             .cli = cli};
 
 bool board_init()
@@ -150,7 +156,9 @@ bool board_init()
     Utils::DelayMs(650);
     Stmh7::imu.init();
 
-    ret &= Stmh7::baro.init();
+    ret &= Stmh7::bmp_baro.init();
+    ret &= Stmh7::ms56_baro.init();
+
     ret &= cli.init();
 
     return ret;

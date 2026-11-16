@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 
 #ifdef STM32H723xx
     cli_init(hw.cli, &hw.usart, hw.led1, hw.led2, hw.led3, &hw.bno055,
-             &hw.bmp390);
+             &hw.bmp390, &hw.ms5611);
 
 #elif defined(STM32L476xx)
     cli_init(hw.cli, &hw.usart, hw.led1);

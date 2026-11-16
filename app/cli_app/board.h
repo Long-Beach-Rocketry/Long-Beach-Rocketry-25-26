@@ -9,6 +9,7 @@
 #include "bno055_imu.h"
 #include "cli.h"
 #include "gpio.h"
+#include "ms561101.h"
 #include "ring_buffer.h"
 #include "sys_clock.h"
 #include "usart.h"
@@ -31,6 +32,7 @@ struct Board
 #endif
     Bno055& bno055;
     Bmp390& bmp390;
+    Ms561101& ms5611;
 
     Cli& cli;
 };
