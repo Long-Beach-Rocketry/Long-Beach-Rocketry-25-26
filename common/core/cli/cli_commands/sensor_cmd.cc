@@ -287,7 +287,7 @@ const Cmd sensorCmd = {
         "-b1, --bmpbaro [p, press | t, temp]\r\n\t"
         "Outputs the bmp390 barometer data\r\n\n\t"
         "-b2, --msbaro [p, press | t, temp]\r\n\t"
-        "Outputs the bmp390 barometer data\r\n\n"
+        "Outputs the ms5611 barometer data\r\n\n"
         "\t-h, --help\t\tShows this message.\r\n",
     .invoke = sensor_cmd_handler,
     .repeatable = true};

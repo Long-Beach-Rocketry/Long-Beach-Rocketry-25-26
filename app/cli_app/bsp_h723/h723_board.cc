@@ -26,7 +26,7 @@ namespace Stmh7
  * PE1 - Led
  */
 
-// Create Clock object (Sysclk = 65 MHz, HCLK = 32.5 MHz, PCLK1 = PCLK2 = PCLK3 = PCLK4 = 16.25 MHz)
+// HSE SYSCLK = 8 MHz, HCLK = 4 MHz, and APB clocks = 2 MHz.
 ClockParams clock_params{Source::HSE8_MHZ_BYPASS, kSysclkHz,
                          D1cprePrescaler::DIV1,   AhbPrescaler::DIV2,
                          Apb1Prescaler::DIV2,     Apb2Prescaler::DIV2,
@@ -108,14 +108,18 @@ Board board{.usart = Stmh7::usart,
 
 bool board_init()
 {
+    if (!Stmh7::clock.init())
+    {
+        return false;
+    }
 
-    // Start the millisecond timebase
+    // Set up SysTick after changing the system clock.
     SystemCoreClockUpdate();
-
     if (SysTick_Config(SystemCoreClock / 1000U) != 0U)
     {
         return false;
     }
+
     bool ret = true;
 
     // Enable peripheral clocks
@@ -132,29 +136,22 @@ bool board_init()
     ret &= Stmh7::usart_rx.init();
     ret &= Stmh7::usart.init();
 
-    // Configure clock tree for this test.
-    bool clock_ok = Stmh7::clock.init();
-    ret &= clock_ok;
-
     // Retune BRR using the actual post-init APB1 frequency.
-    if (clock_ok)
-    {
-        const uint32_t apb1_hz = Stmh7::clock.get_clock_frequencies().apb1;
-        USART_TypeDef* usart_addr = Stmh7::usart.get_addr();
+    const uint32_t apb1_hz = Stmh7::clock.get_clock_frequencies().apb1;
+    USART_TypeDef* usart_addr = Stmh7::usart.get_addr();
+    usart_addr->CR1 &= ~USART_CR1_UE;
+    usart_addr->BRR = apb1_hz / kBaudRate;
+    usart_addr->CR1 |= USART_CR1_TE | USART_CR1_RE;
+    usart_addr->CR1 |= USART_CR1_RXNEIE_RXFNEIE;
+    usart_addr->CR1 |= USART_CR1_UE;
 
-        // Reconfigure BRR after clock switch and explicitly keep TX enabled.
-        usart_addr->CR1 &= ~USART_CR1_UE;
-        usart_addr->BRR = apb1_hz / kBaudRate;
-        usart_addr->CR1 |= USART_CR1_TE | USART_CR1_RE;
-
-        usart_addr->CR1 |= USART_CR1_RXNEIE_RXFNEIE;
-        usart_addr->CR1 |= USART_CR1_UE;
-    }
     NVIC_EnableIRQ(USART3_IRQn);
 
     ret &= Stmh7::sda.init();
     ret &= Stmh7::scl.init();
 
+    // Keep I2C timing independent of the APB Uart clock
+    __HAL_RCC_I2C1_CONFIG(RCC_I2C1CLKSOURCE_HSI);
     ret &= Stmh7::i2c.init();
 
     ret &= Stmh7::rst.init();
@@ -164,7 +161,7 @@ bool board_init()
     Utils::DelayMs(650);
     Stmh7::imu.init();
 
-    ret &= Stmh7::bmp_baro.init();
+    // ret &= Stmh7::bmp_baro.init();
     ret &= Stmh7::ms56_baro.init();
 
     ret &= cli.init();
