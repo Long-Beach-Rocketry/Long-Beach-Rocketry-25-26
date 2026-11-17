@@ -223,8 +223,8 @@ bool sensor_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
                 return false;
             }
             float pressure{0}, temperature{0};
-            bool ret = ms_baro->get_pressure(pressure) &&
-                       ms_baro->get_temperature(temperature);
+            bool ret = ms_baro->get_pressure(pressure);
+            ret &= ms_baro->get_temperature(temperature);
             if (args.argc == 1)
             {
                 std::snprintf(reinterpret_cast<char*>(txOut.data()),
@@ -285,7 +285,7 @@ const Cmd sensorCmd = {
         "-i, --imu [a, acce | g, gyro | l, lacc | g, grav | q, quat]\r\n\t"
         "Outputs specified imu data\r\n\n\t"
         "-b1, --bmpbaro [p, press | t, temp]\r\n\t"
-        "Outputs the bmp390 barometer data\r\n\n"
+        "Outputs the bmp390 barometer data\r\n\n\t"
         "-b2, --msbaro [p, press | t, temp]\r\n\t"
         "Outputs the bmp390 barometer data\r\n\n"
         "\t-h, --help\t\tShows this message.\r\n",

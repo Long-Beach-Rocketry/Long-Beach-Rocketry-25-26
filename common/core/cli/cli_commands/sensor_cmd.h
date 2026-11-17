@@ -22,7 +22,8 @@ extern const Cmd sensorCmd;
 /**
  * @brief Initializes the sensor command with used sensors
  * @param imu_ Pointer to Bno055 object
- * @param baro_ Pointer to Bmp390 object
+ * @param bmp_baro_ Pointer to Bmp390 object
+ * @param ms56_baro_ Pointer to Ms5611 object
  */
 void init(Bno055* imu_, Bmp390* bmp_baro_, Ms561101* ms56_baro_);
 

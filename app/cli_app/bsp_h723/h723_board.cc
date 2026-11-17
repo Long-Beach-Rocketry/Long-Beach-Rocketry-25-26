@@ -7,7 +7,7 @@
 
 static constexpr uint32_t kSysclkHz{8'000'000};
 static constexpr uint32_t kBaudRate{115'200};
-static constexpr uint32_t kI2cTimingR{0x00303D5B};
+static constexpr uint32_t kI2cTimingR{0x20303E5D};
 
 namespace LBR
 {
@@ -108,6 +108,14 @@ Board board{.usart = Stmh7::usart,
 
 bool board_init()
 {
+
+    // Start the millisecond timebase
+    SystemCoreClockUpdate();
+
+    if (SysTick_Config(SystemCoreClock / 1000U) != 0U)
+    {
+        return false;
+    }
     bool ret = true;
 
     // Enable peripheral clocks
