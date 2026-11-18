@@ -5,7 +5,7 @@
 #include "st_sysclk.h"
 #include "st_usart.h"
 
-static constexpr uint32_t kSysclkHz{64'000'000};
+static constexpr uint32_t kSysclkHz{8'000'000};
 static constexpr uint32_t kBaudRate{115'200};
 static constexpr uint32_t kI2cTimingR{0x20303E5D};
 
@@ -161,7 +161,7 @@ bool board_init()
     Utils::DelayMs(650);
     Stmh7::imu.init();
 
-    // ret &= Stmh7::bmp_baro.init();
+    ret &= Stmh7::bmp_baro.init();
     ret &= Stmh7::ms56_baro.init();
 
     ret &= cli.init();
