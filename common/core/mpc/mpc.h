@@ -1,4 +1,4 @@
-/*
+/**
 * @file mpc.h
 * @author Mario Cruz
 * @brief Model Predictive Controller for the airbrake flaps

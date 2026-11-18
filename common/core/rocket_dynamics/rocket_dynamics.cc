@@ -1,25 +1,15 @@
-/* 
-* @file rocket_dynamics.cc
-* @author Mario Cruz
-* @brief Implements the physics calculations for Rocket Dynamic Model
-* @date 9-30-2026
-*/
-
 #include "rocket_dynamics.h"
 #include <algorithm>
 #include <cmath>
-#include "flight_constants.h"
 
 namespace LBR
 {
 
-using namespace FlightConstants;
-
 namespace
 {
 
-constexpr double DegToRad{3.14159265358979323846 / 180.0};
-constexpr double GravityMps2{9.80665};
+static constexpr double DegToRad{3.14159265358979323846 / 180.0};
+static constexpr double GravityMps2{9.80665};
 
 // Total drag coefficient * area of the body and flaps
 // CdA = Cd_body * A_body + n * Cd_flap * A_flap * sin(flap angle)

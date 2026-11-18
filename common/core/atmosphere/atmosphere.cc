@@ -1,10 +1,3 @@
-/* 
-* @file atmosphere.cc
-* @author Mario Cruz
-* @brief Implements the ISA troposphere equations declared in atmosphere.h
-* @date 9-30-2026
-*/
-
 #include "atmosphere.h"
 #include <cmath>
 
@@ -19,22 +12,20 @@ namespace
 // --------------------------------------------------------------------------------
 
 // Standard day air conditions at sea level, used in standard_atmosphere() for SITL, tests, or backup data
-constexpr double SeaLevelPressurePa{101325.0};  // 1 atmosphere
-constexpr double SeaLevelTemperatureK{288.15};  // 15 C
+static constexpr double SeaLevelPressurePa{101325.0};  // 1 atmosphere
+static constexpr double SeaLevelTemperatureK{288.15};  // 15 C
 
-constexpr double LapseRateKPerM{
-    0.0065};  // Troposphere lapse rate, air gets 0.0065K colder per meter climbed
+static constexpr double LapseRateKPerM{0.0065};  // Troposphere lapse rate
 
-constexpr double GravityMps2{9.80665};             // Standard gravity
-constexpr double MolarMassAirKgPerMol{0.0289644};  // Mean molar mass of dry air
-constexpr double UniversalGasConstant{
-    8.31432};  // Universal gas constant, J/(mol*K)
-constexpr double SpecificGasConstantAir{
+static constexpr double GravityMps2{9.80665};             // Standard gravity
+static constexpr double MolarMassAirKgPerMol{0.0289644};  // Mean molar mass of dry air
+static constexpr double UniversalGasConstant{8.31432};    // Universal gas constant
+static constexpr double SpecificGasConstantAir{
     UniversalGasConstant /
-    MolarMassAirKgPerMol};  // Gas constant for dry air per kilogram, J/(kg*K)
+    MolarMassAirKgPerMol};  // Gas constant for dry air per kilogram
 
 // Sets how steeply pressure falls as the air cools, barometric formula: g * M / (R * L) = 5.2558
-constexpr double PressureExponent{(GravityMps2 * MolarMassAirKgPerMol) /
+static constexpr double PressureExponent{(GravityMps2 * MolarMassAirKgPerMol) /
                                   (UniversalGasConstant * LapseRateKPerM)};
 
 // --------------------------------------------------------------------------------

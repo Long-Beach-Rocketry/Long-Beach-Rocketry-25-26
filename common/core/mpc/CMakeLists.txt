@@ -9,5 +9,4 @@ target_include_directories(mpc PUBLIC
 target_link_libraries(mpc PUBLIC
     rocket_dynamics
     atmosphere
-    flight_constants
 )

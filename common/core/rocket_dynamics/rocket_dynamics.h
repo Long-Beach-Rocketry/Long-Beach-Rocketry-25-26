@@ -10,6 +10,9 @@
 namespace LBR
 {
 
+constexpr double AirbrakeRetractedDeg{0.0};
+constexpr double AirbrakeDeployedDeg{30.0};
+
 /**
  * @brief Rocket's variables (time, position, mass, etc) at any given instant
  */
