@@ -17,16 +17,19 @@ static constexpr double SeaLevelTemperatureK{288.15};  // 15 C
 
 static constexpr double LapseRateKPerM{0.0065};  // Troposphere lapse rate
 
-static constexpr double GravityMps2{9.80665};             // Standard gravity
-static constexpr double MolarMassAirKgPerMol{0.0289644};  // Mean molar mass of dry air
-static constexpr double UniversalGasConstant{8.31432};    // Universal gas constant
+static constexpr double GravityMps2{9.80665};  // Standard gravity
+static constexpr double MolarMassAirKgPerMol{
+    0.0289644};  // Mean molar mass of dry air
+static constexpr double UniversalGasConstant{
+    8.31432};  // Universal gas constant
 static constexpr double SpecificGasConstantAir{
     UniversalGasConstant /
     MolarMassAirKgPerMol};  // Gas constant for dry air per kilogram
 
 // Sets how steeply pressure falls as the air cools, barometric formula: g * M / (R * L) = 5.2558
-static constexpr double PressureExponent{(GravityMps2 * MolarMassAirKgPerMol) /
-                                  (UniversalGasConstant * LapseRateKPerM)};
+static constexpr double PressureExponent{
+    (GravityMps2 * MolarMassAirKgPerMol) /
+    (UniversalGasConstant * LapseRateKPerM)};
 
 // --------------------------------------------------------------------------------
 // Safety checks
