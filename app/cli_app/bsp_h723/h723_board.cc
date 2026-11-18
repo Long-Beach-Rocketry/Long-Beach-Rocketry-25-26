@@ -5,7 +5,7 @@
 #include "st_sysclk.h"
 #include "st_usart.h"
 
-static constexpr uint32_t kSysclkHz{8'000'000};
+static constexpr uint32_t kSysclkHz{64'000'000};
 static constexpr uint32_t kBaudRate{115'200};
 static constexpr uint32_t kI2cTimingR{0x20303E5D};
 
@@ -108,17 +108,6 @@ Board board{.usart = Stmh7::usart,
 
 bool board_init()
 {
-    if (!Stmh7::clock.init())
-    {
-        return false;
-    }
-
-    // Set up SysTick after changing the system clock.
-    SystemCoreClockUpdate();
-    if (SysTick_Config(SystemCoreClock / 1000U) != 0U)
-    {
-        return false;
-    }
 
     bool ret = true;
 
@@ -136,14 +125,25 @@ bool board_init()
     ret &= Stmh7::usart_rx.init();
     ret &= Stmh7::usart.init();
 
+    // Configure clock tree for this test.
+    bool clock_ok = Stmh7::clock.init();
+    ret &= clock_ok;
+
     // Retune BRR using the actual post-init APB1 frequency.
-    const uint32_t apb1_hz = Stmh7::clock.get_clock_frequencies().apb1;
-    USART_TypeDef* usart_addr = Stmh7::usart.get_addr();
-    usart_addr->CR1 &= ~USART_CR1_UE;
-    usart_addr->BRR = apb1_hz / kBaudRate;
-    usart_addr->CR1 |= USART_CR1_TE | USART_CR1_RE;
-    usart_addr->CR1 |= USART_CR1_RXNEIE_RXFNEIE;
-    usart_addr->CR1 |= USART_CR1_UE;
+    if (clock_ok)
+    {
+        const uint32_t apb1_hz = Stmh7::clock.get_clock_frequencies().apb1;
+        USART_TypeDef* usart_addr = Stmh7::usart.get_addr();
+
+        // Reconfigure BRR after clock switch and explicitly keep TX enabled.
+        usart_addr->CR1 &= ~USART_CR1_UE;
+        usart_addr->BRR = apb1_hz / kBaudRate;
+        usart_addr->CR1 |= USART_CR1_TE | USART_CR1_RE;
+
+        // sysclk_test is TX-only; disable RX interrupts to avoid echo/noise IRQ spam.
+        usart_addr->CR1 |= USART_CR1_RXNEIE_RXFNEIE;
+        usart_addr->CR1 |= USART_CR1_UE;
+    }
 
     NVIC_EnableIRQ(USART3_IRQn);
 
