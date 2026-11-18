@@ -10,4 +10,5 @@ target_include_directories(sx1262 INTERFACE
 
 target_link_libraries(sx1262 INTERFACE
     driver
+    chip_select
 )
