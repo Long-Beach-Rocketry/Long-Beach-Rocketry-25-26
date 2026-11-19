@@ -328,7 +328,6 @@
                 "samplesPerSecond": 2
             }
         },
-        //Add Kalman_test setting
         {
             "cwd": "${workspaceFolder}",
             "executable": "${workspaceRoot}/build/stm32h723/app/kalman_test/kalman_test",
@@ -365,7 +364,6 @@
                 "enabled": true
             }
         },
-        //End kalman
         {
             "cwd": "${workspaceFolder}",
             "executable": "${workspaceRoot}/build/stm32h723/app/i2c_test/i2c_test",

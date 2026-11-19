@@ -121,7 +121,7 @@ EKF create_filter()
         1.6e-1 * alpha;
 
     model.R.setZero();
-    model.R.diagonal() << 0.12, 0.03;
+    model.R.diagonal() << 0.2, 0.03;
 
     EKF filter{model};
 
@@ -130,7 +130,7 @@ EKF create_filter()
     params.x_predict = params.x;
 
     params.P.setZero();
-    params.P.diagonal() << 0.1, 0.01, 0.002;
+    params.P.diagonal() << 0.2, 0.01, 0.002;
     params.P_predict = params.P;
 
     filter.init(params);
