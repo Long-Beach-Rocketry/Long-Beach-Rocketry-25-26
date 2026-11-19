@@ -8,7 +8,6 @@ static constexpr uint32_t kSysclkHz{8'000'000};
 static constexpr uint32_t kI2cTimingR{0x00303D5B};
 static constexpr uint8_t kMs5611Address{0x77};
 
-
 namespace LBR
 {
 namespace Stmh7
@@ -60,7 +59,9 @@ Ms561101 baro{baro_params};
 
 }  // namespace Stmh7
 
-Board board{.clock = Stmh7::clock, .bno055 = Stmh7::imu, .ms561101 = Stmh7::baro};
+Board board{.clock = Stmh7::clock,
+            .bno055 = Stmh7::imu,
+            .ms561101 = Stmh7::baro};
 
 bool board_init()
 {
