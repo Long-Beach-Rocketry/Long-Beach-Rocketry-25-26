@@ -6,6 +6,8 @@
 
 static constexpr uint32_t kSysclkHz{8'000'000};
 static constexpr uint32_t kI2cTimingR{0x00303D5B};
+static constexpr uint8_t kMs5611Address{0x77};
+
 
 namespace LBR
 {
@@ -53,12 +55,12 @@ Stmh7::HwGpio rst(rst_params);
 Bno055 imu(static_cast<LBR::I2c&>(i2c), Bno055::ADDR_PRIMARY);
 
 // Create Barometer object
-Bmp390Params baro_params{i2c, 0x76};
-Bmp390 baro{baro_params};
+Ms561101Params baro_params{i2c, kMs5611Address};
+Ms561101 baro{baro_params};
 
 }  // namespace Stmh7
 
-Board board{.clock = Stmh7::clock, .bno055 = Stmh7::imu, .bmp390 = Stmh7::baro};
+Board board{.clock = Stmh7::clock, .bno055 = Stmh7::imu, .ms561101 = Stmh7::baro};
 
 bool board_init()
 {

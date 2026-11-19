@@ -30,7 +30,6 @@ if (TARGET kalman_bsp)
 	target_include_directories_for(${TARGET_DEVICE} ${EXECUTABLE}
 		PRIVATE		${CMAKE_CURRENT_SOURCE_DIR}
                 	${CMAKE_SOURCE_DIR}/common/core/kalman_filter
-					${CMAKE_SOURCE_DIR}/common/core/math
 	)
 
 	target_link_options_for(${TARGET_DEVICE} ${EXECUTABLE} PRIVATE

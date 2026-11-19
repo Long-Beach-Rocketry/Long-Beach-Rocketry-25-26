@@ -95,7 +95,7 @@ bool Ms561101::get_raw_data(void)
         return false;
     }
 
-    LBR::Utils::DelayMs(3);
+    LBR::Utils::DelayMs(1);
 
     // 24 bits of adcs = 3 bytes
     std::array<std::uint8_t, 3> pressure{};
@@ -111,7 +111,7 @@ bool Ms561101::get_raw_data(void)
         return false;
     }
 
-    LBR::Utils::DelayMs(3);
+    LBR::Utils::DelayMs(1);
 
     // get the temperature
     std::array<uint8_t, 3> temperature{};

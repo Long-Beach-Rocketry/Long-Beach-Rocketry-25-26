@@ -1,6 +1,6 @@
 #pragma once
 #include <Eigen/Dense>
-#include "bmp390.h"
+#include "ms561101.h"
 #include "bno055_imu.h"
 #include "sys_clock.h"
 
@@ -11,7 +11,7 @@ struct Board
 {
     Clock& clock;
     Bno055& bno055;
-    Bmp390& bmp390;
+    Ms561101& ms561101;
 };
 
 struct AverageBias

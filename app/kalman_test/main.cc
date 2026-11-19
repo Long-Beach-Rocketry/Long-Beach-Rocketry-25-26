@@ -11,7 +11,7 @@ using namespace Eigen;
 using namespace std;
 using namespace LBR;
 
-static constexpr double ATMOSPH_PRESS_InHg{29.98};
+static constexpr double ATMOSPH_PRESS_InHg{30.06};
 static constexpr uint16_t MAX_SAMPLING_SIZE{500};
 static constexpr uint8_t MAX_CALIB_SIZE{60};
 
@@ -117,11 +117,11 @@ EKF create_filter()
     const double alpha = 0.02;
 
     model.Q.setZero();
-    model.Q.diagonal() << 7.5e-3 * pow(alpha, 4), 1.35e-4 * pow(alpha, 2),
-        14e-2 * alpha;
+    model.Q.diagonal() << 2.1e-2 * pow(alpha, 4), 1.35e-4 * pow(alpha, 2),
+        1.6e-1 * alpha;
 
     model.R.setZero();
-    model.R.diagonal() << 0.2, 0.03;
+    model.R.diagonal() << 0.12, 0.03;
 
     EKF filter{model};
 
@@ -130,7 +130,7 @@ EKF create_filter()
     params.x_predict = params.x;
 
     params.P.setZero();
-    params.P.diagonal() << 3.0, 0.01, 0.002;
+    params.P.diagonal() << 0.1, 0.01, 0.002;
     params.P_predict = params.P;
 
     filter.init(params);
@@ -139,7 +139,8 @@ EKF create_filter()
 
 double baro_altitude(Board& hw)
 {
-    const double baro_measure = hw.bmp390.get_pressure();
+    float baro_measure = 0;
+    hw.ms561101.get_pressure(baro_measure);
     return double(
         44330 *
         (1 - pow(baro_measure / (ATMOSPH_PRESS_InHg * 3386.389), 1 / 5.255)));
