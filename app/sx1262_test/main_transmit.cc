@@ -4,9 +4,9 @@
  * @brief Continuously transmit test packets from an SX1262.
  */
 
-#include <span>
 #include <cstddef>
 #include <cstdint>
+#include <span>
 
 #include "board.h"
 #include "delay.h"
