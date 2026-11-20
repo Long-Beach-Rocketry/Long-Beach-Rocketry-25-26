@@ -756,7 +756,73 @@
                 "monitor reset"
             ],
             "showDevDebugOutput": "vscode",
-        }
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceRoot}/build/stm32h723/app/sx1262_test/sx1262_receive_test",
+            "name": "DEBUG SX1262 RECEIVE TEST H7",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32H723",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32h723/app/sx1262_test/sx1262_receive_test",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true,
+            "liveWatch": {
+                "enabled": true,
+                "samplesPerSecond": 2
+            }
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceRoot}/build/stm32h723/app/sx1262_test/sx1262_transmit_test",
+            "name": "DEBUG SX1262 TRANSMIT TEST H7",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32H723",
+            "svdFile": "${workspaceRoot}/mcu_support/stm32/h7xx/STM32H723.svd",
+            "searchDir": [
+                "${workspaceRoot}/mcu_support/stm32"
+            ],
+            "runToMain": true,
+            "configFiles": [
+                "${workspaceRoot}/mcu_support/stm32/stlink-dap.cfg",
+                "${workspaceRoot}/mcu_support/stm32/h7xx/stm32h7x.cfg"
+            ],
+            "debuggerArgs": [
+                "-d",
+                "${workspaceRoot}"
+            ],
+            "preRestartCommands": [
+                "add-symbol-file build/stm32h723/app/sx1262_test/sx1262_transmit_test",
+                "load",
+                "enable breakpoint",
+                "monitor reset"
+            ],
+            "showDevDebugOutput": true,
+            "liveWatch": {
+                "enabled": true,
+                "samplesPerSecond": 2
+            }
+        },
         {
             "cwd": "${workspaceFolder}",
             "executable": "${workspaceRoot}/build/stm32h723/app/logger_test/logger_app_test",
