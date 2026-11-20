@@ -19,21 +19,19 @@ namespace
 // PB5  -> MOSI
 // PD15 -> NRESET
 // PD12 -> BUSY
-const StGpioSettings kChipSelectSettings{
-    GpioMode::GPOUT, GpioOtype::PUSH_PULL, GpioOspeed::VERY_HIGH,
-    GpioPupd::NO_PULL, 0};
-const StGpioSettings kResetSettings{
-    GpioMode::GPOUT, GpioOtype::PUSH_PULL, GpioOspeed::LOW,
-    GpioPupd::NO_PULL, 0};
-const StGpioSettings kBusySettings{
-    GpioMode::INPUT, GpioOtype::PUSH_PULL, GpioOspeed::LOW,
-    GpioPupd::NO_PULL, 0};
-const StGpioSettings kSpiDataSettings{
-    GpioMode::ALT_FUNC, GpioOtype::PUSH_PULL, GpioOspeed::VERY_HIGH,
-    GpioPupd::NO_PULL, 5};
-const StGpioSettings kSpiClockSettings{
-    GpioMode::ALT_FUNC, GpioOtype::PUSH_PULL, GpioOspeed::VERY_HIGH,
-    GpioPupd::PULL_DOWN, 5};
+const StGpioSettings kChipSelectSettings{GpioMode::GPOUT, GpioOtype::PUSH_PULL,
+                                         GpioOspeed::VERY_HIGH,
+                                         GpioPupd::NO_PULL, 0};
+const StGpioSettings kResetSettings{GpioMode::GPOUT, GpioOtype::PUSH_PULL,
+                                    GpioOspeed::LOW, GpioPupd::NO_PULL, 0};
+const StGpioSettings kBusySettings{GpioMode::INPUT, GpioOtype::PUSH_PULL,
+                                   GpioOspeed::LOW, GpioPupd::NO_PULL, 0};
+const StGpioSettings kSpiDataSettings{GpioMode::ALT_FUNC, GpioOtype::PUSH_PULL,
+                                      GpioOspeed::VERY_HIGH, GpioPupd::NO_PULL,
+                                      5};
+const StGpioSettings kSpiClockSettings{GpioMode::ALT_FUNC, GpioOtype::PUSH_PULL,
+                                       GpioOspeed::VERY_HIGH,
+                                       GpioPupd::PULL_DOWN, 5};
 
 const StGpioParams kChipSelectParams{kChipSelectSettings, 14, GPIOD};
 const StGpioParams kResetParams{kResetSettings, 15, GPIOD};
@@ -49,13 +47,13 @@ HwGpio clock_pin{kClockParams};
 HwGpio miso_pin{kMisoParams};
 HwGpio mosi_pin{kMosiParams};
 
-StSpiSettings spi_settings{
-    SpiBaudRate::FPCLK_16, SpiBusMode::MODE1, SpiBitOrder::MSB,
-    SpiDataSize::DSIZE8, SpiRxThreshold::FIFO_1};
+StSpiSettings spi_settings{SpiBaudRate::FPCLK_16, SpiBusMode::MODE1,
+                           SpiBitOrder::MSB, SpiDataSize::DSIZE8,
+                           SpiRxThreshold::FIFO_1};
 HwSpi spi{SPI1, spi_settings};
 GpioChipSelect chip_select{chip_select_pin};
 
-Sx1262TestBoard board{
+Board board{
     .cs = chip_select,
     .spi = spi,
     .reset = reset_pin,
@@ -73,15 +71,14 @@ bool bsp_init()
 
     PWR->CR3 = PWR_CR3_LDOEN;
     (void)PWR->CR3;
-    PWR->D3CR =
-        (PWR->D3CR & ~PWR_D3CR_VOS) | (3u << PWR_D3CR_VOS_Pos);
+    PWR->D3CR = (PWR->D3CR & ~PWR_D3CR_VOS) | (3u << PWR_D3CR_VOS_Pos);
     (void)PWR->D3CR;
     while ((PWR->D3CR & PWR_D3CR_VOSRDY) == 0)
     {
     }
 
-    RCC->AHB4ENR |= RCC_AHB4ENR_GPIOAEN | RCC_AHB4ENR_GPIOBEN |
-                    RCC_AHB4ENR_GPIODEN;
+    RCC->AHB4ENR |=
+        RCC_AHB4ENR_GPIOAEN | RCC_AHB4ENR_GPIOBEN | RCC_AHB4ENR_GPIODEN;
     (void)RCC->AHB4ENR;
     RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
     (void)RCC->APB2ENR;
@@ -113,7 +110,7 @@ bool bsp_init()
     return ret;
 }
 
-Sx1262TestBoard& get_board()
+Board& get_board()
 {
     return board;
 }
