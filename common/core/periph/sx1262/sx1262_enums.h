@@ -1,7 +1,7 @@
 /**
  * @file sx1262_enums.h
- * @author Kent Hong
- * @brief Enums that define settings for the SX1262 RF Trasceiver from the datasheet
+ * @author Kent Hong, Alex Pulido
+ * @brief Enums that define settings for the SX1262 RF Transceiver from the datasheet
  */
 #pragma once
 #include <stdint.h>

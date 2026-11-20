@@ -1,5 +1,6 @@
 /**
  * @file sx1262.cc
+ * @author Kent Hong, Alex Pulido
  * @brief SX1262 LoRa configuration and blocking packet operations.
  *
  * The driver communicates over SPI with a separate active-low chip select,
@@ -285,12 +286,12 @@ bool Sx1262::init()
     // NSS must be high before reset. NRESET is active low; the datasheet
     // minimum pulse is 100 us. 150 ms matches the previous board timing.
     cs.cs_disable();
-    if (!reset_pin.set(false))
+    if (!reset_pin.set(0))
     {
         return false;
     }
     LBR::Utils::DelayMs(150);
-    if (!reset_pin.set(true))
+    if (!reset_pin.set(1))
     {
         return false;
     }

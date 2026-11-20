@@ -1,6 +1,6 @@
 /**
  * @file sx1262.h
- * @author Kent Hong
+ * @author Kent Hong, Alex Pulido
  * @brief SX1262 RF Transceiver Driver Interface
  */
 #pragma once
