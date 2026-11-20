@@ -41,6 +41,18 @@ bool Ms561101::get_temperature(float& temperature)
     return true;
 }
 
+bool Ms561101::read_all(float& pressure, float& temperature)
+{
+    if (!get_raw_data())
+    {
+        return false;
+    }
+
+    pressure = compensate_pressure();
+    temperature = compensate_temperature();
+    return true;
+}
+
 bool Ms561101::get_pressure(float& pressure)
 {
     if (!get_raw_data())

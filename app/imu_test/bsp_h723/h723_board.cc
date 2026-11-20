@@ -1,28 +1,12 @@
-#include <stdint.h>
+#include <cstdint>
 #include "board.h"
 #include "delay.h"
 #include "st_gpio.h"
 #include "st_i2c.h"
-#include "stm32h7xx_hal.h"  // for the hal_init
-// #include "st_sys_clock.h"
+#include "st_sysclk.h"
 
 namespace LBR
 {
-
-/* 
-* Functions that were supposed to be in st_sys_clock. REMOVE both IncDelayTicks()
-* and SysTick_Handler() when st_sys_clk finished.
-*
-* Also uncomment the #include "st_sys_clock.h"
-*
-* Also remove the #include "stm32h7xx_hal.h".
-*
-* Also remove the HAL_Init(); in the bsp_init() function.
-*
-* The DelayMs in the bsp_init() depends on g_ms_ticks getting updated using 
-* IncDelayTicks() which is called in the SysTick_Handler, a function in
-* the st_sys_clk which we don't have yet.
-*/
 
 extern "C" void IncDelayTicks(void);
 
@@ -31,8 +15,17 @@ extern "C" void SysTick_Handler(void)
     HAL_IncTick();    // for HAL
     IncDelayTicks();  // increments g_ms_ticks
 }
-// For 64 MHZ, got this val from STM32CubeMX. REMOVE when st_sys_clk finished
+
+static constexpr uint32_t kSysclkHz{64'000'000};
 static constexpr uint32_t kTimingR{0x20303E5D};
+
+// Clock config (Sysclk = 64 MHz HSI, AHB = 64 MHz, APB1..4 = 64 MHz)
+Stmh7::ClockParams clock_params{
+    Stmh7::Source::HSI64_MHZ,     kSysclkHz,
+    Stmh7::D1cprePrescaler::DIV1, Stmh7::AhbPrescaler::DIV1,
+    Stmh7::Apb1Prescaler::DIV1,   Stmh7::Apb2Prescaler::DIV1,
+    Stmh7::Apb3Prescaler::DIV1,   Stmh7::Apb4Prescaler::DIV1};
+Stmh7::HwClock clock{clock_params};
 
 // SCL pin config (PB8)
 Stmh7::StGpioSettings scl_settings{
@@ -67,25 +60,27 @@ Board board{.imu = imu};
 
 bool bsp_init()
 {
-    // Initialize system clock first; REMOVE when st_sys_clk finished
-    HAL_Init();
+    // Initialize system clock first
+    bool ret = clock.init();
 
     // Enable peripheral clocks
-    RCC->AHB4ENR |= RCC_AHB4ENR_GPIOBEN;
+    RCC->AHB4ENR |= RCC_AHB4ENR_GPIOAEN | RCC_AHB4ENR_GPIOBEN;
     RCC->APB1LENR |= RCC_APB1LENR_I2C1EN;
 
-    bool ret = true;
     ret = ret && sda.init();
     ret = ret && scl.init();
     ret = ret && i2c.init();
     ret = ret && rst.init();
+
     // BNO055 reset sequence
     ret = ret && rst.set(false);
     LBR::Utils::DelayMs(10);
     ret = ret && rst.set(true);
     LBR::Utils::DelayMs(650);
+
     // Initialize IMU
     imu.init();
+
     return ret;
 }
 
