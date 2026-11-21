@@ -1,37 +1,32 @@
 /**
- * @file flash_cmd.h
- * @author Aaron Oh
- * @brief The header for the blink command module
+ * @file w25q_cmd.h
+ * @brief CLI command for the W25Q flash chip
  */
 
 #pragma once
+
 #include <span>
 #include "cmd.h"
 
 namespace LBR
 {
 
-class Gpio;
+class W25q;
 
-namespace FlashCmd
+namespace W25qCmd
 {
-extern const Cmd flashCmd;
+
+extern const Cmd w25qCmd;
 
 /**
- * @brief Initializes the blink command with used gpio leds. Up to three for Stm32h7
- * @param led1 Pointer to led Gpio object 
- * @param led2 Pointer to led Gpio object 
- * @param led3 Pointer to led Gpio object 
+ * @brief Give the W25Q command its flash driver object.
  */
-void init(Gpio* led1, Gpio* led2, Gpio* led3);
+void init(W25q* flash);
 
 /**
- * @brief Outputs command usage and handles led toggle requests
- * @param args CmdArgs object with argument count and tokenized run arguments
- * @param txOut Output that we want to share in CLI, could be requested data or errors
+ * @brief Handle W25Q CLI arguments and write the result to txOut.
  */
-bool blink_cmd_handler(CmdArgs& args, std::span<uint8_t> txOut);
+bool w25q_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut);
 
-}  // namespace FlashCmd
-
+}  // namespace W25qCmd
 }  // namespace LBR
