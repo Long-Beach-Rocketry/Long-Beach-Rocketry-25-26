@@ -140,7 +140,6 @@ bool board_init()
         usart_addr->BRR = apb1_hz / kBaudRate;
         usart_addr->CR1 |= USART_CR1_TE | USART_CR1_RE;
 
-        // sysclk_test is TX-only; disable RX interrupts to avoid echo/noise IRQ spam.
         usart_addr->CR1 |= USART_CR1_RXNEIE_RXFNEIE;
         usart_addr->CR1 |= USART_CR1_UE;
     }
