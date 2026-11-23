@@ -4,14 +4,16 @@
  */
 
 #include "flash_cmd.h"
+#include <algorithm>
 #include <cstdio>
+#include <span>
 #include <string_view>
 #include "string_span.h"
 #include "w25q.h"
 
 namespace LBR
 {
-namespace W25qCmd
+namespace flashCmd
 {
 
 static W25q* flash{nullptr};
@@ -29,14 +31,13 @@ bool w25q_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
 
         if (operation == "-h" || operation == "--help")
         {
-            const std::span<const uint8_t> help = sv_to_span(w25qCmd.desc);
-            if (txOut.size() < help.size())
+            const std::span<const uint8_t> help = sv_to_span(flashCmd.desc);
+            if (txOut.size() >= help.size())
             {
-                return false;
+                std::copy(help.begin(), help.end(), txOut.begin());
             }
 
-            std::copy(help.begin(), help.end(), txOut.begin());
-            return true;
+            return txOut.size() >= help.size();
         }
         //reset w25q flash chip
         if (operation == "reset")
@@ -69,16 +70,16 @@ bool w25q_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
     return false;
 }
 
-const Cmd w25qCmd = {.name = "w25q",
-                     .desc =
-                         "Usage: w25q reset\r\n\n"
-                         "Reset the W25Q flash chip.\r\n"
-                         "Stored flash data is not erased.\r\n\n"
-                         "Options:\r\n"
-                         "\treset\t\tReset the W25Q device.\r\n"
-                         "\t-h, --help\tShow this message.\r\n",
-                     .invoke = w25q_cmd_handler,
-                     .repeatable = false};
+const Cmd flashCmd = {.name = "w25q",
+                      .desc =
+                          "Usage: w25q reset\r\n\n"
+                          "Reset the W25Q flash chip.\r\n"
+                          "Stored flash data is not erased.\r\n\n"
+                          "Options:\r\n"
+                          "\treset\t\tReset the W25Q device.\r\n"
+                          "\t-h, --help\tShow this message.\r\n",
+                      .invoke = w25q_cmd_handler,
+                      .repeatable = false};
 
-}  // namespace W25qCmd
+}  // namespace flashCmd
 }  // namespace LBR
