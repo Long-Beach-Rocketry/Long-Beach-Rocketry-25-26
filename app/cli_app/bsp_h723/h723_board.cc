@@ -7,7 +7,7 @@
 
 static constexpr uint32_t kSysclkHz{8'000'000};
 static constexpr uint32_t kBaudRate{115'200};
-static constexpr uint32_t kI2cTimingR{0x00303D5B};
+static constexpr uint32_t kI2cTimingR{0x20303E5D};
 
 namespace LBR
 {
@@ -26,7 +26,7 @@ namespace Stmh7
  * PE1 - Led
  */
 
-// Create Clock object (Sysclk = 65 MHz, HCLK = 32.5 MHz, PCLK1 = PCLK2 = PCLK3 = PCLK4 = 16.25 MHz)
+// HSE SYSCLK = 8 MHz, HCLK = 4 MHz, and APB clocks = 2 MHz.
 ClockParams clock_params{Source::HSE8_MHZ_BYPASS, kSysclkHz,
                          D1cprePrescaler::DIV1,   AhbPrescaler::DIV2,
                          Apb1Prescaler::DIV2,     Apb2Prescaler::DIV2,
@@ -82,9 +82,14 @@ Stmh7::HwGpio rst(rst_params);
 // Create BNO055 IMU object
 Bno055 imu(static_cast<LBR::I2c&>(i2c), Bno055::ADDR_PRIMARY);
 
-// Create Barometer object
+// Create Barometer object (bmp390)
 Bmp390Params baro_params{i2c, 0x76};
-Bmp390 baro{baro_params};
+Bmp390 bmp_baro{baro_params};
+
+// Create MS5611 object (ms5611)
+static constexpr uint8_t kMs5611Address{0x77};
+const Ms561101Params barometer_params{i2c, kMs5611Address};
+Ms561101 ms56_baro(barometer_params);
 
 }  // namespace Stmh7
 
@@ -97,11 +102,13 @@ Board board{.usart = Stmh7::usart,
             .led2 = Stmh7::ld2,
             .led3 = Stmh7::ld3,
             .bno055 = Stmh7::imu,
-            .bmp390 = Stmh7::baro,
+            .bmp390 = Stmh7::bmp_baro,
+            .ms5611 = Stmh7::ms56_baro,
             .cli = cli};
 
 bool board_init()
 {
+
     bool ret = true;
 
     // Enable peripheral clocks
@@ -136,11 +143,14 @@ bool board_init()
         usart_addr->CR1 |= USART_CR1_RXNEIE_RXFNEIE;
         usart_addr->CR1 |= USART_CR1_UE;
     }
+
     NVIC_EnableIRQ(USART3_IRQn);
 
     ret &= Stmh7::sda.init();
     ret &= Stmh7::scl.init();
 
+    // Keep I2C timing independent of the APB Uart clock
+    __HAL_RCC_I2C1_CONFIG(RCC_I2C1CLKSOURCE_HSI);
     ret &= Stmh7::i2c.init();
 
     ret &= Stmh7::rst.init();
@@ -150,7 +160,9 @@ bool board_init()
     Utils::DelayMs(650);
     Stmh7::imu.init();
 
-    ret &= Stmh7::baro.init();
+    ret &= Stmh7::bmp_baro.init();
+    ret &= Stmh7::ms56_baro.init();
+
     ret &= cli.init();
 
     return ret;

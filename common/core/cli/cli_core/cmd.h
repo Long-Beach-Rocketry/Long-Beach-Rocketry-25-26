@@ -11,7 +11,7 @@
 
 namespace LBR
 {
-constexpr uint16_t kMaxInputLen{320};
+constexpr uint16_t kMaxInputLen{360};
 constexpr std::string_view kCmdErrorNotFound = "ERROR: Command not found\r\n\n";
 constexpr std::string_view kCmdErrorArgs = "ERROR: Invalid arguments\r\n\n";
 constexpr std::string_view kCmdSuccess =
