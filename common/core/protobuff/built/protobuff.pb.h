@@ -115,20 +115,40 @@ extern "C"
 #define StatusData_airbrake_status_ENUMTYPE AirbrakeStatus
 
 /* Initializer values for message structs */
-#define StatusData_init_default \
-    {_FswStatus_MIN, _RocketState_MIN, _AirbrakeStatus_MIN}
-#define IMUData_init_default {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-#define BaroData_init_default {0, 0, 0}
-#define RocketMessage_init_default                                \
-    {false, StatusData_init_default, false, IMUData_init_default, \
-     false, BaroData_init_default,   0}
-#define StatusData_init_zero \
-    {_FswStatus_MIN, _RocketState_MIN, _AirbrakeStatus_MIN}
-#define IMUData_init_zero {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-#define BaroData_init_zero {0, 0, 0}
-#define RocketMessage_init_zero                             \
-    {false, StatusData_init_zero, false, IMUData_init_zero, \
-     false, BaroData_init_zero,   0}
+#define StatusData_init_default                               \
+    {                                                         \
+        _FswStatus_MIN, _RocketState_MIN, _AirbrakeStatus_MIN \
+    }
+#define IMUData_init_default                           \
+    {                                                  \
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 \
+    }
+#define BaroData_init_default \
+    {                         \
+        0, 0, 0               \
+    }
+#define RocketMessage_init_default                                          \
+    {                                                                       \
+        false, StatusData_init_default, false, IMUData_init_default, false, \
+            BaroData_init_default, 0                                        \
+    }
+#define StatusData_init_zero                                  \
+    {                                                         \
+        _FswStatus_MIN, _RocketState_MIN, _AirbrakeStatus_MIN \
+    }
+#define IMUData_init_zero                              \
+    {                                                  \
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 \
+    }
+#define BaroData_init_zero \
+    {                      \
+        0, 0, 0            \
+    }
+#define RocketMessage_init_zero                                       \
+    {                                                                 \
+        false, StatusData_init_zero, false, IMUData_init_zero, false, \
+            BaroData_init_zero, 0                                     \
+    }
 
 /* Field tags (for use in manual encoding/decoding) */
 #define StatusData_fsw_status_tag 1
