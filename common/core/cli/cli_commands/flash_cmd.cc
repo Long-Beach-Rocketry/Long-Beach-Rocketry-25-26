@@ -1,5 +1,5 @@
 /**
- * @file w25q_cmd.cc
+ * @file flash_cmd.cc
  * @brief Implementation of the W25Q reset command
  */
 
