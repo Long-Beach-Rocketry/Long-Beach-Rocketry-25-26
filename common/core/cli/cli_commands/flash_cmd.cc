@@ -13,7 +13,7 @@
 
 namespace LBR
 {
-namespace flashCmd
+namespace FlashCmd
 {
 
 static W25q* flash{nullptr};
@@ -23,7 +23,7 @@ void init(W25q* flash_)
     flash = flash_;
 }
 
-bool w25q_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
+bool flash_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
 {
     if (args.argc == 1)
     {
@@ -70,7 +70,7 @@ bool w25q_cmd_handler(const CmdArgs& args, std::span<uint8_t> txOut)
     return false;
 }
 
-const Cmd flashCmd = {.name = "w25q",
+const Cmd FlashCmd = {.name = "w25q",
                       .desc =
                           "Usage: w25q reset\r\n\n"
                           "Reset the W25Q flash chip.\r\n"
@@ -78,8 +78,8 @@ const Cmd flashCmd = {.name = "w25q",
                           "Options:\r\n"
                           "\treset\t\tReset the W25Q device.\r\n"
                           "\t-h, --help\tShow this message.\r\n",
-                      .invoke = w25q_cmd_handler,
+                      .invoke = flash_cmd_handler,
                       .repeatable = false};
 
-}  // namespace flashCmd
+}  // namespace FlashCmd
 }  // namespace LBR
